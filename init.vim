@@ -1,0 +1,1 @@
+/Users/jory/.config/nvim/init.vim
