@@ -1,127 +1,122 @@
-# iTerm2 and Zsh Command Cheat Sheet
+# iTerm2 & Zsh Command Cheat Sheet for Workhelix Full-Stack Engineers
 
 ## iTerm2 Commands
 
-*   `Cmd + T`: New tab
-*   `Cmd + W`: Close tab
-*   `Cmd + [`/`]`: Previous/next tab
-*   `Cmd + D`: Split vertically
-*   `Cmd + Shift + D`: Split horizontally
-*   `Cmd + Opt + Arrow`: Move between split panes
-*   `Cmd + F`: Search
-*   `Cmd + Shift + F`: Search across all open sessions
+*   **Navigation:**
+    *   `Cmd + T`: New tab
+    *   `Cmd + W`: Close tab
+    *   `Cmd + [`/`]`: Previous/next tab
+    *   `Cmd + D`: Split vertically
+    *   `Cmd + Shift + D`: Split horizontally
+    *   `Cmd + Opt + Arrow`: Move between split panes
 
-## Zsh Aliases and Functions
+*   **Search & Efficiency:**
+    *   `Cmd + F`: Search
+    *   `Cmd + Shift + F`: Search across all open sessions
 
-*   `mkcd`: Create a new directory and move into it
-*   `alias g='git'`: Shorter alias for Git
-*   `alias gaa='git add --all && git commit'`: Quickly add and commit everything
-*   `path`: Display the current PATH variable's value
-*   `alias ga='git add'`: Shorter alias for adding files to Git
-*   `alias gl="git pull --rebase"`: Pull with rebase
-*   `alias gd="git diff"`: View changes between working tree and index or between commits
-*   `alias gc="git commit -m"`: Commit with a message in one command
-*   `alias gco="git checkout"`: Checkout a different branch
-*   `alias gcb="git checkout -b"`: Create and checkout a new branch
-*   `alias gp="git push"`: Push current changes to remote
-*   `alias gs="git status"`: View the status of the working tree
-*   `alias gf="git fetch"`: Fetch changes from remote
-*   `alias gpsup="git push --set-upstream origin $(current_branch)"`: Set upstream for the current branch
-*   `alias gcl="git clone"`: Clone a repository
-*   `alias gpom="git pull origin master"`: Pull changes from the master branch of the origin remote
-*   `alias gst="git stash"`: Stash changes
-*   `alias gsta="git stash apply"`: Apply stashed changes
+## Zsh Aliases and Functions (From .zshrc)
 
-### Additional Useful Commands
+### Git
 
-*   `stree .`: Open SourceTree for the current directory
-*   `zed .`: Open Zed editor for the current directory
-*   `code .`: Open Visual Studio Code for the current directory
-*   `v .` or `nvim .`: Open Neovim for the current directory
-*   `cot [filename]`: Open file in CotEditor
+*   `g`: Short for `git`
+*   `ga`: `git add`
+*   `gaa`: `git add --all`
+*   `gs`: `git status`
+*   `gc`: `git commit -v` (verbose commit)
+*   `gco`: `git checkout`
+*   `gb`: `git branch`
+*   `gd`: `git diff`
+*   `gf`: `git fetch`
+*   `gp`: `git push`
+*   `gl`: `git pull`
+*   `glog`: `git log --oneline --decorate --graph` (visual log)
 
-### Directory Navigation
+### Python Development
 
-*   `z [directory]`: Auto jump to a frequently used directory
-*   `take [directory]`: Create a new directory and change to it
+*   `py`: `python3`
+*   `pip`: `pip3`
+*   `venv`: Create a virtual environment
+*   `activate`: Activate the virtual environment (replace `venv` with your actual environment name)
 
-### Command History
+### Node.js Development
 
-*   `Ctrl + R`: Search through command history interactively
+*   `npms`: `npm start`
+*   `npmt`: `npm test`
+*   `npmr`: `npm run`
+*   `npmi`: `npm install`
+*   `npmu`: `npm update`
 
-### System Monitoring
+### Docker
 
-*   `htop`: Interactive process viewer and system monitor
-*   `lsof -i :[port]`: List processes using a specific port
-    *   Example: `lsof -i :8080`
+*   `d`: Short for `docker`
+*   `dc`: `docker-compose`
+*   `dps`: `docker ps` (list containers)
+*   `dimages`: `docker images`
 
-### Clipboard Operations
+### Utility
 
-*   **Copy file contents to clipboard:**
-    ```bash
-    pbcopy < filename.txt
-    ```
-*   **Copy command output to clipboard:**
-    ```bash
-    command | pbcopy
-    ```
+*   `dud`: Disk usage of directories (`du -d 1 -h`)
+*   `duf`: Disk usage of files (`du -sh *`)
+*   `fd`: Find directories (uses `fd` if installed, otherwise `find`)
+*   `ff`: Find files (uses `fd` if installed, otherwise `find`)
+*   `mkcd [name]`: Create directory and `cd` into it
+*   `backup [file]`: Backs up a file (e.g., `backup app.py`)
+*   `extract [archive]`: Extract archives (.zip, .tar.gz, etc.)
 
-## Plugin Commands
+### Environment Management
 
-### z (directory jumping)
+*   `use_system_python`: Switch to the system's default Python installation
+*   `use_pyenv`: Activate pyenv for managing Python versions 
 
-*   Jump to a directory: `z directory_name`
-*   Show directory rankings: `z -r`
-*   List only directories that match: `z -l directory_name`
+### Claude CLI (for Workhelix-Specific Tasks)
 
-### fzf (fuzzy finder)
+*   `claude [query]`: Ask Claude a question using the default context
+*   `claude_project [project_name]`: Set context, index, and summarize a project
+*   `claude_save [name]`: Save Claude's response
+*   `swc`: Set work context (alias for `set_work_context`)
+*   `ccc`: Clear Claude context (alias for `clear_claude_context`)
+*   `cw [query]`: Ask Claude using work context
 
-*   Fuzzy file search: `Ctrl + T`
-*   Fuzzy command history search: `Ctrl + R`
-*   Fuzzy directory jumping: `Alt + C`
+## Additional Useful Commands
 
-### oh-my-zsh
+*   `htop`: Monitor system resources and processes
+*   `lsof -i :[port]`: Check which process is using a port (e.g., `lsof -i :8000`)
 
-*   `take [directory]`: Create a new directory and change to it
+*   **Copy file contents to clipboard:** `pbcopy < filename.txt`
+*   **Copy command output to clipboard:** `command | pbcopy`
 
-## Custom Functions from .zshrc
 
-### Claude CLI Functions
 
-*   `claude_project [project_name]`: Set context, index documents, and query Claude for project analysis
-*   `claude_save [response_name]`: Save Claude's last response
-*   `set_work_context` (alias `swc`): Set work context for Claude CLI
-*   `clear_claude_context` (alias `ccc`): Clear all contexts for Claude CLI
-*   `ask_claude_work` (alias `cw`): Quickly query Claude with work context
+## Workflow Examples (Tailored for Your Workhelix Context)
 
-### Utility Functions
+### FastAPI Backend Development
 
-*   `mkcd [directory]`: Create a directory and change into it
-*   `path`: Print PATH in a readable format
-*   `backup [file]`: Create a backup of a file
-*   `extract [archive]`: Extract various archive formats
-*   `search_and_edit` (alias `se`): Search for a file and open it in the default editor
+1.  **Navigate to your project:** `z my_fastapi_project`
+2.  **Activate virtual environment:** `activate` (assuming your environment is named "venv")
+3.  **Start development server:** `uvicorn main:app --reload` 
+4.  **Open another tab (iTerm2):** `Cmd + T`
+5.  **Run tests:** `pytest` 
+6.  **Switch between tabs:** `Cmd + [` or `Cmd + ]`
 
-## Environment Management
+### React Frontend Development
 
-*   `use_system_python`: Switch to system Python
-*   `use_pyenv`: Switch to Pyenv-managed Python
-*   `activate_claude`: Activate Claude environment
-*   `deactivate_claude`: Deactivate Claude environment
+1.  **Navigate to your project:** `z my_react_project`
+2.  **Start development server:** `npm start`
+3.  **Open another tab (iTerm2):** `Cmd + T`
+4.  **Run tests:** `npm test` or `jest`
+5.  **Switch between tabs:** `Cmd + [` or `Cmd + ]` 
+6.  **Install a new package:** `npmi package-name`
 
-## Additional Aliases
+### Cloud Operations (AWS)
 
-*   `update_all`: Comprehensive system update
-*   `weather`: Show weather information
-*   `cheat`: Access cheat sheets
-*   `speedtest`: Run a speed test
-*   `pubip`: Show public IP address
-*   `localip`: Show local IP address
+1.  **Check running containers:** `dps`
+2.  **SSH into an EC2 instance:** `ssh -i my_key.pem ec2-user@public_ip`
+3.  **Query RDS instance status:** `aws rds describe-db-instances`
+4.  **Log into AWS console:** `aws sso login` (if using AWS SSO)
 
-## Tips and Tricks
+## Tips & Tricks
 
-1.  Use `Ctrl + R` for reverse history search.
-2.  Leverage `z` for quick directory navigation.
-3.  Utilize `fzf` for fuzzy finding files and commands.
-4.  Use `extract` function for easy archive extraction.
-5.  Employ `search_and_edit` (alias `se`) to quickly find and edit files.
+*   **fzf:** Use `fzf` (`Ctrl+T`) for lightning-fast file searches within projects.
+*   **`z`:** Use the `z` command to quickly jump to frequented directories.
+*   **`se`:** Search for a file by name and open it for editing (`se filename`).
+*   **`cw`:** If you are working on the Workhelix project, quickly query Claude in your work context.
