@@ -19,6 +19,10 @@ set cmdheight=2
 set updatetime=300
 set shortmess+=c
 set signcolumn=yes
+set termguicolors
+
+" Explicitly set terminal emulator to iTerm2
+let g:terminal_emulator = 'iterm2'
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
@@ -53,11 +57,19 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'sheerun/vim-polyglot'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
+Plug 'hkupty/iron.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'lewis6991/gitsigns.nvim'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'folke/which-key.nvim'
+Plug 'akinsho/toggleterm.nvim'
+Plug 'lukas-reineke/indent-blankline.nvim'
 
 call plug#end()
 
-" Plugin settings
-let g:EasyMotion_do_mapping = 0 " Disable default mappings
+" Plugin configurations
 
 " Dracula theme
 colorscheme dracula
@@ -66,7 +78,139 @@ colorscheme dracula
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 
+" NERDTree configuration
+let NERDTreeShowHidden=1
+nnoremap <C-n> :NERDTreeToggle<CR>
+nnoremap <C-w>w :call NERDTreeFocus()<CR>
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
+autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+
+" GitGutter configuration
+let g:gitgutter_enabled = 1
+let g:gitgutter_sign_added = '+'
+let g:gitgutter_sign_modified = '~'
+let g:gitgutter_sign_removed = '_'
+
+" Lua configurations
+lua << EOF
+-- Iron.nvim configuration
+local iron = require("iron.core")
+
+iron.setup {
+  config = {
+    scratch_repl = true,
+    repl_definition = {
+      python = {
+        command = {"python"}
+      }
+    },
+    repl_open_cmd = 'vertical botright 80 split',
+  },
+  keymaps = {
+    send_line = "<leader>sl",
+    visual_send = "<leader>sc",
+    send_file = "<leader>sf",
+    send_until_cursor = "<leader>su",
+    send_mark = "<leader>sm",
+    mark_motion = "<leader>mc",
+    mark_visual = "<leader>mc",
+    remove_mark = "<leader>md",
+    cr = "<leader>s<cr>",
+    interrupt = "<leader>s<space>",
+    exit = "<leader>sq",
+    clear = "<leader>cl",
+  },
+}
+
+-- ToggleTerm configuration
+require("toggleterm").setup{
+  size = 20,
+  open_mapping = [[<c-\>]],
+  hide_numbers = true,
+  shade_filetypes = {},
+  shade_terminals = true,
+  shading_factor = 2,
+  start_in_insert = true,
+  insert_mappings = true,
+  persist_size = true,
+  direction = 'float',
+  close_on_exit = true,
+  shell = vim.o.shell,
+  float_opts = {
+    border = 'curved',
+    winblend = 0,
+    highlights = {
+      border = "Normal",
+      background = "Normal",
+    }
+  }
+}
+
+-- Telescope configuration
+local telescope = require('telescope')
+local actions = require('telescope.actions')
+
+telescope.setup({
+  defaults = {
+    mappings = {
+      i = {
+        ["<C-j>"] = actions.move_selection_next,
+        ["<C-k>"] = actions.move_selection_previous,
+      },
+    },
+    file_ignore_patterns = {"node_modules", ".git"},
+  },
+  pickers = {
+    find_files = {
+      find_command = {"fd", "--type", "f", "--hidden", "--exclude", ".git"},
+    },
+    live_grep = {
+      additional_args = function(opts)
+        return {"--hidden"}
+      end
+    }
+  },
+})
+
+-- Gitsigns configuration
+require('gitsigns').setup()
+
+-- Treesitter configuration
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = { "c", "lua", "python", "javascript", "html", "css" },
+  sync_install = false,
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = false,
+  },
+  indent = {
+    enable = true,
+  },
+}
+
+-- Which-key configuration
+require("which-key").setup {}
+
+-- Indent-blankline configuration
+require("ibl").setup {
+  indent = {
+    char = "│",
+    tab_char = "│",
+  },
+  scope = {
+    enabled = true,
+  },
+  exclude = {
+    filetypes = { "dashboard", "NvimTree", "packer", "lsp-installer" },
+    buftypes = { "terminal" },
+  },
+}
+EOF
+
 " Key mappings
+
 " Commentary
 noremap <leader>/ :Commentary<CR>
 
@@ -76,9 +220,6 @@ nnoremap <leader>ms :MarkdownPreviewStop<CR>
 
 " EasyMotion
 map <leader>w <Plug>(easymotion-bd-w)
-
-" NERDTree
-nnoremap <C-n> :NERDTreeToggle<CR>
 
 " FZF
 nnoremap <leader>ff :Files<CR>
@@ -149,19 +290,17 @@ nnoremap <leader>hp :GitGutterPreviewHunk<CR>
 nnoremap <leader>hs :GitGutterStageHunk<CR>
 nnoremap <leader>hu :GitGutterUndoHunk<CR>
 
-" NERDTree configuration
-let NERDTreeShowHidden=1
-nnoremap <C-w>w :call NERDTreeFocus()<CR>
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+" Run Python script (using terminal emulator)
+nnoremap <F5> :w<CR>:split<CR>:execute "terminal " . g:terminal_emulator . " python %"<CR>
 
-" GitGutter configuration
-let g:gitgutter_enabled = 1
-let g:gitgutter_sign_added = '+'
-let g:gitgutter_sign_modified = '~'
-let g:gitgutter_sign_removed = '_'
+" Open Python REPL in ToggleTerm
+nnoremap <leader>ro :ToggleTerm<CR>:IronRepl<CR>
+
+" Telescope mappings
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
 " CoC configuration
 inoremap <silent><expr> <TAB>

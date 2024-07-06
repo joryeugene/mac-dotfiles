@@ -1,101 +1,126 @@
 # Zsh Configuration
 
-This README documents the custom configurations, aliases, and functions in the .zshrc file.
+This README documents the custom configurations, aliases, and functions in the `.zshrc` file, along with installation steps and common workflow examples.
+
+## Installation
+
+1. **Install Zsh:**
+   ```bash
+   sudo apt install zsh
+   ```
+
+2. **Set Zsh as your default shell:**
+   ```bash
+   chsh -s $(which zsh)
+   ```
+
+3. **Install Oh My Zsh:**
+   ```bash
+   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+   ```
+
+4. **Install Powerlevel10k theme:**
+   ```bash
+   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+   ```
+
+5. **Install plugins:**
+   ```bash
+   git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+   ```
+
+6. **Update your `.zshrc`:**
+   ```bash
+   ZSH_THEME="powerlevel10k/powerlevel10k"
+   plugins=(git zsh-autosuggestions zsh-syntax-highlighting z vi-mode fzf history-substring-search colored-man-pages docker kubectl pyenv npm command-not-found web-search extract)
+   ```
+
+7. **Install additional tools:**
+   ```bash
+   brew install fzf ripgrep fd
+   ```
+
+8. **Configure Powerlevel10k:**
+   ```bash
+   p10k configure
+   ```
 
 ## Oh My Zsh Configuration
 
-- Theme: Powerlevel10k
-- Plugins: git, zsh-autosuggestions, zsh-syntax-highlighting, z, vi-mode, fzf, history-substring-search, colored-man-pages, docker, kubectl, pyenv, npm, command-not-found, web-search, extract
+- **Theme:** Powerlevel10k
+- **Plugins:** git, zsh-autosuggestions, zsh-syntax-highlighting, z, vi-mode, fzf, history-substring-search, colored-man-pages, docker, kubectl, pyenv, npm, command-not-found, web-search, extract
 
 ## Key Bindings
 
 - Vi mode enabled
 - `ctrl-e`: Edit command line in vim
-- `^[[A` / `^[[B`: Up/down in history search
+- `^[[A` / `^[[B`: Up/down in history search (default)
 - `vicmd 'k'` / `vicmd 'j'`: Up/down in history search (vi mode)
 
-## Aliases
+## Aliases and Functions
 
-### System and Navigation
+_**(Include your existing aliases and functions section here)** _
 
-- `zshconfig`: Edit .zshrc
-- `ohmyzsh`: Edit Oh My Zsh configuration
-- `nvimconfig`: Edit Neovim configuration
-- `sourcezsh`: Reload .zshrc
-- `update`: Update Homebrew, npm, and Oh My Zsh
-- `c`: Clear terminal
-- `..`, `...`, `....`, `.....`: Navigate up directories
-- `~`: Go to home directory
-- `-`: Go to previous directory
+## Common Workflow Examples
 
-### List Directory Contents
+1. **Navigate and search directories:**
+   ```bash
+   z project_dir
+   fd -t d node_modules
+   ```
 
-- `ls`, `ll`, `la`, `l`: Various options for listing directory contents
+2. **Find and edit files:**
+   ```bash
+   se config
+   vim $(fzf)
+   ```
 
-### Git
+3. **Git workflow:**
+   ```bash
+   gs
+   gaa
+   gc -m "Update feature"
+   gp
+   ```
 
-- `g`: git
-- `ga`: git add
-- `gaa`: git add --all
-- `gs`: git status
-- `gc`: git commit -v
-- `gco`: git checkout
-- `gb`: git branch
-- `gd`: git diff
-- `gf`: git fetch
-- `gp`: git push
-- `gl`: git pull
-- `glog`: git log with graph
+4. **Python development:**
+   ```bash
+   venv
+   activate
+   py script.py
+   ```
 
-### Vim/Neovim
+5. **Node.js development:**
+   ```bash
+   npmi express
+   npms
+   ```
 
-- `vim`, `vi`, `v`: Open Neovim
+6. **Docker operations:**
+   ```bash
+   dps
+   d exec -it container_name bash
+   ```
 
-### Docker
+7. **System updates:**
+   ```bash
+   update_all
+   ```
 
-- `d`: docker
-- `dc`: docker-compose
-- `dps`: docker ps
-- `dimages`: docker images
+8. **Quick file operations:**
+   ```bash
+   mkcd new_project
+   backup important_file.txt
+   extract archive.tar.gz
+   ```
 
-### Python
-
-- `py`: python3
-- `pip`: pip3
-- `venv`: Create virtual environment
-- `activate`: Activate virtual environment
-
-### Node.js
-
-- `npms`: npm start
-- `npmt`: npm test
-- `npmr`: npm run
-- `npmi`: npm install
-- `npmu`: npm update
-
-### Utility
-
-- `dud`: Du with depth 1
-- `duf`: Du summary
-- `fd`: Find directories
-- `ff`: Find files
-
-## Custom Functions
-
-- `mkcd`: Make directory and change into it
-- `path`: Pretty print PATH
-- `extract`: Extract various archive formats
-- `backup`: Create a backup of a file
-- `search_and_edit`: Search for a file and open it in the default editor
-
-## Claude CLI Functions
-
-- `claude_project`: Set context, index documents, and query Claude for project analysis
-- `claude_clear_index`: Clear the indexed documents
-- `claude_query`: Query Claude with context
-- `claude_stream`: Start a streaming session with Claude
-- `claude_save`: Save Claude's last response
-- `claude_role`: Set a role for Claude
+9. **Use Claude CLI:**
+   ```bash
+   claude_project my_project
+   claude_query "Explain the main features of this project"
+   claude_save "project_summary"
+   ```
 
 ## Environment Variables
 
@@ -113,3 +138,4 @@ The configuration loads environment variables from a `.env` file in the home dir
 
 - Ensure that all required tools (Oh My Zsh, Powerlevel10k, etc.) are installed.
 - Some configurations may need to be adjusted based on your specific setup and preferences.
+- For more detailed information on each plugin or tool, refer to their respective documentation.

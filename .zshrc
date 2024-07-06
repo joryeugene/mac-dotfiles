@@ -8,20 +8,19 @@ export ZSH="$HOME/.oh-my-zsh"
 
 # Set theme to Powerlevel10k
 ZSH_THEME="powerlevel10k/powerlevel10k"
-
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 
 # Set plugins
 plugins=(
-    git zsh-autosuggestions zsh-syntax-highlighting z vi-mode fzf
-    history-substring-search colored-man-pages docker kubectl pyenv npm
-    command-not-found web-search extract
+  git zsh-autosuggestions zsh-syntax-highlighting z vi-mode fzf
+  history-substring-search colored-man-pages docker kubectl pyenv npm
+  command-not-found web-search extract
 )
 
 # Oh My Zsh configuration
 CASE_SENSITIVE="false"
 HYPHEN_INSENSITIVE="true"
-DISABLE_AUTO_UPDATE="false"
+DISABLE_AUTO_UPDATE="true"
 DISABLE_UPDATE_PROMPT="false"
 export UPDATE_ZSH_DAYS=13
 ENABLE_CORRECTION="true"
@@ -171,8 +170,11 @@ function path(){
 
 # NVM configuration
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+nvm() {
+  unset -f nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  nvm "$@"
+}
 
 # Colorize man pages
 export LESS_TERMCAP_mb=$'\e[1;32m'
@@ -201,46 +203,56 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=cyan'
 # Custom oh-my-zsh title
 DISABLE_AUTO_TITLE="true"
 function _set_terminal_title() {
-    echo -ne "\033]0;${PWD##*/}\007"
+  echo -ne "\033]0;${PWD##*/}\007"
 }
 precmd_functions+=(_set_terminal_title)
 
 # Load environment variables and API keys
 if [ -f "$HOME/.env" ]; then
-    set -a
-    source "$HOME/.env"
-    set +a
+  set -a
+  source "$HOME/.env"
+  set +a
 fi
 
 # Claude CLI functions
+alias claude='$HOME/claude_env/bin/python3 $HOME/scripts/claude_cli.py'
+
 function claude_project() {
-    local project_name=$1
-    local context_path="$HOME/projects/$project_name/docs"
-    local claude_cli="$HOME/scripts/claude_cli.py"
-    
-    python3 "$claude_cli" --set-context-path "$context_path" && \
-    python3 "$claude_cli" --index && \
-    python3 "$claude_cli" "Analyze the documents in the context path and summarize the main features of the project they describe. Focus on providing a concise overview highlighting key aspects."
-}
-
-function claude_clear_index() {
-    $HOME/claude_env/bin/python3 $HOME/scripts/claude_cli.py --clear-index
-}
-
-function claude_query() {
-    $HOME/claude_env/bin/python3 $HOME/scripts/claude_cli.py "$1"
-}
-
-function claude_stream() {
-    $HOME/claude_env/bin/python3 $HOME/scripts/claude_cli.py --stream "$1"
+  local project_name=$1
+  local context_path="$HOME/projects/$project_name/docs"
+  local claude_cli="$HOME/scripts/claude_cli.py"
+  python3 "$claude_cli" --set-context-path "$context_path" && \
+  python3 "$claude_cli" --index && \
+  python3 "$claude_cli" "Analyze the documents in the context path and summarize the main features of the project they describe. Focus on providing a concise overview highlighting key aspects."
 }
 
 function claude_save() {
-    $HOME/claude_env/bin/python3 $HOME/scripts/claude_cli.py --save "$1"
+  $HOME/claude_env/bin/python3 $HOME/scripts/claude_cli.py --save "$1"
 }
 
-alias claude='$HOME/claude_env/bin/python3 $HOME/scripts/claude_cli.py'
-alias claude_roles='$HOME/claude_env/bin/python3 $HOME/scripts/claude_cli.py --list-roles'
+# Function to set work context for Claude CLI
+function set_work_context() {
+  claude --set-context-path "$HOME/projects/work-context/docs"
+  claude --index
+  echo "Work context set and indexed for Claude CLI"
+}
+
+# Function to clear all contexts for Claude CLI
+function clear_claude_context() {
+  claude --clear-index
+  echo "All contexts cleared for Claude CLI"
+}
+
+# Function to quickly query Claude with work context
+function ask_claude_work() {
+  set_work_context
+  claude "$@"
+}
+
+# Aliases for quick access
+alias swc='set_work_context'
+alias ccc='clear_claude_context'
+alias cw='ask_claude_work'
 alias activate_claude='source $HOME/claude_env/bin/activate'
 alias deactivate_claude='deactivate'
 
@@ -258,43 +270,46 @@ alias localip="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo
 
 # Function to create a backup of a file
 function backup() {
-    cp "$1" "$1.bak"
-    echo "Backup created: $1.bak"
+  cp "$1" "$1.bak"
+  echo "Backup created: $1.bak"
 }
 
 # Function to extract various archive formats
 function extract() {
-    if [ -f $1 ] ; then
-        case $1 in
-            *.tar.bz2)   tar xjf $1     ;;
-            *.tar.gz)    tar xzf $1     ;;
-            *.bz2)       bunzip2 $1     ;;
-            *.rar)       unrar e $1     ;;
-            *.gz)        gunzip $1      ;;
-            *.tar)       tar xf $1      ;;
-            *.tbz2)      tar xjf $1     ;;
-            *.tgz)       tar xzf $1     ;;
-            *.zip)       unzip $1       ;;
-            *.Z)         uncompress $1  ;;
-            *.7z)        7z x $1        ;;
-            *)     echo "'$1' cannot be extracted via extract()" ;;
-        esac
-    else
-        echo "'$1' is not a valid file"
-    fi
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2) tar xjf $1 ;;
+      *.tar.gz) tar xzf $1 ;;
+      *.bz2) bunzip2 $1 ;;
+      *.rar) unrar e $1 ;;
+      *.gz) gunzip $1 ;;
+      *.tar) tar xf $1 ;;
+      *.tbz2) tar xjf $1 ;;
+      *.tgz) tar xzf $1 ;;
+      *.zip) unzip $1 ;;
+      *.Z) uncompress $1 ;;
+      *.7z) 7z x $1 ;;
+      *) echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
 }
 
 # Function to search for a file and open it with the default editor
 function search_and_edit() {
-    local file=$(find . -type f -name "*$1*" | fzf)
-    if [[ -n $file ]]; then
-        $EDITOR "$file"
-    else
-        echo "No file found matching '$1'"
-    fi
+  local file=$(find . -type f -name "*$1*" | fzf)
+  if [[ -n $file ]]; then
+    $EDITOR "$file"
+  else
+    echo "No file found matching '$1'"
+  fi
 }
 alias se='search_and_edit'
 
 # Load any local customizations
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# Created by `pipx` on 2024-07-05 15:33:05
+export PATH="$PATH:/Users/jory/.local/bin"
 
