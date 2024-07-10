@@ -6,6 +6,8 @@ fi
 # Path to your oh-my-zsh installation
 export ZSH="$HOME/.oh-my-zsh"
 
+export PATH="/Applications/PyCharm.app/Contents/MacOS:$PATH"
+
 # Set theme to Powerlevel10k
 ZSH_THEME="powerlevel10k/powerlevel10k"
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
