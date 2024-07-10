@@ -315,3 +315,4 @@ alias se='search_and_edit'
 # Created by `pipx` on 2024-07-05 15:33:05
 export PATH="$PATH:/Users/jory/.local/bin"
 
+eval "$(direnv hook zsh)"
