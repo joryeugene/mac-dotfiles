@@ -153,6 +153,7 @@ nnoremap <leader>ms :MarkdownPreviewStop<CR>
 
 " EasyMotion
 map <leader>w <Plug>(easymotion-bd-w)
+map <leader>e <Plug>(easymotion-s)
 
 " Telescope mappings
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
@@ -166,8 +167,8 @@ nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
 nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
 nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
 nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
-nnoremap <silent> <C-n> <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
-nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+nnoremap <silent> <C-n> <cmd>lua vim.diagnostic.goto_prev()<CR>
+nnoremap <silent> <C-p> <cmd>lua vim.diagnostic.goto_next()<CR>
 
 " NvimTree
 nnoremap <leader>n :NvimTreeToggle<CR>
@@ -193,9 +194,9 @@ nnoremap <leader>wj <C-W>j
 nnoremap <leader>wk <C-W>k
 nnoremap <leader>wl <C-W>l
 
-" Split creation
-nnoremap <leader>vs :vsplit<CR>
-nnoremap <leader>ns :split<CR>
+" Split creation (updated to match PyCharm IdeaVim)
+nnoremap <leader>sv :vsplit<CR>
+nnoremap <leader>sh :split<CR>
 
 " Buffer navigation
 nnoremap <leader>q :bdelete<CR>
@@ -225,3 +226,115 @@ tnoremap <C-h> <C-\><C-N><C-w>h
 tnoremap <C-j> <C-\><C-N><C-w>j
 tnoremap <C-k> <C-\><C-N><C-w>k
 tnoremap <C-l> <C-\><C-N><C-w>l
+
+" New mappings to align with PyCharm IdeaVim
+" Search everywhere (similar to PyCharm's SearchEverywhere)
+nnoremap <leader>se <cmd>Telescope<cr>
+
+" Find action (similar to PyCharm's GotoAction)
+nnoremap <leader>a <cmd>Telescope commands<cr>
+
+" Recent files (similar to PyCharm's RecentFiles)
+nnoremap <leader>r <cmd>Telescope oldfiles<cr>
+
+" Find in path (similar to PyCharm's FindInPath)
+nnoremap <leader>fp <cmd>Telescope live_grep<cr>
+
+" Toggle project view (similar to PyCharm's ActivateProjectToolWindow)
+nnoremap <leader>p :NvimTreeToggle<CR>
+
+" Refactoring menu (using Telescope for now, can be enhanced with a custom function)
+nnoremap <leader>rf <cmd>Telescope lsp_references<cr>
+
+" Show intention actions (using Telescope for code actions)
+nnoremap <leader>i <cmd>Telescope lsp_code_actions<cr>
+
+" Toggle breakpoint (requires a DAP setup, this is a placeholder)
+nnoremap <leader>b :echo "Breakpoint toggled"<CR>
+
+" Create new file (using Telescope)
+nnoremap <leader>nf <cmd>Telescope find_files<cr>
+
+" Create new directory (requires a custom function)
+nnoremap <leader>nd :lua require'telescope.builtin'.file_browser()<CR>
+
+" Reopen closed tab (buffer)
+nnoremap <leader>ro <C-^>
+
+" Toggle soft wrap
+nnoremap <leader>sw :set wrap!<CR>
+
+" Quick documentation (using LSP hover)
+nnoremap K <cmd>lua vim.lsp.buf.hover()<CR>
+
+" Quick implementation (using LSP implementation)
+nnoremap <leader>qi <cmd>lua vim.lsp.buf.implementation()<CR>
+
+" Show usages (using Telescope)
+nnoremap <leader>su <cmd>Telescope lsp_references<cr>
+
+" Optimize imports (requires LSP)
+nnoremap <leader>oi <cmd>lua vim.lsp.buf.execute_command({command = "_typescript.organizeImports", arguments = {vim.fn.expand("%:p")}})<CR>
+
+lua << EOF
+local nvim_lsp = require('lspconfig')
+
+-- Python
+nvim_lsp.pyright.setup{}
+
+-- JavaScript/TypeScript
+nvim_lsp.tsserver.setup{}
+
+-- Bash
+nvim_lsp.bashls.setup{}
+
+-- HTML
+nvim_lsp.html.setup{}
+
+-- CSS
+nvim_lsp.cssls.setup{}
+
+-- JSON
+nvim_lsp.jsonls.setup{}
+
+-- Markdown
+nvim_lsp.marksman.setup{}
+
+-- Global mappings.
+-- See `:help vim.diagnostic.*` for documentation on any of the below functions
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
+
+-- Use LspAttach autocommand to only map the following keys
+-- after the language server attaches to the current buffer
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+  callback = function(ev)
+    -- Enable completion triggered by <c-x><c-o>
+    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+
+    -- Buffer local mappings.
+    -- See `:help vim.lsp.*` for documentation on any of the below functions
+    local opts = { buffer = ev.buf }
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+    vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
+    vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
+    vim.keymap.set('n', '<space>wl', function()
+      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+    end, opts)
+    vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
+    vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
+    vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, opts)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+    vim.keymap.set('n', '<space>f', function()
+      vim.lsp.buf.format { async = true }
+    end, opts)
+  end,
+})
+EOF
