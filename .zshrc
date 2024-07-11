@@ -3,16 +3,17 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Path to your oh-my-zsh installation
+# Path to oh-my-zsh installation
 export ZSH="$HOME/.oh-my-zsh"
 
+# Add PyCharm to PATH
 export PATH="/Applications/PyCharm.app/Contents/MacOS:$PATH"
 
-# Set theme to Powerlevel10k
+# Theme
 ZSH_THEME="powerlevel10k/powerlevel10k"
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 
-# Set plugins
+# Plugins
 plugins=(
   git zsh-autosuggestions zsh-syntax-highlighting z vi-mode fzf
   history-substring-search colored-man-pages docker kubectl pyenv npm
@@ -166,7 +167,7 @@ function mkcd() {
   mkdir -p "$@" && cd "$_";
 }
 
-function path(){
+function path() {
   echo $PATH | tr ':' '\n' | nl
 }
 
@@ -307,6 +308,7 @@ function search_and_edit() {
     echo "No file found matching '$1'"
   fi
 }
+
 alias se='search_and_edit'
 
 # Load any local customizations
@@ -315,4 +317,6 @@ alias se='search_and_edit'
 # Created by `pipx` on 2024-07-05 15:33:05
 export PATH="$PATH:/Users/jory/.local/bin"
 
+# direnv hook
 eval "$(direnv hook zsh)"
+

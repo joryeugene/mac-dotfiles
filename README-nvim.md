@@ -4,22 +4,22 @@ This is a comprehensive Neovim configuration designed for efficient coding and t
 
 ## Features
 
-- Modern UI with Dracula theme and Airline status bar
-- File navigation with NERDTree and Telescope
-- Git integration with Fugitive and GitGutter
-- Code completion and linting with CoC (Conquer of Completion)
-- Markdown preview and editing enhancements
+- Modern UI with Dracula theme and lualine status bar
+- File navigation with nvim-tree and Telescope
+- Git integration with Fugitive and Gitsigns
+- Code completion and LSP support with built-in LSP and nvim-cmp
+- Markdown preview
 - Easy motion for quick navigation
-- REPL integration with Iron.nvim
-- Terminal integration
-- Text object manipulation with Surround
+- Terminal integration with toggleterm
+- Text object manipulation with vim-surround
+- Syntax highlighting with Treesitter
 - And much more!
 
 ## Prerequisites
 
 - Neovim (0.5 or later recommended)
 - Git
-- Node.js (for CoC and some Markdown plugins)
+- Node.js (for some LSP servers)
 - Python 3 (for some plugins)
 - A Nerd Font (for icons)
 - Ripgrep (for Telescope live grep)
@@ -56,6 +56,9 @@ This is a comprehensive Neovim configuration designed for efficient coding and t
    ```
 
 2. **Clone this repository**:
+   ```bash
+   git clone https://github.com/yourusername/neovim-config.git ~/.config/nvim
+   ```
 
 3. **Install vim-plug** (the plugin manager):
    ```bash
@@ -65,61 +68,101 @@ This is a comprehensive Neovim configuration designed for efficient coding and t
 
 4. **Open Neovim and run `:PlugInstall` to install the plugins**.
 
-5. **Install CoC extensions**:
-   ```bash
-   :CocInstall coc-json coc-tsserver coc-html coc-css coc-python
-   ```
+5. **Install language servers** for the languages you use (e.g., pyright for Python, tsserver for JavaScript/TypeScript).
 
 ## Key Mappings
 
 Here are some of the most important key mappings:
 
 - `<Space>` is the leader key
-- `<C-n>` Toggle NERDTree
+- `<leader>n` Toggle nvim-tree
 - `<leader>ff` Search files with Telescope
 - `<leader>fg` Live grep with Telescope
 - `<leader>/` Comment/uncomment lines
-- `gd` Go to definition (CoC)
-- `gr` Find references (CoC)
-- `<leader>rn` Rename symbol (CoC)
+- `gd` Go to definition (LSP)
+- `gr` Find references (LSP)
+- `K` Show documentation (LSP)
 - `<C-j/k/h/l>` Navigate between splits
 - `<leader>vs` Create vertical split
 - `<leader>ns` Create horizontal split
 - `<leader>w` EasyMotion word motion
-- `<leader>f{char}` EasyMotion find character
-- `<leader>sl` Send line to REPL (Iron.nvim)
-- `<leader>sc` Send selection to REPL (Iron.nvim)
-
-For a full list of mappings and commands, please refer to the `nvim-commands.md` file.
+- `<C-\>` Toggle terminal
 
 ## Workflow Examples
 
 ### Backend Development (Python, FastAPI, SQLModel)
 
-1. Open NERDTree: `<C-n>`
+1. Open nvim-tree: `<leader>n`
 2. Navigate to backend directory: `j`, `k`
-3. Open main FastAPI file: `o`
+3. Open main FastAPI file: `<CR>`
 4. Edit code: `i` to insert, `<Esc>` to exit insert mode
-5. Run server: `:terminal` and type `uvicorn main:app --reload`
-6. Switch back to editor: `<C-\><C-n>`, `<C-w>h`
-7. Navigate to test file: `<leader>ff`, type test file name, `<CR>`
-8. Run tests: `:terminal` and type `pytest`
+5. Open terminal: `<C-\>`
+6. Run server: Type `uvicorn main:app --reload`
+7. Switch back to editor: `<C-\>` (toggle terminal)
+8. Navigate to test file: `<leader>ff`, type test file name, `<CR>`
+9. Run tests: Open terminal `<C-\>` and type `pytest`
 
 ### Frontend Development (React or SvelteKit)
 
-1. Open NERDTree: `<C-n>`
+1. Open nvim-tree: `<leader>n`
 2. Navigate to frontend directory: `j`, `k`
-3. Open main component file: `o`
+3. Open main component file: `<CR>`
 4. Edit code: `i` to insert, `<Esc>` to exit insert mode
-5. Run development server: `:terminal` and type `npm start`
-6. Switch back to editor: `<C-\><C-n>`, `<C-w>h`
-7. Navigate to another component file: `<leader>ff`, type component file name, `<CR>`
-8. Edit and save changes: `i` to insert, `<Esc>` to exit insert mode, `:w`
+5. Open terminal: `<C-\>`
+6. Run development server: Type `npm start`
+7. Switch back to editor: `<C-\>` (toggle terminal)
+8. Navigate to another component file: `<leader>ff`, type component file name, `<CR>`
+9. Edit and save changes: `i` to insert, `<Esc>` to exit insert mode, `:w`
 
+## Plugin-Specific Commands
 
-## Customization
+### nvim-tree
 
-You can customize this configuration by editing the `init.vim` file. Feel free to add or remove plugins, change keybindings, or modify settings to suit your preferences.
+- `<leader>n` - Toggle nvim-tree
+- `<CR>` - Open file/directory
+- `a` - Create new file/directory
+- `r` - Rename file/directory
+- `d` - Delete file/directory
+- `c` - Copy file/directory
+- `x` - Cut file/directory
+- `p` - Paste file/directory
+
+### Telescope
+
+- `<leader>ff` - Find files
+- `<leader>fg` - Live grep
+- `<leader>fb` - Buffers
+- `<leader>fh` - Help tags
+
+### EasyMotion
+
+- `<leader>w` - Word motions
+- `<leader>f{char}` - Find character
+
+### Commentary
+
+- `gcc` - Comment/uncomment line
+- `gc` - Comment/uncomment selection (in visual mode)
+
+### Fugitive
+
+- `:Git` or `:G` - Git status
+- `:Git commit` - Git commit
+- `:Git push` - Git push
+- `:Git pull` - Git pull
+
+### LSP
+
+- `gd` - Go to definition
+- `gr` - Go to references
+- `gi` - Go to implementation
+- `K` - Show documentation
+- `<leader>rn` - Rename
+- `<leader>ca` - Code action
+
+### Toggleterm
+
+- `<C-\>` - Toggle terminal
 
 ## Troubleshooting
 
@@ -129,3 +172,4 @@ If you encounter any issues:
 2. Run `:checkhealth` in Neovim for diagnostics
 3. Ensure all plugins are up to date with `:PlugUpdate`
 4. Check the Neovim and plugin documentation for any recent changes
+

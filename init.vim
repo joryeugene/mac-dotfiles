@@ -21,16 +21,13 @@ set shortmess+=c
 set signcolumn=yes
 set termguicolors
 
-" Explicitly set terminal emulator to iTerm2
-let g:terminal_emulator = 'iterm2'
-
 " Don't use Ex mode, use Q for formatting
 map Q gq
 
 " Install vim-plug if not found
 if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
-  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 endif
 
 " Run PlugInstall if there are missing plugins
@@ -39,90 +36,96 @@ autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
 \| endif
 
 call plug#begin('~/.local/share/nvim/plugged')
-
 " Plugins
-Plug 'machakann/vim-highlightedyank'
 Plug 'tpope/vim-commentary'
 Plug 'easymotion/vim-easymotion'
-Plug 'preservim/nerdtree'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+Plug 'nvim-tree/nvim-tree.lua'
+Plug 'nvim-lualine/lualine.nvim'
 Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
+Plug 'lewis6991/gitsigns.nvim'
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'sheerun/vim-polyglot'
-Plug 'jiangmiao/auto-pairs'
-Plug 'tpope/vim-surround'
-Plug 'hkupty/iron.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
-Plug 'kyazdani42/nvim-web-devicons'
-Plug 'lewis6991/gitsigns.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'neovim/nvim-lspconfig'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'L3MON4D3/LuaSnip'
+Plug 'saadparwaiz1/cmp_luasnip'
 Plug 'folke/which-key.nvim'
 Plug 'akinsho/toggleterm.nvim'
 Plug 'lukas-reineke/indent-blankline.nvim'
-
 call plug#end()
 
 " Plugin configurations
-
 " Dracula theme
 colorscheme dracula
 
-" Airline settings
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
-
-" NERDTree configuration
-let NERDTreeShowHidden=1
-nnoremap <C-n> :NERDTreeToggle<CR>
-nnoremap <C-w>w :call NERDTreeFocus()<CR>
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-
-" GitGutter configuration
-let g:gitgutter_enabled = 1
-let g:gitgutter_sign_added = '+'
-let g:gitgutter_sign_modified = '~'
-let g:gitgutter_sign_removed = '_'
-
 " Lua configurations
 lua << EOF
--- Iron.nvim configuration
-local iron = require("iron.core")
+-- nvim-tree configuration
+require("nvim-tree").setup{}
 
-iron.setup {
-  config = {
-    scratch_repl = true,
-    repl_definition = {
-      python = {
-        command = {"python"}
-      }
-    },
-    repl_open_cmd = 'vertical botright 80 split',
-  },
-  keymaps = {
-    send_line = "<leader>sl",
-    visual_send = "<leader>sc",
-    send_file = "<leader>sf",
-    send_until_cursor = "<leader>su",
-    send_mark = "<leader>sm",
-    mark_motion = "<leader>mc",
-    mark_visual = "<leader>mc",
-    remove_mark = "<leader>md",
-    cr = "<leader>s<cr>",
-    interrupt = "<leader>s<space>",
-    exit = "<leader>sq",
-    clear = "<leader>cl",
+-- lualine configuration
+require('lualine').setup {
+  options = {
+    theme = 'dracula'
+  }
+}
+
+-- Gitsigns configuration
+require('gitsigns').setup()
+
+-- Telescope configuration
+local telescope = require('telescope')
+telescope.setup{}
+
+-- Treesitter configuration
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = { "c", "lua", "vim", "vimdoc", "python", "javascript", "html", "css" },
+  sync_install = false,
+  auto_install = true,
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = false,
   },
 }
+
+-- LSP configuration
+local lspconfig = require('lspconfig')
+local servers = { 'pyright', 'tsserver', 'html', 'cssls' }
+for _, lsp in ipairs(servers) do
+  lspconfig[lsp].setup{}
+end
+
+-- nvim-cmp configuration
+local cmp = require'cmp'
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      require('luasnip').lsp_expand(args.body)
+    end,
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' },
+  }, {
+    { name = 'buffer' },
+  })
+})
+
+-- Which-key configuration
+require("which-key").setup {}
 
 -- ToggleTerm configuration
 require("toggleterm").setup{
@@ -131,86 +134,16 @@ require("toggleterm").setup{
   hide_numbers = true,
   shade_filetypes = {},
   shade_terminals = true,
-  shading_factor = 2,
   start_in_insert = true,
-  insert_mappings = true,
   persist_size = true,
   direction = 'float',
-  close_on_exit = true,
-  shell = vim.o.shell,
-  float_opts = {
-    border = 'curved',
-    winblend = 0,
-    highlights = {
-      border = "Normal",
-      background = "Normal",
-    }
-  }
 }
-
--- Telescope configuration
-local telescope = require('telescope')
-local actions = require('telescope.actions')
-
-telescope.setup({
-  defaults = {
-    mappings = {
-      i = {
-        ["<C-j>"] = actions.move_selection_next,
-        ["<C-k>"] = actions.move_selection_previous,
-      },
-    },
-    file_ignore_patterns = {"node_modules", ".git"},
-  },
-  pickers = {
-    find_files = {
-      find_command = {"fd", "--type", "f", "--hidden", "--exclude", ".git"},
-    },
-    live_grep = {
-      additional_args = function(opts)
-        return {"--hidden"}
-      end
-    }
-  },
-})
-
--- Gitsigns configuration
-require('gitsigns').setup()
-
--- Treesitter configuration
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = { "c", "lua", "python", "javascript", "html", "css" },
-  sync_install = false,
-  highlight = {
-    enable = true,
-    additional_vim_regex_highlighting = false,
-  },
-  indent = {
-    enable = true,
-  },
-}
-
--- Which-key configuration
-require("which-key").setup {}
 
 -- Indent-blankline configuration
-require("ibl").setup {
-  indent = {
-    char = "│",
-    tab_char = "│",
-  },
-  scope = {
-    enabled = true,
-  },
-  exclude = {
-    filetypes = { "dashboard", "NvimTree", "packer", "lsp-installer" },
-    buftypes = { "terminal" },
-  },
-}
+require("ibl").setup {}
 EOF
 
 " Key mappings
-
 " Commentary
 noremap <leader>/ :Commentary<CR>
 
@@ -221,24 +154,23 @@ nnoremap <leader>ms :MarkdownPreviewStop<CR>
 " EasyMotion
 map <leader>w <Plug>(easymotion-bd-w)
 
-" FZF
-nnoremap <leader>ff :Files<CR>
-nnoremap <leader>fg :GFiles<CR>
-nnoremap <leader>fb :Buffers<CR>
-nnoremap <leader>fl :Lines<CR>
+" Telescope mappings
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
-" CoC mappings
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-nmap <leader>rn <Plug>(coc-rename)
-nmap <leader>qf <Plug>(coc-fix-current)
-nnoremap <silent> K :call CocAction('doHover')<CR>
+" LSP mappings
+nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> <C-n> <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
+nnoremap <silent> <C-p> <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
 
-" Navigation
-nnoremap <C-o> <C-o>
-nnoremap <C-i> <C-i>
+" NvimTree
+nnoremap <leader>n :NvimTreeToggle<CR>
 
 " Move to beginning/end of line
 nnoremap H ^
@@ -256,28 +188,27 @@ nnoremap <leader>vv :e $MYVIMRC<CR>
 nnoremap <leader>vr :source $MYVIMRC<CR>
 
 " Split navigation
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+nnoremap <leader>wh <C-W>h
+nnoremap <leader>wj <C-W>j
+nnoremap <leader>wk <C-W>k
+nnoremap <leader>wl <C-W>l
 
 " Split creation
 nnoremap <leader>vs :vsplit<CR>
 nnoremap <leader>ns :split<CR>
 
 " Buffer navigation
-nnoremap <leader>bn :bnext<CR>
-nnoremap <leader>bp :bprevious<CR>
-nnoremap <leader>bf :bfirst<CR>
-nnoremap <leader>bl :blast<CR>
-nnoremap <leader>bd :bdelete<CR>
-nnoremap <leader>ls :ls<CR>
+nnoremap <leader>q :bdelete<CR>
+nnoremap <leader>qa :%bd<CR>
+nnoremap <leader>qo :%bd<CR>:execute 'bwipeout' . (v:lua.pcall(function() vim.fn.bufnr('#') end) and ' #' or '')<CR>
+nnoremap <leader>] :bnext<CR>
+nnoremap <leader>[ :bprevious<CR>
 
 " Resize splits
-nnoremap <silent> <leader>+ :vertical resize +5<CR>
-nnoremap <silent> <leader>- :vertical resize -5<CR>
-nnoremap <silent> <leader>> :resize +5<CR>
-nnoremap <silent> <leader>< :resize -5<CR>
+nnoremap <leader>+ :vertical resize +5<CR>
+nnoremap <leader>- :vertical resize -5<CR>
+nnoremap <leader>> :resize +5<CR>
+nnoremap <leader>< :resize -5<CR>
 
 " Fugitive mappings
 nnoremap <leader>gs :Git<CR>
@@ -285,39 +216,12 @@ nnoremap <leader>gc :Git commit<CR>
 nnoremap <leader>gp :Git push<CR>
 nnoremap <leader>gl :Git pull<CR>
 
-" GitGutter mappings
-nnoremap <leader>hp :GitGutterPreviewHunk<CR>
-nnoremap <leader>hs :GitGutterStageHunk<CR>
-nnoremap <leader>hu :GitGutterUndoHunk<CR>
+" Better escape
+inoremap jk <Esc>
 
-" Run Python script (using terminal emulator)
-nnoremap <F5> :w<CR>:split<CR>:execute "terminal " . g:terminal_emulator . " python %"<CR>
-
-" Open Python REPL in ToggleTerm
-nnoremap <leader>ro :ToggleTerm<CR>:IronRepl<CR>
-
-" Telescope mappings
-nnoremap <leader>ff <cmd>Telescope find_files<cr>
-nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
-nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-
-" CoC configuration
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-" Use <c-space> to trigger completion
-inoremap <silent><expr> <c-space> coc#refresh()
-
-" Make <CR> auto-select the first completion item and notify coc.nvim to
-" format on enter, <cr> could be remapped by other vim plugin
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+" Terminal mappings
+tnoremap <Esc> <C-\><C-n>
+tnoremap <C-h> <C-\><C-N><C-w>h
+tnoremap <C-j> <C-\><C-N><C-w>j
+tnoremap <C-k> <C-\><C-N><C-w>k
+tnoremap <C-l> <C-\><C-N><C-w>l
