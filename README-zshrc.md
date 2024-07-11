@@ -1,141 +1,129 @@
 # Zsh Configuration
 
-This README documents the custom configurations, aliases, and functions in the `.zshrc` file, along with installation steps and common workflow examples.
+This document provides an overview of the custom Zsh configuration, including key features, aliases, functions, and common workflows.
+
+## Table of Contents
+
+1. [Features](#features)
+2. [Installation](#installation)
+3. [Key Bindings](#key-bindings)
+4. [Aliases](#aliases)
+5. [Functions](#functions)
+6. [Common Workflows](#common-workflows)
+7. [Plugin Configurations](#plugin-configurations)
+8. [Customization](#customization)
+
+## Features
+
+- Oh My Zsh with Powerlevel10k theme
+- Vi-mode for command line editing
+- Custom aliases and functions for productivity
+- Integration with tools like Git, Docker, Python, and Node.js
+- FZF for fuzzy finding
+- Syntax highlighting and autosuggestions
+- Custom Claude CLI integration
 
 ## Installation
 
-1. **Install Zsh:**
-   ```bash
-   sudo apt install zsh
+1. Ensure you have Zsh installed
+2. Install [Oh My Zsh](https://ohmyz.sh/)
+3. Clone this repository
+4. Symlink the `.zshrc` file to your home directory:
    ```
-
-2. **Set Zsh as your default shell:**
-   ```bash
-   chsh -s $(which zsh)
+   ln -s /path/to/repo/.zshrc ~/.zshrc
    ```
-
-3. **Install Oh My Zsh:**
-   ```bash
-   sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-   ```
-
-4. **Install Powerlevel10k theme:**
-   ```bash
-   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-   ```
-
-5. **Install plugins:**
-   ```bash
-   git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-   ```
-
-6. **Update your `.zshrc`:**
-   ```bash
-   ZSH_THEME="powerlevel10k/powerlevel10k"
-   plugins=(git zsh-autosuggestions zsh-syntax-highlighting z vi-mode fzf history-substring-search colored-man-pages docker kubectl pyenv npm command-not-found web-search extract)
-   ```
-
-7. **Install additional tools:**
-   ```bash
-   brew install fzf ripgrep fd
-   ```
-
-8. **Configure Powerlevel10k:**
-   ```bash
-   p10k configure
-   ```
-
-## Oh My Zsh Configuration
-
-- **Theme:** Powerlevel10k
-- **Plugins:** git, zsh-autosuggestions, zsh-syntax-highlighting, z, vi-mode, fzf, history-substring-search, colored-man-pages, docker, kubectl, pyenv, npm, command-not-found, web-search, extract
+5. Install required plugins and tools (see [Plugin Configurations](#plugin-configurations))
 
 ## Key Bindings
 
-- Vi mode enabled
-- `ctrl-e`: Edit command line in vim
-- `^[[A` / `^[[B`: Up/down in history search (default)
-- `vicmd 'k'` / `vicmd 'j'`: Up/down in history search (vi mode)
+- `Ctrl+R`: Fuzzy search through command history
+- `Ctrl+E`: Edit current command in vim
+- `jk`: Escape (in vi-mode)
+- `Ctrl+Space`: Complete suggestion
 
-## Aliases and Functions
+## Aliases
 
-_**(Include your existing aliases and functions section here)** _
+### Navigation
+- `..`, `...`, `....`, `.....`: Go up 1-4 directories
+- `~`: Go to home directory
+- `cdprev`: Go to previous directory
 
-## Common Workflow Examples
+### Git
+- `g`: git
+- `gs`: git status
+- `ga`: git add
+- `gc`: git commit
+- `gp`: git push
+- `gl`: git pull
+- (see `.zshrc` for full list)
 
-1. **Navigate and search directories:**
-   ```bash
-   z project_dir
-   fd -t d node_modules
-   ```
+### Docker
+- `d`: docker
+- `dc`: docker-compose
+- `dps`: docker ps
+- `di`: docker images
 
-2. **Find and edit files:**
-   ```bash
-   se config
-   vim $(fzf)
-   ```
+### Python
+- `py`: python3
+- `pip`: pip3
+- `venv`: Create virtual environment
+- `activate`: Activate virtual environment
 
-3. **Git workflow:**
-   ```bash
-   gs
-   gaa
-   gc -m "Update feature"
-   gp
-   ```
+### Node.js
+- `ns`: npm start
+- `nt`: npm test
+- `ni`: npm install
+- (see `.zshrc` for full list)
 
-4. **Python development:**
-   ```bash
-   venv
-   activate
-   py script.py
-   ```
+### Neovim
+- `vim`, `vi`, `v`, `nv`: neovim
+- `nvf`: Open file with neovim using fzf
 
-5. **Node.js development:**
-   ```bash
-   npmi express
-   npms
-   ```
+## Functions
 
-6. **Docker operations:**
-   ```bash
-   dps
-   d exec -it container_name bash
-   ```
+- `mkcd`: Create directory and cd into it
+- `extract`: Extract various archive formats
+- `search_and_edit`: Search for file and open in editor
+- `nvt`: Open Neovim with Telescope file finder
+- `nvg`: Open Neovim with Telescope grep
+- `mkvenv`: Create and activate Python virtual environment
+- `cdp`: Change to project directory using fzf
+- `update_all`: Update all package managers
+- `new_project`: Create new project directory with git init
 
-7. **System updates:**
-   ```bash
-   update_all
-   ```
+## Common Workflows
 
-8. **Quick file operations:**
-   ```bash
-   mkcd new_project
-   backup important_file.txt
-   extract archive.tar.gz
-   ```
+### Python Development
+1. Create new project: `new_project myproject`
+2. Set up virtual environment: `mkvenv`
+3. Install dependencies: `pip install <packages>`
+4. Open project in Neovim: `nvt`
 
-9. **Use Claude CLI:**
-   ```bash
-   claude_project my_project
-   claude_query "Explain the main features of this project"
-   claude_save "project_summary"
-   ```
+### Git Workflow
+1. Check status: `gs`
+2. Stage changes: `ga` or `gaa`
+3. Commit changes: `gcm "Commit message"`
+4. Pull latest changes: `gl`
+5. Push changes: `gp`
 
-## Environment Variables
+### Docker Workflow
+1. Build containers: `dcb`
+2. Start services: `dcu`
+3. View logs: `dcl`
+4. Stop services: `dcd`
 
-The configuration loads environment variables from a `.env` file in the home directory.
+### Node.js Development
+1. Initialize project: `npm init`
+2. Install dependencies: `ni <packages>`
+3. Start development server: `ns`
+4. Run tests: `nt`
 
-## Additional Configurations
+## Plugin Configurations
 
-- NVM (Node Version Manager) configuration
-- Pyenv configuration
-- FZF configuration
-- Syntax highlighting settings
-- Custom Oh My Zsh title
+- Powerlevel10k: Fast and customizable Zsh theme
+- zsh-autosuggestions: Suggests commands as you type
+- zsh-syntax-highlighting: Syntax highlighting for Zsh
+- fzf: Fuzzy finder for command-line
+- z: Jump to frequently used directories
 
-## Notes
-
-- Ensure that all required tools (Oh My Zsh, Powerlevel10k, etc.) are installed.
-- Some configurations may need to be adjusted based on your specific setup and preferences.
-- For more detailed information on each plugin or tool, refer to their respective documentation.
+For more detailed information on specific features or workflows, refer to the comments in the `.zshrc` file.

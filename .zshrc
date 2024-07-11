@@ -43,6 +43,9 @@ export EDITOR='nvim'
 # FZF configuration
 export FZF_BASE=$(brew --prefix)/opt/fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git"
 
 # Pyenv configuration
 export PYENV_ROOT="$HOME/.pyenv"
@@ -83,7 +86,6 @@ alias zshconfig='$EDITOR ~/.zshrc'
 alias ohmyzsh='$EDITOR ~/.oh-my-zsh'
 alias nvimconfig='$EDITOR ~/.config/nvim/init.vim'
 alias sourcezsh='source ~/.zshrc && echo "ZSH config reloaded!"'
-alias update='brew update && brew upgrade && npm update -g && omz update'
 alias c='clear'
 alias h='history'
 alias j='jobs -l'
@@ -92,6 +94,7 @@ alias now='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
 alias myip='curl http://ipecho.net/plain; echo'
 alias ports='netstat -tulanp'
+alias cdprev='cd -'
 
 # Navigation
 alias ..='cd ..'
@@ -99,7 +102,6 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ~='cd ~'
-alias -- -='cd -'
 
 # List directory contents
 alias ls='ls -GFh'
@@ -111,39 +113,58 @@ alias l='ls -CF'
 alias g='git'
 alias ga='git add'
 alias gaa='git add --all'
-alias gs='git status'
-alias gc='git commit -v'
-alias gco='git checkout'
 alias gb='git branch'
+alias gba='git branch -a'
+alias gbd='git branch -d'
+alias gc='git commit -v'
+alias gcm='git commit -m'
+alias gco='git checkout'
 alias gd='git diff'
 alias gf='git fetch'
-alias gp='git push'
 alias gl='git pull'
 alias glog='git log --oneline --decorate --graph'
+alias gp='git push'
+alias grb='git rebase'
+alias gs='git status'
+alias gst='git stash'
+alias gstp='git stash pop'
+alias gstc='git stash clear'
 
 # Vim/Neovim
 alias vim='nvim'
 alias vi='nvim'
 alias v='nvim'
+alias nv='nvim'
+alias nvf='nvim $(fzf)'
 
 # Docker
 alias d='docker'
 alias dc='docker-compose'
 alias dps='docker ps'
-alias dimages='docker images'
+alias di='docker images'
+alias dcu='docker-compose up'
+alias dcd='docker-compose down'
+alias dcb='docker-compose build'
+alias dce='docker-compose exec'
+alias dcl='docker-compose logs'
 
 # Python
 alias py='python3'
 alias pip='pip3'
 alias venv='python3 -m venv'
-alias activate='source venv/bin/activate'
+alias activate='source ./venv/bin/activate'
+alias deactivate='deactivate'
 
 # Node.js
-alias npms='npm start'
-alias npmt='npm test'
-alias npmr='npm run'
-alias npmi='npm install'
-alias npmu='npm update'
+alias ns='npm start'
+alias nt='npm test'
+alias nr='npm run'
+alias ni='npm install'
+alias nid='npm install --save-dev'
+alias nig='npm install -g'
+alias nu='npm update'
+alias nrb='npm run build'
+alias nrd='npm run dev'
 
 # Utility
 alias dud='du -d 1 -h'
@@ -264,7 +285,6 @@ alias use_system_python='PATH=$(echo $PATH | sed -e "s|$HOME/.pyenv/shims:||g")'
 alias use_pyenv='eval "$(pyenv init --path)" && eval "$(pyenv init -)"'
 
 # Additional helpful aliases
-alias update_all='brew update && brew upgrade && npm update -g && omz update && pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 pip install -U'
 alias weather='curl wttr.in'
 alias cheat='curl cheat.sh/'
 alias speedtest='speedtest-cli'
@@ -311,6 +331,69 @@ function search_and_edit() {
 
 alias se='search_and_edit'
 
+# Neovim-specific functions
+function nvt() {
+  nvim -c "Telescope find_files"
+}
+
+function nvg() {
+  nvim -c "Telescope live_grep"
+}
+
+function nvs() {
+  if [[ -n $1 ]]; then
+    nvim -S "$1"
+  else
+    local session_file=$(find ~/.local/share/nvim/sessions -type f | fzf)
+    if [[ -n $session_file ]]; then
+      nvim -S "$session_file"
+    else
+      echo "No session file selected."
+    fi
+  fi
+}
+
+function nvns() {
+  if [[ -n $1 ]]; then
+    nvim -c "mksession ~/.local/share/nvim/sessions/$1.vim"
+  else
+    echo "Please provide a session name."
+  fi
+}
+
+# Improved Python environment management
+function mkvenv() {
+  python3 -m venv venv && source venv/bin/activate
+}
+
+# Jump to project directory
+function cdp() {
+  cd $(find ~/projects -type d -maxdepth 1 | fzf)
+}
+
+# Update all package managers
+function update_all() {
+  brew update && brew upgrade
+  npm update -g
+  pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 pip install -U
+  omz update
+  nvim +PlugUpdate +qall
+}
+
+# Create a new project directory with basic setup
+function new_project() {
+  if [ $# -eq 0 ]; then
+    echo "Please provide a project name"
+    return 1
+  fi
+  
+  mkdir -p ~/projects/$1 && cd ~/projects/$1
+  git init
+  touch README.md .gitignore
+  echo "# $1" > README.md
+  echo "Project $1 created and initialized"
+}
+
 # Load any local customizations
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
@@ -319,4 +402,3 @@ export PATH="$PATH:/Users/jory/.local/bin"
 
 # direnv hook
 eval "$(direnv hook zsh)"
-
