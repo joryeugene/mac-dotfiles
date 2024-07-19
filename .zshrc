@@ -172,6 +172,42 @@ alias duf='du -sh *'
 alias fd='find . -type d -name'
 alias ff='find . -type f -name'
 
+# Aliases for CLI tools
+alias lg='lazygit'
+alias cat='bat'  # Replace cat with bat
+
+# GitHub Copilot CLI functions
+copilot_explain() {
+    gh copilot explain "$*"
+}
+
+copilot_suggest() {
+    gh copilot suggest "$*"
+}
+
+alias cpe='copilot_explain'
+alias cps='copilot_suggest'
+
+# CLI Tools Reference
+cli_tools() {
+    echo "Available CLI tools:"
+    echo "  - lazygit: A simple terminal UI for git commands"
+    echo "  - bat: A cat clone with syntax highlighting and Git integration"
+    echo "  - tldr: Simplified and community-driven man pages"
+    echo "  - scc: A very fast accurate code counter with complexity calculations"
+    echo "  - nvim: Neovim text editor"
+    echo "  - gh copilot: GitHub Copilot CLI for explanations and suggestions"
+    echo ""
+    echo "Usage examples:"
+    echo "  lg                                    # Open lazygit"
+    echo "  bat filename.txt                      # View file with syntax highlighting"
+    echo "  tldr tar                              # Get simplified help for tar command"
+    echo "  scc /path/to/project                  # Count lines of code in a project"
+    echo "  nvim file.txt                         # Edit file.txt with Neovim"
+    echo "  cpe \"how to do something in vim\"      # Get explanation from GitHub Copilot"
+    echo "  cps \"Undo the last commit\"            # Get suggestion from GitHub Copilot"
+}
+
 # History configuration
 HISTSIZE=10000
 SAVEHIST=10000
