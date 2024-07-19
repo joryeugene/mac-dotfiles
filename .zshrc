@@ -93,8 +93,8 @@ alias path='echo -e ${PATH//:/\\n}'
 alias now='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
 alias myip='curl http://ipecho.net/plain; echo'
-alias ports='netstat -tulanp'
-alias cdprev='cd -'
+alias ports='lsof -i -P -n | grep LISTEN'  # Fixed ports alias
+alias cdp='cd -'
 
 # Navigation
 alias ..='cd ..'
@@ -109,7 +109,7 @@ alias ll='ls -lAFh'
 alias la='ls -A'
 alias l='ls -CF'
 
-# Git
+# Git aliases
 alias g='git'
 alias ga='git add'
 alias gaa='git add --all'
@@ -194,11 +194,8 @@ function path() {
 
 # NVM configuration
 export NVM_DIR="$HOME/.nvm"
-nvm() {
-  unset -f nvm
-  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-  nvm "$@"
-}
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Colorize man pages
 export LESS_TERMCAP_mb=$'\e[1;32m'
@@ -237,48 +234,6 @@ if [ -f "$HOME/.env" ]; then
   source "$HOME/.env"
   set +a
 fi
-
-# Claude CLI functions
-alias claude='$HOME/claude_env/bin/python3 $HOME/scripts/claude_cli.py'
-
-function claude_project() {
-  local project_name=$1
-  local context_path="$HOME/projects/$project_name/docs"
-  local claude_cli="$HOME/scripts/claude_cli.py"
-  python3 "$claude_cli" --set-context-path "$context_path" && \
-  python3 "$claude_cli" --index && \
-  python3 "$claude_cli" "Analyze the documents in the context path and summarize the main features of the project they describe. Focus on providing a concise overview highlighting key aspects."
-}
-
-function claude_save() {
-  $HOME/claude_env/bin/python3 $HOME/scripts/claude_cli.py --save "$1"
-}
-
-# Function to set work context for Claude CLI
-function set_work_context() {
-  claude --set-context-path "$HOME/projects/work-context/docs"
-  claude --index
-  echo "Work context set and indexed for Claude CLI"
-}
-
-# Function to clear all contexts for Claude CLI
-function clear_claude_context() {
-  claude --clear-index
-  echo "All contexts cleared for Claude CLI"
-}
-
-# Function to quickly query Claude with work context
-function ask_claude_work() {
-  set_work_context
-  claude "$@"
-}
-
-# Aliases for quick access
-alias swc='set_work_context'
-alias ccc='clear_claude_context'
-alias cw='ask_claude_work'
-alias activate_claude='source $HOME/claude_env/bin/activate'
-alias deactivate_claude='deactivate'
 
 # Python environment management
 alias use_system_python='PATH=$(echo $PATH | sed -e "s|$HOME/.pyenv/shims:||g")'
