@@ -1,6 +1,3 @@
-" Set leader key
-let mapleader = " "
-
 " General settings
 set scrolloff=5
 set incsearch
@@ -20,11 +17,15 @@ set updatetime=300
 set shortmess+=c
 set signcolumn=yes
 set termguicolors
+set timeoutlen=500
+
+" Set leader key
+let mapleader = " "
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
 
-" Install vim-plug if not found
+" Plugin management
 if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
   silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -58,11 +59,130 @@ Plug 'saadparwaiz1/cmp_luasnip'
 Plug 'folke/which-key.nvim'
 Plug 'akinsho/toggleterm.nvim'
 Plug 'lukas-reineke/indent-blankline.nvim'
+Plug 'tpope/vim-surround'
 call plug#end()
 
-" Plugin configurations
-" Dracula theme
+" Color scheme
 colorscheme dracula
+
+" Key mappings
+
+" General
+inoremap jk <Esc>
+nnoremap U <C-R>
+
+" File operations
+nnoremap <leader>w :w<CR>
+nnoremap <leader>ve :e $MYVIMRC<CR>
+nnoremap <leader>vr :source $MYVIMRC<CR>
+
+" Navigation
+nnoremap H ^
+nnoremap L $
+
+" Window management
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+nnoremap <leader>sv :vsplit<CR>
+nnoremap <leader>sh :split<CR>
+nnoremap <leader>sc :close<CR>
+nnoremap <leader>me <C-w>_<C-w>|
+nnoremap <leader>= <C-w>=
+
+" Resize splits
+nnoremap <leader>+ :vertical resize +5<CR>
+nnoremap <leader>- :vertical resize -5<CR>
+nnoremap <leader>> :resize +5<CR>
+nnoremap <leader>< :resize -5<CR>
+
+" Buffer navigation
+nnoremap <leader>] :bnext<CR>
+nnoremap <leader>[ :bprevious<CR>
+nnoremap <leader>b :Telescope buffers<CR>
+
+" Close windows and buffers (matching IdeaVim setup)
+nnoremap <leader>qx :q<CR>
+nnoremap <leader>qa :qall<CR>
+nnoremap <leader>qo :%bd\|e#\|bd#<CR>
+nnoremap <leader>qt :tabclose<CR>
+
+" Search and replace
+nnoremap <leader>se <cmd>Telescope<cr>
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <leader>fp <cmd>Telescope live_grep<cr>
+
+" Code navigation and editing
+nnoremap <leader>gc <cmd>Telescope git_commits<cr>
+nnoremap <leader>gf <cmd>Telescope git_files<cr>
+nnoremap <leader>a <cmd>Telescope commands<cr>
+nnoremap <leader>rl <cmd>Telescope oldfiles<cr>
+nnoremap <leader>rr <cmd>Telescope find_files<cr>
+nnoremap <leader>nd :lua require'telescope.builtin'.file_browser()<CR>
+nnoremap <leader>ro <C-^>
+nnoremap <leader>sw :set wrap!<CR>
+
+" LSP
+nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> <C-n> <cmd>lua vim.diagnostic.goto_prev()<CR>
+nnoremap <silent> <C-p> <cmd>lua vim.diagnostic.goto_next()<CR>
+nnoremap <leader>rf <cmd>Telescope lsp_references<cr>
+nnoremap <leader>i <cmd>Telescope lsp_code_actions<cr>
+nnoremap <leader>qi <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <leader>su <cmd>Telescope lsp_references<cr>
+nnoremap <leader>oi <cmd>lua vim.lsp.buf.execute_command({command = "_typescript.organizeImports", arguments = {vim.fn.expand("%:p")}})<CR>
+nnoremap <leader>pi :lua vim.lsp.buf.signature_help()<CR>
+nnoremap <leader>sd :lua vim.diagnostic.open_float()<CR>
+
+" Git
+nnoremap <leader>gs :Git<CR>
+nnoremap <leader>gc :Git commit<CR>
+nnoremap <leader>gp :Git push<CR>
+nnoremap <leader>gl :Git pull<CR>
+
+" NvimTree (similar to NERDTree)
+nnoremap <leader>pt :NvimTreeToggle<CR>
+nnoremap <leader>tp :NvimTreeToggle<CR>
+
+" Commentary
+nnoremap <leader>/ :Commentary<CR>
+
+" Terminal mappings
+nnoremap <leader>tt :ToggleTerm<CR>
+tnoremap <leader>tt <C-\><C-n>:ToggleTerm<CR>
+tnoremap <Esc> <C-\><C-n>
+tnoremap <C-h> <C-\><C-N><C-w>h
+tnoremap <C-j> <C-\><C-N><C-w>j
+tnoremap <C-k> <C-\><C-N><C-w>k
+tnoremap <C-l> <C-\><C-N><C-w>l
+
+" Markdown Preview
+nnoremap <leader>mp :MarkdownPreview<CR>
+nnoremap <leader>ms :MarkdownPreviewStop<CR>
+
+" Move selected lines
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" Go to exact window
+nnoremap <leader>1 :1wincmd w<CR>
+nnoremap <leader>2 :2wincmd w<CR>
+nnoremap <leader>3 :3wincmd w<CR>
+nnoremap <leader>4 :4wincmd w<CR>
+nnoremap <leader>5 :5wincmd w<CR>
+nnoremap <leader>6 :6wincmd w<CR>
+nnoremap <leader>7 :7wincmd w<CR>
+nnoremap <leader>8 :8wincmd w<CR>
+nnoremap <leader>9 :9wincmd w<CR>
 
 " Lua configurations
 lua << EOF
@@ -96,7 +216,7 @@ require'nvim-treesitter.configs'.setup {
 
 -- LSP configuration
 local lspconfig = require('lspconfig')
-local servers = { 'pyright', 'tsserver', 'html', 'cssls' }
+local servers = { 'pyright', 'tsserver', 'html', 'cssls', 'bashls', 'jsonls', 'marksman' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup{}
 end
@@ -141,167 +261,8 @@ require("toggleterm").setup{
 
 -- Indent-blankline configuration
 require("ibl").setup {}
-EOF
 
-" Key mappings
-" Commentary
-noremap <leader>/ :Commentary<CR>
-
-" Toggle Markdown Preview
-nnoremap <leader>mp :MarkdownPreview<CR>
-nnoremap <leader>ms :MarkdownPreviewStop<CR>
-
-" EasyMotion
-map <leader>w <Plug>(easymotion-bd-w)
-map <leader>e <Plug>(easymotion-s)
-
-" Telescope mappings
-nnoremap <leader>ff <cmd>Telescope find_files<cr>
-nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
-nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-
-" LSP mappings
-nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
-nnoremap <silent> gi <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
-nnoremap <silent> <C-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
-nnoremap <silent> <C-n> <cmd>lua vim.diagnostic.goto_prev()<CR>
-nnoremap <silent> <C-p> <cmd>lua vim.diagnostic.goto_next()<CR>
-
-" NvimTree
-nnoremap <leader>n :NvimTreeToggle<CR>
-
-" Move to beginning/end of line
-nnoremap H ^
-nnoremap L $
-
-" Move selected lines up/down
-vnoremap J :m '>+1<CR>gv=gv
-vnoremap K :m '<-2<CR>gv=gv
-
-" Redo
-nnoremap U <C-R>
-
-" Quick edit and reload of init.vim
-nnoremap <leader>vv :e $MYVIMRC<CR>
-nnoremap <leader>vr :source $MYVIMRC<CR>
-
-" Split navigation
-nnoremap <leader>wh <C-W>h
-nnoremap <leader>wj <C-W>j
-nnoremap <leader>wk <C-W>k
-nnoremap <leader>wl <C-W>l
-
-" Split creation (updated to match PyCharm IdeaVim)
-nnoremap <leader>sv :vsplit<CR>
-nnoremap <leader>sh :split<CR>
-
-" Buffer navigation
-nnoremap <leader>q :bdelete<CR>
-nnoremap <leader>qa :%bd<CR>
-nnoremap <leader>qo :%bd<CR>:execute 'bwipeout' . (v:lua.pcall(function() vim.fn.bufnr('#') end) and ' #' or '')<CR>
-nnoremap <leader>] :bnext<CR>
-nnoremap <leader>[ :bprevious<CR>
-
-" Resize splits
-nnoremap <leader>+ :vertical resize +5<CR>
-nnoremap <leader>- :vertical resize -5<CR>
-nnoremap <leader>> :resize +5<CR>
-nnoremap <leader>< :resize -5<CR>
-
-" Fugitive mappings
-nnoremap <leader>gs :Git<CR>
-nnoremap <leader>gc :Git commit<CR>
-nnoremap <leader>gp :Git push<CR>
-nnoremap <leader>gl :Git pull<CR>
-
-" Better escape
-inoremap jk <Esc>
-
-" Terminal mappings
-tnoremap <Esc> <C-\><C-n>
-tnoremap <C-h> <C-\><C-N><C-w>h
-tnoremap <C-j> <C-\><C-N><C-w>j
-tnoremap <C-k> <C-\><C-N><C-w>k
-tnoremap <C-l> <C-\><C-N><C-w>l
-
-" New mappings to align with PyCharm IdeaVim
-" Search everywhere (similar to PyCharm's SearchEverywhere)
-nnoremap <leader>se <cmd>Telescope<cr>
-
-" Find action (similar to PyCharm's GotoAction)
-nnoremap <leader>a <cmd>Telescope commands<cr>
-
-" Recent files (similar to PyCharm's RecentFiles)
-nnoremap <leader>r <cmd>Telescope oldfiles<cr>
-
-" Find in path (similar to PyCharm's FindInPath)
-nnoremap <leader>fp <cmd>Telescope live_grep<cr>
-
-" Toggle project view (similar to PyCharm's ActivateProjectToolWindow)
-nnoremap <leader>p :NvimTreeToggle<CR>
-
-" Refactoring menu (using Telescope for now, can be enhanced with a custom function)
-nnoremap <leader>rf <cmd>Telescope lsp_references<cr>
-
-" Show intention actions (using Telescope for code actions)
-nnoremap <leader>i <cmd>Telescope lsp_code_actions<cr>
-
-" Toggle breakpoint (requires a DAP setup, this is a placeholder)
-nnoremap <leader>b :echo "Breakpoint toggled"<CR>
-
-" Create new file (using Telescope)
-nnoremap <leader>nf <cmd>Telescope find_files<cr>
-
-" Create new directory (requires a custom function)
-nnoremap <leader>nd :lua require'telescope.builtin'.file_browser()<CR>
-
-" Reopen closed tab (buffer)
-nnoremap <leader>ro <C-^>
-
-" Toggle soft wrap
-nnoremap <leader>sw :set wrap!<CR>
-
-" Quick documentation (using LSP hover)
-nnoremap K <cmd>lua vim.lsp.buf.hover()<CR>
-
-" Quick implementation (using LSP implementation)
-nnoremap <leader>qi <cmd>lua vim.lsp.buf.implementation()<CR>
-
-" Show usages (using Telescope)
-nnoremap <leader>su <cmd>Telescope lsp_references<cr>
-
-" Optimize imports (requires LSP)
-nnoremap <leader>oi <cmd>lua vim.lsp.buf.execute_command({command = "_typescript.organizeImports", arguments = {vim.fn.expand("%:p")}})<CR>
-
-lua << EOF
-local nvim_lsp = require('lspconfig')
-
--- Python
-nvim_lsp.pyright.setup{}
-
--- JavaScript/TypeScript
-nvim_lsp.tsserver.setup{}
-
--- Bash
-nvim_lsp.bashls.setup{}
-
--- HTML
-nvim_lsp.html.setup{}
-
--- CSS
-nvim_lsp.cssls.setup{}
-
--- JSON
-nvim_lsp.jsonls.setup{}
-
--- Markdown
-nvim_lsp.marksman.setup{}
-
--- Global mappings.
--- See `:help vim.diagnostic.*` for documentation on any of the below functions
+-- Global mappings
 vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
