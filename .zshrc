@@ -395,3 +395,5 @@ export PATH="$PATH:/Users/jory/.local/bin"
 eval "$(direnv hook zsh)"
 
 source $HOME/.cargo/env
+
+. "$HOME/.cargo/env"

@@ -73,6 +73,7 @@ nnoremap U <C-R>
 
 " File operations
 nnoremap <leader>w :w<CR>
+nnoremap <leader>x :wq<CR>
 nnoremap <leader>ve :e $MYVIMRC<CR>
 nnoremap <leader>vr :source $MYVIMRC<CR>
 
@@ -158,7 +159,6 @@ nnoremap <leader>/ :Commentary<CR>
 
 " Terminal mappings
 nnoremap <leader>tt :ToggleTerm<CR>
-tnoremap <Esc> <C-\><C-n>
 
 " Markdown Preview
 nnoremap <leader>mp :MarkdownPreview<CR>
