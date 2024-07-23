@@ -82,6 +82,7 @@ autoload edit-command-line; zle -N edit-command-line
 bindkey '^e' edit-command-line
 
 # Aliases
+alias p='pycharm'
 alias zshconfig='$EDITOR ~/.zshrc'
 alias ohmyzsh='$EDITOR ~/.oh-my-zsh'
 alias nvimconfig='$EDITOR ~/.config/nvim/init.vim'
@@ -197,6 +198,7 @@ cli_tools() {
     echo "  - scc: A very fast accurate code counter with complexity calculations"
     echo "  - nvim: Neovim text editor"
     echo "  - gh copilot: GitHub Copilot CLI for explanations and suggestions"
+    echo "  - jless"
     echo ""
     echo "Usage examples:"
     echo "  lg                                    # Open lazygit"
@@ -388,6 +390,8 @@ function new_project() {
 # Load any local customizations
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
+source /etc/zprofile
+
 # Created by `pipx` on 2024-07-05 15:33:05
 export PATH="$PATH:/Users/jory/.local/bin"
 
@@ -397,3 +401,13 @@ eval "$(direnv hook zsh)"
 source $HOME/.cargo/env
 
 . "$HOME/.cargo/env"
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/opt/libpq/lib"
+export LDFLAGS="-L/opt/homebrew/opt/libpq/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/libpq/include"
+
+# system-wide environment settings for zsh(1)
+if [ -x /usr/libexec/path_helper ]; then
+    eval `/usr/libexec/path_helper -s`
+fi
+

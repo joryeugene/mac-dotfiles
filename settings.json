@@ -1,0 +1,69 @@
+{
+    "window.commandCenter": 1,
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.external.osxExec": "iTerm.app",
+    "terminal.integrated.profiles.osx": {
+
+        "bash": {
+            "path": "bash",
+            "args": [
+                "-l"
+            ],
+            "icon": "terminal-bash"
+        },
+        "zsh": {
+            "path": "zsh",
+            "args": [
+                "-l"
+            ]
+        },
+        "fish": {
+            "path": "fish",
+            "args": [
+                "-l"
+            ]
+        },
+        "tmux": {
+            "path": "tmux",
+            "icon": "terminal-tmux"
+        },
+        "pwsh": {
+            "path": "pwsh",
+            "icon": "terminal-powershell"
+        }
+    },
+    "application.shellEnvironmentResolutionTimeout": 43,
+    "editor.fontFamily": "Berkeley Mono",
+    "editor.fontSize": 14,
+    "cursor.aipreview.enabled": true,
+    "cursor.chat.alwaysSearchWeb": true,
+    "cursor.cmdk.ghostTextAtSymbols": true,
+    "cursor.cmdk.useThemedDiffBackground": true,
+    "cursor.general.enableShadowWorkspace": true,
+    "cursor.cpp.enablePartialAccepts": true,
+    "editor.fontLigatures": true,
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    },
+    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
+    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
+    "editor.lineNumbers": "relative",
+    "editor.cursorStyle": "block",
+    "editor.scrollBeyondLastLine": false,
+    "editor.smoothScrolling": true,
+    "workbench.list.automaticKeyboardNavigation": false,
+    "editor.rulers": [88, 120],
+    "editor.suggestSelection": "first",
+    "editor.acceptSuggestionOnCommitCharacter": true,
+    "editor.snippetSuggestions": "top",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "python.showStartPage": false,
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.stubPath": "typings",
+    "python.analysis.typeshedPaths": [],
+    "python.analysis.useLibraryCodeForTypes": true,
+}
