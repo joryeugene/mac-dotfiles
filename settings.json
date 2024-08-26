@@ -3,25 +3,18 @@
     "terminal.integrated.defaultProfile.osx": "zsh",
     "terminal.external.osxExec": "iTerm.app",
     "terminal.integrated.profiles.osx": {
-
         "bash": {
             "path": "bash",
-            "args": [
-                "-l"
-            ],
+            "args": ["-l"],
             "icon": "terminal-bash"
         },
         "zsh": {
             "path": "zsh",
-            "args": [
-                "-l"
-            ]
+            "args": ["-l"]
         },
         "fish": {
             "path": "fish",
-            "args": [
-                "-l"
-            ]
+            "args": ["-l"]
         },
         "tmux": {
             "path": "tmux",
@@ -35,35 +28,48 @@
     "application.shellEnvironmentResolutionTimeout": 43,
     "editor.fontFamily": "Berkeley Mono",
     "editor.fontSize": 14,
-    "cursor.aipreview.enabled": true,
-    "cursor.chat.alwaysSearchWeb": true,
-    "cursor.cmdk.ghostTextAtSymbols": true,
-    "cursor.cmdk.useThemedDiffBackground": true,
-    "cursor.general.enableShadowWorkspace": true,
-    "cursor.cpp.enablePartialAccepts": true,
     "editor.fontLigatures": true,
-    "extensions.experimental.affinity": {
-        "asvetliakov.vscode-neovim": 1
-    },
-    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
-    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
     "editor.lineNumbers": "relative",
     "editor.cursorStyle": "block",
     "editor.scrollBeyondLastLine": false,
     "editor.smoothScrolling": true,
-    "workbench.list.automaticKeyboardNavigation": false,
+    "editor.minimap.enabled": false,
     "editor.rulers": [88, 120],
     "editor.suggestSelection": "first",
     "editor.acceptSuggestionOnCommitCharacter": true,
     "editor.snippetSuggestions": "top",
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
-    "python.showStartPage": false,
-    "python.terminal.activateEnvironment": true,
+
+    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
+    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
+
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.testing.pytestEnabled": true,
     "python.analysis.autoImportCompletions": true,
-    "python.analysis.autoSearchPaths": true,
-    "python.analysis.diagnosticMode": "workspace",
-    "python.analysis.stubPath": "typings",
-    "python.analysis.typeshedPaths": [],
-    "python.analysis.useLibraryCodeForTypes": true,
+
+    "cursor.aipreview.enabled": true,
+    "cursor.cmdk.ghostTextAtSymbols": true,
+    "cursor.cmdk.useThemedDiffBackground": true,
+    "cursor.general.enableShadowWorkspace": true,
+    "cursor.cpp.enablePartialAccepts": true,
+
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    },
+    "workbench.colorTheme": "Dracula Theme",
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "sqltools.useNodeRuntime": true,
+    "workbench.activityBar.location": "bottom",
+    "editor.renderWhitespace": "all",
+    "terminal.integrated.env.osx": {},
+    "cursor.chat.ghostTextAtSymbols": true,
+    "cursor.chat.smoothStreaming": true,
+    "breadcrumbs.enabled": false,
+    "git.openRepositoryInParentFolders": "always",
+    "cursor.chat.narrowScrollbar": false,
+    "cursor.diffs.useCharacterLevelDiffs": true
 }

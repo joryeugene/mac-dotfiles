@@ -1,0 +1,248 @@
+" General settings
+set scrolloff=5
+set incsearch
+set showmode
+set number
+set relativenumber
+set clipboard+=unnamed
+set splitbelow
+set splitright
+set ignorecase
+set smartcase
+set hidden
+set nobackup
+set nowritebackup
+set cmdheight=2
+set updatetime=300
+set shortmess+=c
+set signcolumn=yes
+set termguicolors
+set timeoutlen=500
+
+" Set leader key
+let mapleader = " "
+
+" Don't use Ex mode, use Q for formatting
+map Q gq
+
+" Plugin management (use your preferred plugin manager)
+call plug#begin('~/.local/share/nvim/plugged')
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
+Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-fugitive'
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'neovim/nvim-lspconfig'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'L3MON4D3/LuaSnip'
+Plug 'folke/which-key.nvim'
+Plug 'tpope/vim-surround'
+call plug#end()
+
+" Color scheme
+colorscheme dracula
+
+" Key mappings (work in both VSCode and regular Neovim)
+
+" General
+inoremap jk <Esc>
+nnoremap U <C-R>
+
+" File operations
+nnoremap <leader>w :w<CR>
+nnoremap <leader>x :x<CR>
+
+" Edit and source init.vim
+nnoremap <leader>ve :execute 'edit' resolve($HOME . '/.config/nvim/init.vim')<CR>
+nnoremap <leader>vr :source $MYVIMRC<CR>
+
+" Navigation
+nnoremap H ^
+nnoremap L $
+
+" Window management
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" Buffer navigation
+nnoremap <leader>] :bnext<CR>
+nnoremap <leader>[ :bprevious<CR>
+
+" Close windows and buffers
+nnoremap <leader>q :q<CR>
+nnoremap <leader>Q :qa!<CR>
+
+" Search
+nnoremap <leader>ff :Telescope find_files<CR>
+nnoremap <leader>fg :Telescope live_grep<CR>
+nnoremap <leader>fb :Telescope buffers<CR>
+
+" Git (assuming you're using fugitive)
+nnoremap <leader>gs :Git<CR>
+nnoremap <leader>gc :Git commit<CR>
+nnoremap <leader>gp :Git push<CR>
+
+" Commentary
+nnoremap <leader>/ :Commentary<CR>
+
+" Move selected lines
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" VSCode / Cursor specific settings
+if exists('g:vscode')
+    " VSCode extension
+    lua << EOF
+    local vscode = require('vscode')
+
+    -- Helper function for mapping keys
+    local function map(mode, lhs, rhs, opts)
+        local options = {noremap = true, silent = true}
+        if opts then options = vim.tbl_extend('force', options, opts) end
+        vim.api.nvim_set_keymap(mode, lhs, rhs, options)
+    end
+
+    -- Navigation
+    map('n', 'gd', "<Cmd>lua vscode.action('editor.action.revealDefinition')<CR>")
+    map('n', 'gr', "<Cmd>lua vscode.action('editor.action.goToReferences')<CR>")
+    map('n', 'gh', "<Cmd>lua vscode.action('editor.action.showHover')<CR>")
+    map('n', '<leader>rn', "<Cmd>lua vscode.action('editor.action.rename')<CR>")
+
+    -- Code actions
+    map('n', '<leader>ca', "<Cmd>lua vscode.action('editor.action.quickFix')<CR>")
+    map('n', '<leader>cf', "<Cmd>lua vscode.action('editor.action.formatDocument')<CR>")
+
+    -- File explorer
+    map('n', '<leader>e', "<Cmd>lua vscode.action('workbench.view.explorer')<CR>")
+
+    -- Search
+    map('n', '<leader>sg', "<Cmd>lua vscode.action('workbench.action.findInFiles')<CR>")
+
+    -- Window management
+    map('n', '<leader>wv', "<Cmd>lua vscode.action('workbench.action.splitEditor')<CR>")
+    map('n', '<leader>wh', "<Cmd>lua vscode.action('workbench.action.splitEditorOrthogonal')<CR>")
+
+    -- Terminal
+    map('n', '<leader>tt', "<Cmd>lua vscode.action('workbench.action.terminal.toggleTerminal')<CR>")
+
+    -- Hide all windows / back to editor
+    map('n', '<leader>hw', "<Cmd>lua vscode.action('workbench.action.toggleSidebarVisibility')<CR>")
+    map('n', '<Esc>', "<Cmd>lua vscode.action('workbench.action.focusActiveEditorGroup')<CR>")
+
+    -- Zen / Distraction free mode
+    map('n', '<leader>zz', "<Cmd>lua vscode.action('workbench.action.toggleZenMode')<CR>")
+
+    -- Cursor AI Chat
+    map('n', '<leader>ai', "<Cmd>lua vscode.action('cursor.askCursorAI')<CR>")
+
+    -- Inline AI (assuming it's bound to the default Cmd+L in Cursor)
+    map('n', '<leader>ia', "<Cmd>lua vscode.action('cursor.openChatPlaceholder')<CR>")
+
+    -- Command palette (Cmd+Shift+P equivalent)
+    map('n', '<leader>cp', "<Cmd>lua vscode.action('workbench.action.showCommands')<CR>")
+
+    -- Quick open (Cmd+P equivalent)
+    map('n', '<leader>p', "<Cmd>lua vscode.action('workbench.action.quickOpen')<CR>")
+
+    -- Custom functions for running tests and FastAPI
+    local function run_python_file()
+        local file = vim.fn.expand('%:p')
+        vscode.action('workbench.action.terminal.new')
+        vscode.action('workbench.action.terminal.sendSequence', { args = { text = string.format("python %s\n", file) }})
+    end
+
+    local function run_tests_in_file()
+        local file = vim.fn.expand('%:p')
+        vscode.action('workbench.action.terminal.new')
+        vscode.action('workbench.action.terminal.sendSequence', { args = { text = string.format("pytest %s\n", file) }})
+    end
+
+    local function run_fastapi()
+        vscode.action('workbench.action.terminal.new')
+        vscode.action('workbench.action.terminal.sendSequence', { args = { text = "uvicorn main:app --reload\n" }})
+    end
+
+    -- Mapping custom functions
+    vim.keymap.set('n', '<leader>rp', run_python_file, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>rt', run_tests_in_file, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>rf', run_fastapi, {noremap = true, silent = true})
+
+    -- Override some built-in Neovim functionalities if modules are available
+    local status_ok, vscode_ui = pcall(require, 'vscode.ui')
+    if status_ok then
+        vim.ui = vscode_ui
+    end
+
+    local status_ok, vscode_lsp_buf = pcall(require, 'vscode.lsp.buf')
+    if status_ok then
+        vim.lsp.buf = vscode_lsp_buf
+    end
+
+    -- Use VSCode's clipboard provider if available
+    if vim.g.vscode_clipboard then
+        vim.g.clipboard = vim.g.vscode_clipboard
+    end
+EOF
+else
+    " Regular Neovim settings
+    " Add any Neovim-specific settings here
+    
+    " Example: NERDTree-like file explorer using Telescope
+    nnoremap <leader>e :Telescope file_browser<CR>
+    
+    " LSP configurations
+    lua << EOF
+    local nvim_lsp = require('lspconfig')
+
+    -- Use an on_attach function to only map the following keys
+    -- after the language server attaches to the current buffer
+    local on_attach = function(client, bufnr)
+        local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+        local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+        -- Enable completion triggered by <c-x><c-o>
+        buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
+
+        -- Mappings.
+        local opts = { noremap=true, silent=true }
+
+        -- See `:help vim.lsp.*` for documentation on any of the below functions
+        buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+        buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+        buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+        buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+        buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+        buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+        buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+        buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+        buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+        buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+        buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+        buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+        buf_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+        buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+        buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+        buf_set_keymap('n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
+        buf_set_keymap('n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+    end
+
+    -- Use a loop to conveniently call 'setup' on multiple servers and
+    -- map buffer local keybindings when the language server attaches
+    local servers = { 'pyright', 'tsserver' }
+    for _, lsp in ipairs(servers) do
+        nvim_lsp[lsp].setup {
+            on_attach = on_attach,
+            flags = {
+                debounce_text_changes = 150,
+            }
+        }
+    end
+EOF
+endif
