@@ -1,6 +1,10 @@
-.PHONY: all install discover brew casks cli configs set_permissions backup_configs help
+.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs
 
 DOTFILES_DIR := $(HOME)/dotfiles
+
+all: install manual_installs
+
+install: brew casks cli configs
 
 help:
 	@echo "Available commands:"
@@ -16,8 +20,6 @@ help:
 	@echo "  make set_permissions   - Set correct permissions for discovery scripts"
 	@echo "  make manual_installs   - Show applications that may need manual installation"
 
-all: install
-
 set_permissions:
 	@echo "Setting correct permissions..."
 	@chmod +x app_discovery.sh brew_discovery.sh cli_tools_discovery.sh
@@ -27,8 +29,6 @@ discover: set_permissions
 	@./cli_tools_discovery.sh
 	@./app_discovery.sh
 	@./brew_discovery.sh
-
-install: brew casks cli configs
 
 brew:
 	@echo "Installing Homebrew formulae..."
@@ -91,10 +91,18 @@ configs: backup_configs
 	# @./setup_env.sh
 
 manual_installs:
-	@echo "The following applications may need manual installation:"
+	@echo "\nApplications that may need manual installation:"
 	@sort user_apps.txt > /tmp/sorted_user_apps.txt
 	@sort user_installed_casks.txt > /tmp/sorted_user_installed_casks.txt
-	@comm -23 /tmp/sorted_user_apps.txt /tmp/sorted_user_installed_casks.txt
+	@comm -23 /tmp/sorted_user_apps.txt /tmp/sorted_user_installed_casks.txt | while read app; do \
+		echo "$$app"; \
+		case "$$app" in \
+			"Rectangle Pro") echo "  Download from: https://rectangleapp.com/pro" ;; \
+			"Superhuman") echo "  Download from: https://superhuman.com/download" ;; \
+			"Zen Browser") echo "  Download from: https://www.zen-browser.app/" ;; \
+			*) echo "  Please search and download manually" ;; \
+		esac; \
+	done
 	@rm /tmp/sorted_user_apps.txt /tmp/sorted_user_installed_casks.txt
 
 .DEFAULT_GOAL := help
