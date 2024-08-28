@@ -63,7 +63,7 @@ bindkey '^[[B' history-substring-search-down
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 bindkey '^R' fzf-history-widget
-bindkey '^O' fzf-cd-widget
+bindkey '^F' fzf-cd-widget
 
 # Colorize man pages
 export LESS_TERMCAP_mb=$'\e[1;32m'
@@ -92,31 +92,6 @@ eval "$(direnv hook zsh)"
 if [ -x /usr/libexec/path_helper ]; then
     eval `/usr/libexec/path_helper -s`
 fi
-
-# Function to backup config files
-backup_configs() {
-  local dotfiles_dir="$HOME/dotfiles"
-  mkdir -p "$dotfiles_dir"
-
-  local files=(
-    "$HOME/.zshrc"
-    "$HOME/.config/starship.toml"
-    "$HOME/.config/nvim/init.vim"
-    "$HOME/Library/Application Support/Cursor/User/profiles/48fc2b27/keybindings.json"
-    "$HOME/Library/Application Support/Cursor/User/profiles/48fc2b27/settings.json"
-  )
-
-  for file in "${files[@]}"; do
-    if [ -f "$file" ]; then
-      cp "$file" "$dotfiles_dir/$(basename "$file")"
-      echo "Backed up $file"
-    else
-      echo "Warning: $file not found"
-    fi
-  done
-
-  echo "Backup complete. Files saved in $dotfiles_dir"
-}
 
 # Load any local customizations
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local

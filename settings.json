@@ -71,5 +71,6 @@
     "breadcrumbs.enabled": false,
     "git.openRepositoryInParentFolders": "always",
     "cursor.chat.narrowScrollbar": false,
-    "cursor.diffs.useCharacterLevelDiffs": true
+    "cursor.diffs.useCharacterLevelDiffs": true,
+    "editor.accessibilitySupport": "off"
 }

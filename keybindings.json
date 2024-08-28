@@ -398,5 +398,15 @@
   {
     "key": "ctrl+shift+cmd+i",
     "command": "workbench.panel.composerViewPane"
+  },
+  {
+    "key": "shift+j",
+    "command": "workbench.action.previousEditor",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
+    "key": "shift+k",
+    "command": "workbench.action.nextEditor",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
   }
 ]
