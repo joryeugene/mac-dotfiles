@@ -399,3 +399,9 @@ vim.cmd[[
 
 -- Note: Remember to run :Mason to install language servers
 -- and external tools: npm i -g prettier eslint, pip install black flake8
+
+-- Font settings
+vim.opt.guifont = "Berkeley Mono:h14"
+vim.opt.linespace = 0
+vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50"
+vim.opt.termguicolors = true
