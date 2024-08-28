@@ -6,8 +6,8 @@ autoload -Uz _zinit
 # User configuration
 export EDITOR='nvim'
 
-# Load Starship prompt
-eval "$(starship init zsh)"
+# Increase FUNCNEST limit
+FUNCNEST=100
 
 # FZF configuration
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -30,19 +30,32 @@ eval "$(pyenv init -)"
 bindkey -v
 export KEYTIMEOUT=1
 
-# Change cursor shape for different vi modes
-function zle-keymap-select {
-  if [[ ${KEYMAP} == vicmd ]] || [[ $1 = 'block' ]]; then
-    echo -ne '\e[2 q'
-  elif [[ ${KEYMAP} == main ]] || [[ ${KEYMAP} == viins ]] || [[ ${KEYMAP} = '' ]] || [[ $1 = 'beam' ]]; then
-    echo -ne '\e[5 q'
-  fi
+# Function to update cursor and Starship keymap
+function update_vim_mode() {
+    case ${KEYMAP} in
+        vicmd)
+            echo -ne '\e[2 q'
+            STARSHIP_SHELL_KEYMAP=NORMAL
+            ;;
+        main|viins)
+            echo -ne '\e[5 q'
+            STARSHIP_SHELL_KEYMAP=INSERT
+            ;;
+    esac
 }
+
+# Set up Zle hooks
+function zle-line-init zle-keymap-select {
+    update_vim_mode
+    zle reset-prompt
+}
+
+zle -N zle-line-init
 zle -N zle-keymap-select
 
 # Use beam shape cursor on startup and for each new prompt
 echo -ne '\e[5 q'
-preexec() { echo -ne '\e[5 q' ;}
+preexec() { echo -ne '\e[5 q'; }
 
 # Edit line in vim with ctrl-e
 autoload edit-command-line; zle -N edit-command-line
@@ -95,3 +108,8 @@ fi
 
 # Load any local customizations
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+
+# Load Starship prompt (move this line to the end of your .zshrc)
+eval "$(starship init zsh)"
+
