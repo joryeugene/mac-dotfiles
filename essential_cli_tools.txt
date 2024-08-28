@@ -10,7 +10,6 @@ wget
 curl
 htop
 bat
-exa
 zsh
 starship
 brew
@@ -29,10 +28,8 @@ lazydocker
 docker
 kubectl
 helm
-terraform
 ansible
 awscli
-gcloud
 az
 gh
 httpie
@@ -42,8 +39,6 @@ tldr
 mc
 nmap
 rsync
-ssh
-scp
 ffmpeg
 imagemagick
 pandoc

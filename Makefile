@@ -1,6 +1,20 @@
-.PHONY: all install discover brew casks cli configs set_permissions backup_configs
+.PHONY: all install discover brew casks cli configs set_permissions backup_configs help
 
 DOTFILES_DIR := $(HOME)/dotfiles
+
+help:
+	@echo "Available commands:"
+	@echo "  make help              - Show this help message"
+	@echo "  make all               - Run the entire installation process"
+	@echo "  make install           - Install everything (brew, casks, cli tools, and configs)"
+	@echo "  make discover          - Discover system state (CLI tools, apps, and Brew packages)"
+	@echo "  make brew              - Install Homebrew formulae"
+	@echo "  make casks             - Install cask applications"
+	@echo "  make cli               - Install CLI tools"
+	@echo "  make configs           - Set up configuration files"
+	@echo "  make backup_configs    - Backup current configuration files"
+	@echo "  make set_permissions   - Set correct permissions for discovery scripts"
+	@echo "  make manual_installs   - Show applications that may need manual installation"
 
 all: install
 
@@ -51,7 +65,6 @@ configs: backup_configs
 	@cp -f $(DOTFILES_DIR)/settings.json "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/settings.json" || true
 	@mkdir -p $(HOME)/.config/karabiner
 	@cp -f $(DOTFILES_DIR)/karabiner.json $(HOME)/.config/karabiner/karabiner.json || true
-
 	# TODO:
 	# @echo "Setting up environment variables..."
 	# @./setup_env.sh
@@ -59,3 +72,5 @@ configs: backup_configs
 manual_installs:
 	@echo "The following applications may need manual installation:"
 	@comm -23 <(sort user_apps.txt) <(sort user_installed_casks.txt)
+
+.DEFAULT_GOAL := help
