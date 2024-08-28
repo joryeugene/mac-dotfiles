@@ -1,5 +1,4 @@
 {
-    "window.commandCenter": 1,
     "terminal.integrated.defaultProfile.osx": "zsh",
     "terminal.external.osxExec": "iTerm.app",
     "terminal.integrated.profiles.osx": {
@@ -72,5 +71,7 @@
     "git.openRepositoryInParentFolders": "always",
     "cursor.chat.narrowScrollbar": false,
     "cursor.diffs.useCharacterLevelDiffs": true,
-    "editor.accessibilitySupport": "off"
+    "editor.accessibilitySupport": "off",
+    "workbench.layoutControl.enabled": false,
+    "window.commandCenter": false
 }
