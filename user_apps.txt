@@ -1,0 +1,55 @@
+.Karabiner-VirtualHIDDevice-Manager
+1Password 7
+AltTab
+Asana
+BatFi
+Bloks
+Boop
+ChatGPT
+CotEditor
+Cursor
+DaisyDisk
+Dash
+DataGrip
+Discord
+Docker
+Elgato Stream Deck
+Figma
+Firefox
+GitHub Desktop
+Google Chrome
+HTTPie
+Hidden Bar
+Jan
+Karabiner-Elements
+Karabiner-EventViewer
+Keynote
+LM Studio
+Lumina
+MonitorControl
+Notion
+Numbers
+Obsidian
+One Thing
+Pages
+Raycast
+Rectangle Pro
+Shortcat
+Sketch
+Slack
+Sourcetree
+Superhuman
+Tailscale
+Tot
+Tuple
+Twos
+Visual Studio Code
+WhatsApp
+Zen Browser
+hhkb-keymap-tool
+iMovie
+iTerm
+iTermAI
+lghub
+superwhisper
+zoom.us
