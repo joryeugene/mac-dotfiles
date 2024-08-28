@@ -17,9 +17,17 @@ set cmdheight=2
 set updatetime=300
 set shortmess+=c
 set signcolumn=yes
-
-" Disable timeout for better which-key experience
 set timeoutlen=500
+
+" VSCode-like settings
+set cursorline
+set expandtab
+set shiftwidth=4
+set tabstop=4
+set nowrap
+set colorcolumn=88,120
+set list
+set listchars=tab:→\ ,space:·,nbsp:␣,trail:•,eol:¶,precedes:«,extends:»
 
 " Key mappings
 " Move to beginning/end of line
@@ -45,7 +53,6 @@ nnoremap <leader>sp ggVG"+p
 
 " Preserve some Vim functionalities
 nnoremap % %
-nnoremap * *
 nnoremap # #
 nnoremap g; g;
 nnoremap g, g,
@@ -62,24 +69,22 @@ nnoremap <leader>sv :vsplit<CR>
 nnoremap <leader>sh :split<CR>
 nnoremap <leader>sc :close<CR>
 
-" Move between splits (these will be overridden by VSCode keybindings)
+" Move between splits
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
-" Save
-"
-nnoremap <leader>. :w<CR>
+" Save and quit
+nnoremap <leader>w :w<CR>
 nnoremap <leader>x :x<CR>
 
 " Folding
-"
-nnoremap <leader>fo :fold<CR>
-nnoremap <leader>fc :foldclose<CR>
-nnoremap <leader>fC :foldclose!<CR>
+nnoremap <leader>fc :fold<CR>
 nnoremap <leader>fo :foldopen<CR>
+nnoremap <leader>fC :foldclose<CR>
 nnoremap <leader>fO :foldopen!<CR>
+nnoremap <leader>fa :foldclose!<CR>
 
 " Marks
 nnoremap <leader>m :mark<Space>
@@ -88,8 +93,27 @@ nnoremap <leader>' :marks<CR>
 " Quick window switching
 nnoremap <leader>w <C-w>w
 
-" Commentary (will be handled by VSCode)
+" Commentary (requires commentary.vim plugin)
 nnoremap <leader>/ :Commentary<CR>
+
+" VSCode-like keybindings
+nnoremap <leader>e :Lexplore<CR>
+nnoremap <leader>f :find<Space>
+nnoremap <leader>g :grep<Space>
+nnoremap <leader>h :noh<CR>
+nnoremap <C-p> :Files<CR>
+nnoremap <leader>t :terminal<CR>
+
+" Plugins (using vim-plug)
+call plug#begin('~/.vim/plugged')
+Plug 'tpope/vim-commentary'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'dracula/vim', { 'as': 'dracula' }
+call plug#end()
+
+" Color scheme
+colorscheme dracula
 
 " Reminder comments
 " zf - create fold
@@ -102,9 +126,3 @@ nnoremap <leader>/ :Commentary<CR>
 " q{a-z} - record macro
 " @{a-z} - play macro
 " @@ - replay last macro
-
-" Custom text objects (requires VSCode support)
-" yt - tag object
-" yf - function object
-" yc - comment object
-" y, - argument object
