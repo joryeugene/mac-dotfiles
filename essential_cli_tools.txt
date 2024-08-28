@@ -14,7 +14,7 @@ zsh
 starship
 brew
 python3
-pip3
+pipx
 node
 npm
 yarn
@@ -35,7 +35,7 @@ gh
 httpie
 jless
 shellcheck
-tldr
+tlrc
 mc
 nmap
 rsync

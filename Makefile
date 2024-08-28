@@ -32,15 +32,36 @@ install: brew casks cli configs
 
 brew:
 	@echo "Installing Homebrew formulae..."
-	@xargs brew install < user_installed_formulae.txt
+	@cat user_installed_formulae.txt | while read formula; do \
+		if ! brew list --formula | grep -q "^$$formula$$"; then \
+			echo "Installing $$formula..."; \
+			brew install $$formula; \
+		else \
+			echo "$$formula is already installed. Skipping."; \
+		fi; \
+	done
 
 casks:
 	@echo "Installing cask applications..."
-	@xargs brew install --cask < user_installed_casks.txt
+	@cat user_installed_casks.txt | while read cask; do \
+		if ! brew list --cask | grep -q "^$$cask$$"; then \
+			echo "Installing $$cask..."; \
+			brew install --cask $$cask; \
+		else \
+			echo "$$cask is already installed. Skipping."; \
+		fi; \
+	done
 
 cli:
 	@echo "Installing CLI tools..."
-	@cat essential_cli_tools.txt | xargs -I {} brew install {} || true
+	@cat essential_cli_tools.txt | while read tool; do \
+		if ! brew list --formula | grep -q "^$$tool$$"; then \
+			echo "Installing $$tool..."; \
+			brew install $$tool || true; \
+		else \
+			echo "$$tool is already installed. Skipping."; \
+		fi; \
+	done
 
 backup_configs:
 	@echo "Backing up configuration files..."
