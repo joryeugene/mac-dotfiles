@@ -1,4 +1,4 @@
--- Init.lua: Comprehensive Neovim configuration
+-- Init.lua: Calmhive's Comprehensive Neovim Configuration
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"

@@ -71,6 +71,9 @@ configs: backup_configs
 
 manual_installs:
 	@echo "The following applications may need manual installation:"
-	@comm -23 <(sort user_apps.txt) <(sort user_installed_casks.txt)
+	@sort user_apps.txt > /tmp/sorted_user_apps.txt
+	@sort user_installed_casks.txt > /tmp/sorted_user_installed_casks.txt
+	@comm -23 /tmp/sorted_user_apps.txt /tmp/sorted_user_installed_casks.txt
+	@rm /tmp/sorted_user_apps.txt /tmp/sorted_user_installed_casks.txt
 
 .DEFAULT_GOAL := help
