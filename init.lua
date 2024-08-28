@@ -128,9 +128,6 @@ require("lazy").setup({
       -- Set up database connections
       vim.g.dbs = {
         { name = 'localhost', url = 'postgresql:///workhelix' }, -- Uses the `localhost` entry from pgpass
-        { name = 'dev-db', url = 'postgresql:///dev-db' },       -- Uses the `dev-db` entry from pgpass
-        { name = 'prod-db', url = 'postgresql:///workhelix@prod-db' }, -- Uses the `prod-db` entry from pgpass
-        { name = 'demo-db', url = 'postgresql:///demo-db' },     -- Uses the `demo-db` entry from pgpass
       }
 
       -- Use .pgpass file for authentication
