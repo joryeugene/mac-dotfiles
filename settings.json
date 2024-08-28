@@ -41,7 +41,7 @@
     "files.insertFinalNewline": true,
 
     "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
-    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.vim",
+    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.lua",
 
     "python.languageServer": "Pylance",
     "python.analysis.typeCheckingMode": "basic",
