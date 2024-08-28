@@ -101,6 +101,52 @@ require("lazy").setup({
 
   -- Tailwind CSS support
   { "williamboman/mason.nvim" },
+
+  -- Database plugins
+  {
+    'tpope/vim-dadbod',
+    dependencies = {
+      'kristijanhusak/vim-dadbod-ui',
+      'kristijanhusak/vim-dadbod-completion',
+    },
+    opts = {
+      db_completion = function()
+        require('cmp').setup.buffer({ sources = {{ name = 'vim-dadbod-completion' }} })
+      end,
+    },
+    config = function(_, opts)
+      vim.g.db_ui_save_location = vim.fn.stdpath("config") .. "/db_ui"
+      vim.g.db_ui_use_nerd_fonts = 1
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = {"sql", "mysql", "plsql"},
+        callback = function()
+          vim.schedule(opts.db_completion)
+        end,
+      })
+
+      -- Set up database connections
+      vim.g.dbs = {
+        { name = 'localhost', url = 'postgresql:///workhelix' }, -- Uses the `localhost` entry from pgpass
+        { name = 'dev-db', url = 'postgresql:///dev-db' },       -- Uses the `dev-db` entry from pgpass
+        { name = 'prod-db', url = 'postgresql:///workhelix@prod-db' }, -- Uses the `prod-db` entry from pgpass
+        { name = 'demo-db', url = 'postgresql:///demo-db' },     -- Uses the `demo-db` entry from pgpass
+      }
+
+      -- Use .pgpass file for authentication
+      vim.g.db_ui_use_pgpass = 1
+    end,
+    cmd = {
+      'DB',
+      'DBUI',
+      'DBUIToggle',
+      'DBUIAddConnection',
+      'DBUIFindBuffer',
+    },
+    keys = {
+      { "<leader>db", "<cmd>DBUIToggle<cr>", desc = "Toggle DBUI" },
+    },
+  },
 })
 
 -- General settings
@@ -131,7 +177,7 @@ vim.opt.listchars = {
   space = "·",
   nbsp = "␣",
   trail = "•",
-  eol = "¶",
+  -- eol = "¶",
   precedes = "«",
   extends = "»"
 }
