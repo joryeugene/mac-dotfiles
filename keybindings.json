@@ -173,7 +173,6 @@
   {
     "key": "space c",
     "command": "testing.clearTestResults",
-    // workbench.action.toggleCenteredLayout",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
@@ -231,14 +230,10 @@
     "command": "workbench.action.showAllSymbols",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
-  // {
-  //   "key": "space h",
-  //   "command": "workbench.view.debug",
-  //   "when": "editorTextFocus && neovim.mode != 'insert'"
-  // },
   {
     "key": "space h",
-    "command": "workbench.action.closePanel",
+    "command": "vscode-neovim.send",
+    "args": ":noh<CR>",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
@@ -329,17 +324,11 @@
   {
     "key": "space t",
     "command": "workbench.action.terminal.new",
-    // "command": "workbench.view.testing.focus",
-    // "command": "workbench.action.files.newUntitledFile",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
     "key": "space u",
-    // "command": "testing.toggleInlineTestOutput",
-    // "command": "workbench.action.toggleEditorVisibility",
-    // "command": "workbench.panel.markers.view.focus",
     "command": "editor.closeTestPeek",
-    // "command": "workbench.panel.testResults.view.toggleVisibility",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
