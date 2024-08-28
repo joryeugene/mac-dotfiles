@@ -134,7 +134,7 @@
       "float" : 0
     },
     "gestures" : {
-      "string" : "[24,{\"trail\":4,\"flags\":917504},119,{\"trail\":1,\"flags\":786432},2,{\"trail\":1,\"flags\":655360},74,{\"flags\":917504,\"trail\":1},130,{\"trail\":36,\"flags\":524288},35,{\"flags\":0,\"trail\":0},3,{\"trail\":1,\"flags\":524288},107,{\"flags\":786432,\"trail\":4},110,{\"flags\":786432,\"trail\":2},5,{\"flags\":0,\"trail\":4},21,{\"trail\":3,\"flags\":655360},127,{\"trail\":19,\"flags\":524288},10,{\"flags\":0,\"trail\":2},49,{\"flags\":655360,\"trail\":2},128,{\"flags\":524288,\"trail\":20},20,{\"flags\":917504,\"trail\":3},19,{\"trail\":2,\"flags\":0},108,{\"flags\":786432,\"trail\":3},23,{\"trail\":4,\"flags\":655360},11,{\"flags\":0,\"trail\":1},4,{\"flags\":0,\"trail\":3},48,{\"trail\":2,\"flags\":524288},129,{\"trail\":35,\"flags\":524288}]"
+      "string" : "[24,{\"trail\":4,\"flags\":917504},119,{\"flags\":786432,\"trail\":1},2,{\"flags\":655360,\"trail\":1},74,{\"flags\":917504,\"trail\":1},130,{\"flags\":524288,\"trail\":36},35,{\"trail\":0,\"flags\":0},3,{\"trail\":1,\"flags\":524288},107,{\"trail\":4,\"flags\":786432},110,{\"flags\":786432,\"trail\":2},5,{\"flags\":0,\"trail\":4},21,{\"flags\":655360,\"trail\":3},127,{\"trail\":19,\"flags\":524288},10,{\"flags\":0,\"trail\":2},49,{\"trail\":2,\"flags\":655360},128,{\"flags\":524288,\"trail\":20},20,{\"trail\":3,\"flags\":917504},50,{\"trail\":2,\"flags\":917504},108,{\"flags\":786432,\"trail\":3},23,{\"flags\":655360,\"trail\":4},19,{\"trail\":2,\"flags\":0},4,{\"trail\":3,\"flags\":0},48,{\"flags\":524288,\"trail\":2},11,{\"flags\":0,\"trail\":1},129,{\"flags\":524288,\"trail\":35}]"
     },
     "hapticFeedbackOnSnap" : {
       "int" : 0
@@ -272,7 +272,7 @@
       "int" : 2
     },
     "reticleColor" : {
-      "string" : "{\"green\":0.3,\"red\":0.8,\"blue\":0.2,\"alpha\":0.5}"
+      "string" : "{\"alpha\":0.5,\"green\":0.3,\"blue\":0.2,\"red\":0.8}"
     },
     "reticleDisplayMinDist" : {
       "float" : 0
@@ -562,6 +562,6 @@
       "modifierFlags" : 786432
     }
   },
-  "timestamp" : 746558815.851813,
+  "timestamp" : 746559253.710081,
   "version" : "172"
 }

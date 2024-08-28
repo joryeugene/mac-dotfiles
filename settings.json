@@ -73,5 +73,6 @@
     "cursor.diffs.useCharacterLevelDiffs": true,
     "editor.accessibilitySupport": "off",
     "workbench.layoutControl.enabled": false,
-    "window.commandCenter": false
+    "window.commandCenter": false,
+    "cursor.chat.showSuggestedFiles": true
 }
