@@ -367,6 +367,12 @@
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
+    "key": "space y v",
+    "command": "vscode.open",
+    "args": "/Users/jory/.config/nvim/init.lua",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
     "key": "space w",
     "command": "workbench.action.files.save",
     "when": "editorTextFocus && neovim.mode != 'insert'"
