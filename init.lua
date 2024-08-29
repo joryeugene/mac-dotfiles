@@ -83,10 +83,10 @@ require("lazy").setup({
   },
 
   -- Status line
-  {
-    "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-  },
+{
+  "nvim-lualine/lualine.nvim",
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+},
 
   -- Which-key for keybinding help
   { "folke/which-key.nvim" },
@@ -158,6 +158,7 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.scrolloff = 5
 vim.opt.showmode = false
+
 vim.opt.hidden = true
 vim.opt.backup = false
 vim.opt.writebackup = false
@@ -364,7 +365,13 @@ null_ls.setup({
 
 -- Additional plugin configurations
 require('gitsigns').setup()
-require('lualine').setup()
+require('lualine').setup {
+  options = {
+    icons_enabled = false,
+    component_separators = { left = '|', right = '|'},
+    section_separators = { left = '', right = ''},
+  },
+}
 require('nvim-tree').setup()
 require('telescope').setup()
 require('which-key').setup()
@@ -394,3 +401,5 @@ vim.opt.guifont = "Berkeley Mono:h14"
 vim.opt.linespace = 0
 vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50"
 vim.opt.termguicolors = true
+
+
