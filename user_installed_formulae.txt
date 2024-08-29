@@ -54,7 +54,6 @@ speedtest-cli
 sqlfluff
 starship
 tcl-tk
-terraform
 tig
 tlrc
 tree

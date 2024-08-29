@@ -1,10 +1,17 @@
-.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs
+SHELL := /usr/bin/env zsh
+
+.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies
 
 DOTFILES_DIR := $(HOME)/dotfiles
+BREW := brew
+PIPX := pipx
+NPM := npm
+RUSTUP := rustup
+GO := go
+VIM := vim
+NVIM := nvim
 
-all: install manual_installs
-
-install: brew casks cli configs
+.DEFAULT_GOAL := help
 
 help:
 	@echo "Available commands:"
@@ -19,6 +26,17 @@ help:
 	@echo "  make backup_configs    - Backup current configuration files"
 	@echo "  make set_permissions   - Set correct permissions for discovery scripts"
 	@echo "  make manual_installs   - Show applications that may need manual installation"
+	@echo "  make update            - Update system packages and tools"
+	@echo "  make check_dependencies - Check if all required tools are installed"
+
+all: check_dependencies install manual_installs
+
+install: brew casks cli configs
+
+check_dependencies:
+	@command -v $(BREW) >/dev/null 2>&1 || (echo "Homebrew is not installed. Please install it first." && exit 1)
+	@command -v git >/dev/null 2>&1 || (echo "Git is not installed. Please install it first." && exit 1)
+	@command -v make >/dev/null 2>&1 || (echo "Make is not installed. Please install it first." && exit 1)
 
 set_permissions:
 	@echo "Setting correct permissions..."
@@ -33,9 +51,9 @@ discover: set_permissions
 brew:
 	@echo "Installing Homebrew formulae..."
 	@cat user_installed_formulae.txt | while read formula; do \
-		if ! brew list --formula | grep -q "^$$formula$$"; then \
+		if ! $(BREW) list --formula | grep -q "^$$formula$$"; then \
 			echo "Installing $$formula..."; \
-			brew install $$formula; \
+			$(BREW) install $$formula; \
 		else \
 			echo "$$formula is already installed. Skipping."; \
 		fi; \
@@ -44,9 +62,9 @@ brew:
 casks:
 	@echo "Installing cask applications..."
 	@cat user_installed_casks.txt | while read cask; do \
-		if ! brew list --cask | grep -q "^$$cask$$"; then \
+		if ! $(BREW) list --cask | grep -q "^$$cask$$"; then \
 			echo "Installing $$cask..."; \
-			brew install --cask $$cask; \
+			$(BREW) install --cask $$cask; \
 		else \
 			echo "$$cask is already installed. Skipping."; \
 		fi; \
@@ -55,9 +73,9 @@ casks:
 cli:
 	@echo "Installing CLI tools..."
 	@cat essential_cli_tools.txt | while read tool; do \
-		if ! brew list --formula | grep -q "^$$tool$$"; then \
+		if ! $(BREW) list --formula | grep -q "^$$tool$$"; then \
 			echo "Installing $$tool..."; \
-			brew install $$tool || true; \
+			$(BREW) install $$tool || true; \
 		else \
 			echo "$$tool is already installed. Skipping."; \
 		fi; \
@@ -86,9 +104,6 @@ configs: backup_configs
 	@cp -f $(DOTFILES_DIR)/settings.json "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/settings.json" || true
 	@mkdir -p $(HOME)/.config/karabiner
 	@cp -f $(DOTFILES_DIR)/karabiner.json $(HOME)/.config/karabiner/karabiner.json || true
-	# TODO:
-	# @echo "Setting up environment variables..."
-	# @./setup_env.sh
 
 manual_installs:
 	@echo "\nApplications that may need manual installation:"
@@ -105,4 +120,35 @@ manual_installs:
 	done
 	@rm /tmp/sorted_user_apps.txt /tmp/sorted_user_installed_casks.txt
 
-.DEFAULT_GOAL := help
+update:
+	@echo "Updating system packages and tools..."
+	-@$(BREW) update
+	-@$(BREW) upgrade
+	-@$(BREW) cleanup
+	-@$(BREW) doctor || true
+	@echo "Homebrew update complete."
+	@if command -v $(PIPX) >/dev/null 2>&1; then \
+		echo "Updating pipx packages..."; \
+		$(PIPX) upgrade-all; \
+	else \
+		echo "pipx not found, skipping"; \
+	fi
+	@if command -v $(NPM) >/dev/null 2>&1; then \
+		echo "Updating npm packages..."; \
+		$(NPM) update -g; \
+	else \
+		echo "npm not found, skipping"; \
+	fi
+	@if command -v $(VIM) >/dev/null 2>&1; then \
+		echo "Updating Vim plugins..."; \
+		$(VIM) +PlugUpdate +qall; \
+	else \
+		echo "vim not found, skipping"; \
+	fi
+	@if command -v $(NVIM) >/dev/null 2>&1; then \
+		echo "Updating Neovim plugins..."; \
+		$(NVIM) +PlugUpdate +qall; \
+	else \
+		echo "nvim not found, skipping"; \
+	fi
+	@echo "System update complete."
