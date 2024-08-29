@@ -86,6 +86,8 @@ backup_configs:
 	@mkdir -p $(DOTFILES_DIR)
 	@mkdir -p $(DOTFILES_DIR)/.obsidian
 	@cp -f $(HOME)/.zshrc $(DOTFILES_DIR)/.zshrc || true
+	@cp -f $(HOME)/.zsh_functions $(DOTFILES_DIR)/.zsh_functions || true
+	@cp -f $(HOME)/.zsh_aliases $(DOTFILES_DIR)/.zsh_aliases || true
 	@cp -f $(HOME)/.config/starship.toml $(DOTFILES_DIR)/starship.toml || true
 	@cp -f $(HOME)/.config/nvim/init.lua $(DOTFILES_DIR)/init.lua || true
 	@cp -f "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/keybindings.json" $(DOTFILES_DIR)/keybindings.json || true
@@ -102,6 +104,8 @@ backup_configs:
 configs: backup_configs
 	@echo "Setting up configurations..."
 	@cp -f $(DOTFILES_DIR)/.zshrc $(HOME)/.zshrc || true
+	@cp -f $(DOTFILES_DIR)/.zsh_functions $(HOME)/.zsh_functions || true
+	@cp -f $(DOTFILES_DIR)/.zsh_aliases $(HOME)/.zsh_aliases || true
 	@mkdir -p $(HOME)/.config
 	@cp -f $(DOTFILES_DIR)/starship.toml $(HOME)/.config/starship.toml || true
 	@mkdir -p $(HOME)/.config/nvim

@@ -1,0 +1,102 @@
+# General
+alias zshconfig='$EDITOR ~/.zshrc'
+alias zshaliases='$EDITOR ~/.zsh_aliases'
+alias zshfunctions='$EDITOR ~/.zsh_functions'
+
+
+alias zc='zshconfig'
+alias za='zshaliases'
+alias zf='zshfunctions'
+
+alias sourcezsh='source ~/.zshrc && echo "ZSH config reloaded!"'
+alias sz='sourcezsh'
+
+alias c='clear'
+alias h='history'
+alias j='jobs -l'
+alias path='echo -e ${PATH//:/\\n}'
+
+alias now='date +"%T"'
+alias nowdate='date +"%d-%m-%Y"'
+alias myip='curl http://ipecho.net/plain; echo'
+alias ports='lsof -i -P -n | grep LISTEN'
+
+# Often Used CLI tools
+alias bi='brew install'
+alias ze='zellij'
+alias lg='lazygit'
+alias ld='lazydocker'
+alias cat='bat'
+
+# Vim/Neovim
+alias vim='nvim'
+alias vi='nvim'
+alias v='nvim'
+alias nv='nvim'
+alias nvf='nvim $(fzf)'
+alias nvimconfig='$EDITOR ~/.config/nvim/init.lua'
+alias vc='nvimconfig'
+
+# Navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ~='cd ~'
+alias cdp='cd -'
+
+# List directory contents
+alias la='ls -A'
+alias ls='ls -GFh'
+alias ll='ls -lAFh'
+alias l='ls -CF'
+
+# Git aliases
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gbd='git branch -d'
+alias gc='git commit -v'
+alias gcm='git commit -m'
+alias gco='git checkout'
+alias gd='git diff'
+alias gf='git fetch'
+alias gl='git pull'
+alias glog='git log --oneline --decorate --graph'
+alias gp='git push'
+alias grb='git rebase'
+alias gs='git status'
+alias gst='git stash'
+alias gstp='git stash pop'
+alias gstc='git stash clear'
+
+# Python
+alias py='python3'
+alias pip='pip3'
+alias venv='python3 -m venv'
+alias activate='source ./venv/bin/activate'
+alias deactivate='deactivate'
+alias pru='poetry run uvicorn app.main:app --reload'
+
+# Node.js
+alias ns='npm start'
+alias nt='npm test'
+alias nr='npm run'
+alias ni='npm install'
+alias nid='npm install --save-dev'
+alias nig='npm install -g'
+alias nu='npm update'
+alias nrb='npm run build'
+alias nrd='npm run dev'
+
+# Utility
+alias dud='du -d 1 -h'
+alias duf='du -sh *'
+alias fd='find . -type d -name'
+alias ff='find . -type f -name'
+
+# GitHub Copilot CLI
+alias cpe='gh copilot explain'
+alias cps='gh copilot suggest'

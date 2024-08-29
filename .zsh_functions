@@ -1,0 +1,129 @@
+# Custom functions
+
+## Function to backup config files
+backup_configs() {
+  local dotfiles_dir="$HOME/dotfiles"
+  mkdir -p "$dotfiles_dir"
+
+  local files=(
+    "$HOME/.zshrc"
+    "$HOME/.config/starship.toml"
+    "$HOME/.config/nvim/init.lua"
+    "$HOME/Library/Application Support/Cursor/User/profiles/48fc2b27/keybindings.json"
+    "$HOME/Library/Application Support/Cursor/User/profiles/48fc2b27/settings.json"
+    "$HOME/.config/karabiner/karabiner.json"
+  )
+
+  for file in "${files[@]}"; do
+    if [ -f "$file" ]; then
+      cp "$file" "$dotfiles_dir/$(basename "$file")"
+      echo "Backed up $file"
+    else
+      echo "Warning: $file not found"
+    fi
+  done
+
+  echo "Backup complete. Files saved in $dotfiles_dir"
+}
+
+function mkcd() {
+  mkdir -p "$@" && cd "$_";
+}
+
+function path() {
+  echo $PATH | tr ':' '\n' | nl
+}
+
+function backup() {
+  cp "$1" "$1.bak"
+  echo "Backup created: $1.bak"
+}
+
+function extract() {
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2) tar xjf $1 ;;
+      *.tar.gz) tar xzf $1 ;;
+      *.bz2) bunzip2 $1 ;;
+      *.rar) unrar e $1 ;;
+      *.gz) gunzip $1 ;;
+      *.tar) tar xf $1 ;;
+      *.tbz2) tar xjf $1 ;;
+      *.tgz) tar xzf $1 ;;
+      *.zip) unzip $1 ;;
+      *.Z) uncompress $1 ;;
+      *.7z) 7z x $1 ;;
+      *) echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+function search_and_edit() {
+  local file=$(find . -type f -name "*$1*" | fzf)
+  if [[ -n $file ]]; then
+    $EDITOR "$file"
+  else
+    echo "No file found matching '$1'"
+  fi
+}
+
+function mkvenv() {
+  python3 -m venv venv && source venv/bin/activate
+}
+
+function cdp() {
+  cd $(find ~/projects -type d -maxdepth 1 | fzf)
+}
+
+function update_all() {
+  brew update && brew upgrade
+  npm update -g
+  pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 pip install -U
+  nvim +PlugUpdate +qall
+}
+
+function copy_file_names() {
+    ls -p | grep -v / | pbcopy
+}
+
+function new_project() {
+  if [ $# -eq 0 ]; then
+    echo "Please provide a project name"
+    return 1
+  fi
+
+  mkdir -p ~/projects/$1 && cd ~/projects/$1
+  git init
+  touch README.md .gitignore
+  echo "# $1" > README.md
+  echo "Project $1 created and initialized"
+}
+
+function calmhive() {
+  cd /Users/jory/Documents/calmhive
+
+  # Count markdown files
+  md_files=$(find . -name "*.md" | wc -l)
+
+  # Count folders
+  folders=$(find . -type d | wc -l)
+
+  # Count total words in markdown files
+  total_words=$(find . -name "*.md" -exec cat {} + | wc -w)
+
+  echo "CalmHive Statistics:"
+  echo "Markdown files: $md_files"
+  echo "Folders: $folders"
+  echo "Total words: $total_words"
+
+  echo "Ready to enter CalmHive notes? (y/n)"
+  read answer
+  if [[ $answer != "y" ]]; then
+    echo "CalmHive entry cancelled."
+    return
+  fi
+
+  nvim /Users/jory/Documents/calmhive/hub.md
+}
