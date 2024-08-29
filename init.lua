@@ -1,4 +1,7 @@
 -- Init.lua: Calmhive's Comprehensive Neovim Configuration
+--
+-- Note: Remember to run :Mason to install language servers
+-- and external tools: npm i -g prettier eslint, pip install black flake8
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -22,6 +25,7 @@ require("lazy").setup({
   -- Theme options
   { "Mofiqul/dracula.nvim" },
   { "folke/tokyonight.nvim" },
+  { "tanvirtin/monokai.nvim" },
 
   -- Treesitter for better syntax highlighting
   {
@@ -180,7 +184,7 @@ vim.opt.listchars = {
 }
 
 -- Color scheme
-vim.cmd[[colorscheme dracula]]
+vim.cmd[[colorscheme monokai]] -- _pro
 
 -- Key mappings
 local keymap = vim.api.nvim_set_keymap
@@ -384,21 +388,6 @@ vim.cmd[[
     autocmd BufWritePre * :%s/\s\+$//e
   augroup END
 ]]
-
--- Reminder comments
--- zf - create fold
--- zo - open fold
--- zc - close fold
--- zR - open all folds
--- zM - close all folds
--- m{a-zA-Z} - set mark
--- '{a-zA-Z} - jump to mark
--- q{a-z} - record macro
--- @{a-z} - play macro
--- @@ - replay last macro
-
--- Note: Remember to run :Mason to install language servers
--- and external tools: npm i -g prettier eslint, pip install black flake8
 
 -- Font settings
 vim.opt.guifont = "Berkeley Mono:h14"

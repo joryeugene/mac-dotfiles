@@ -57,7 +57,7 @@
     "extensions.experimental.affinity": {
         "asvetliakov.vscode-neovim": 1
     },
-    "workbench.colorTheme": "Dracula Theme",
+    "workbench.colorTheme": "Monokai",
     "[jsonc]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
