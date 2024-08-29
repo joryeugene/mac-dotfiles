@@ -84,11 +84,17 @@ cli:
 backup_configs:
 	@echo "Backing up configuration files..."
 	@mkdir -p $(DOTFILES_DIR)
+	@mkdir -p $(DOTFILES_DIR)/.obsidian
 	@cp -f $(HOME)/.zshrc $(DOTFILES_DIR)/.zshrc || true
 	@cp -f $(HOME)/.config/starship.toml $(DOTFILES_DIR)/starship.toml || true
 	@cp -f $(HOME)/.config/nvim/init.lua $(DOTFILES_DIR)/init.lua || true
 	@cp -f "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/keybindings.json" $(DOTFILES_DIR)/keybindings.json || true
 	@cp -f "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/settings.json" $(DOTFILES_DIR)/settings.json || true
+	@cp -f "$(HOME)/Documents/calmhive/.obsidian.vimrc" $(DOTFILES_DIR)/.obsidian.vimrc || true
+	@cp -f "$(HOME)/Documents/calmhive/.obsidian/app.json" $(DOTFILES_DIR)/.obsidian/app.json || true
+	@cp -f "$(HOME)/Documents/calmhive/.obsidian/appearance.json" $(DOTFILES_DIR)/.obsidian/appearance.json || true
+	@cp -f "$(HOME)/Documents/calmhive/.obsidian/community-plugins.json" $(DOTFILES_DIR)/.obsidian/community-plugins.json || true
+	@cp -f "$(HOME)/Documents/calmhive/.obsidian/hotkeys.json" $(DOTFILES_DIR)/.obsidian/hotkeys.json || true
 	@cp -f $(HOME)/.config/karabiner/karabiner.json $(DOTFILES_DIR)/karabiner.json || true
 	@echo "Backup complete. Files saved in $(DOTFILES_DIR)"
 
@@ -102,8 +108,13 @@ configs: backup_configs
 	@mkdir -p "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27"
 	@cp -f $(DOTFILES_DIR)/keybindings.json "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/keybindings.json" || true
 	@cp -f $(DOTFILES_DIR)/settings.json "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/settings.json" || true
-	@mkdir -p $(HOME)/.config/karabiner
-	@cp -f $(DOTFILES_DIR)/karabiner.json $(HOME)/.config/karabiner/karabiner.json || true
+	@cp -f $(DOTFILES_DIR)/.obsidian.vimrc "$(HOME)/Documents/calmhive/.obsidian.vimrc" || true
+	@cp -f $(DOTFILES_DIR)/.obsidian/app.json "$(HOME)/Documents/calmhive/.obsidian/app.json" || true
+	@cp -f $(DOTFILES_DIR)/.obsidian/appearance.json "$(HOME)/Documents/calmhive/.obsidian/appearance.json" || true
+	@cp -f $(DOTFILES_DIR)/.obsidian/community-plugins.json "$(HOME)/Documents/calmhive/.obsidian/community-plugins.json" || true
+	@cp -f $(DOTFILES_DIR)/.obsidian/hotkeys.json "$(HOME)/Documents/calmhive/.obsidian/hotkeys.json" || true
+	# @mkdir -p $(HOME)/.config/karabiner
+	# @cp -f $(DOTFILES_DIR)/karabiner.json $(HOME)/.config/karabiner/karabiner.json || true
 
 manual_installs:
 	@echo "\nApplications that may need manual installation:"
