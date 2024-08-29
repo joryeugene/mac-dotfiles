@@ -259,8 +259,13 @@ vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 -- NvimTree
 vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', {})
 
--- Toggleterm
-vim.keymap.set('n', '<leader>t', ':ToggleTerm<CR>', {})
+-- Toggleterm setup and keybindings
+require('toggleterm').setup({
+})
+-- Keybinding to open ToggleTerm
+vim.keymap.set('n', '<leader>t', ':ToggleTerm<CR>', { noremap = true, silent = true })
+-- Keybinding to close ToggleTerm from within the terminal
+vim.keymap.set('t', '<C-q>', '<C-\\><C-n>:ToggleTerm<CR>', { noremap = true, silent = true })
 
 -- LSP keybindings
 local on_attach = function(client, bufnr)
@@ -375,7 +380,6 @@ require('lualine').setup {
 require('nvim-tree').setup()
 require('telescope').setup()
 require('which-key').setup()
-require('toggleterm').setup()
 
 -- Markdown preview setup
 vim.g.mkdp_auto_start = 0
