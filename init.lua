@@ -2,7 +2,7 @@
 --
 -- Note: Remember to run :Mason to install language servers
 -- and external tools: npm i -g prettier eslint, pip install black flake8
-
+--
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -79,7 +79,12 @@ require("lazy").setup({
   -- File explorer
   {
     "nvim-tree/nvim-tree.lua",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+      require("nvim-tree").setup()
+    end,
   },
 
   -- Status line
@@ -110,6 +115,19 @@ require("lazy").setup({
       { "<leader>ar", function() require("avante.api").refresh() end, desc = "avante: refresh" },
       { "<leader>ae", function() require("avante.api").edit() end, desc = "avante: edit", mode = "v" },
     },
+    config = function()
+      require("avante").setup({
+        modifiable = true,
+        buffer_options = {
+          modifiable = true,
+        },
+        on_buffer_create = function(bufnr)
+          vim.api.nvim_buf_set_option(bufnr, 'modifiable', true)
+          vim.api.nvim_buf_set_option(bufnr, 'buftype', '')
+        end,
+        -- Other configuration options...
+      })
+    end,
     dependencies = {
       "stevearc/dressing.nvim",
       "nvim-lua/plenary.nvim",
@@ -213,7 +231,7 @@ vim.opt.expandtab = true
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 vim.opt.wrap = false
-vim.opt.colorcolumn = "88,120"
+vim.opt.colorcolumn = { "88", "120" }
 vim.opt.list = true
 vim.opt.listchars = {
   tab = "→ ",
@@ -227,6 +245,7 @@ vim.opt.listchars = {
 
 -- Color scheme
 vim.cmd[[colorscheme monokai]] -- _pro
+-- vim.cmd[[colorscheme tokyonight]]
 
 -- Key mappings
 local keymap = vim.api.nvim_set_keymap
@@ -274,6 +293,7 @@ keymap("n", "<leader>fa", ":foldclose!<CR>", opts)
 
 -- Commentary
 keymap("n", "<leader>/", ":Commentary<CR>", opts)
+keymap("v", "<leader>/", ":Commentary<CR>", opts)
 
 -- Clear search highlighting
 keymap("n", "<leader>h", ":noh<CR>", opts)
@@ -286,9 +306,7 @@ keymap("n", "<leader>\\", ":set wrap!<CR>", opts)
 keymap("n", "<leader>bd", ":bdelete<CR>", opts)
 keymap("n", "<leader>bn", ":enew<CR>", opts)
 keymap("n", "<leader>o", ":only<CR>", opts)
-
--- Markdown preview
-keymap("n", "<leader>mp", ":MarkdownPreview<CR>", opts)
+keymap("n", "<leader>j", ":e /Users/jory/Documents/calmhive/hub.md<CR>", opts)
 
 -- Telescope mappings
 local builtin = require('telescope.builtin')
@@ -413,12 +431,39 @@ null_ls.setup({
 require('gitsigns').setup()
 require('lualine').setup {
   options = {
-    icons_enabled = false,
-    component_separators = { left = '|', right = '|'},
+    icons_enabled = true,
+    theme = 'auto',
+    -- component_separators = { left = '|', right = '|'},
+    component_separators = { left = '', right = ''},
+    -- section_separators = { left = '', right = ''},
     section_separators = { left = '', right = ''},
   },
 }
-require('nvim-tree').setup()
+require('nvim-tree').setup({
+  renderer = {
+    icons = {
+      show = {
+        file = true,
+        folder = true,
+        folder_arrow = true,
+        git = true,
+      },
+    },
+    highlight_git = true,
+    highlight_opened_files = "all",
+  },
+  view = {
+    width = 30,
+    side = "left",
+  },
+})
+
+-- Setup for nvim-web-devicons
+require('nvim-web-devicons').setup({
+  default = true,
+  strict = true,
+})
+
 require('telescope').setup()
 require('which-key').setup()
 
@@ -438,9 +483,16 @@ vim.cmd[[
 ]]
 
 -- Font settings
-vim.opt.guifont = "Berkeley Mono:h14"
+vim.opt.guifont = "Berkeley Mono:h14,Hack Nerd Font Mono:h14"
 vim.opt.linespace = 0
 vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50"
 vim.opt.termguicolors = true
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "avante",
+  callback = function()
+    vim.bo.modifiable = true
+    vim.bo.buftype = ""
+  end,
+})
 
