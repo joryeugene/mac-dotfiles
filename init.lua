@@ -381,7 +381,7 @@ keymap('n', '<leader>tw', ':Twilight<CR>', opts)
 -- Transparent toggle
 keymap('n', '<leader>tr', ':TransparentToggle<CR>', opts)
 
-keymap('n', '<leader>nd', ':Noice dismiss<CR>', opts)
+keymap('n', '<leader>nn', ':Noice dismiss<CR>', opts)
 
 -- Copilot toggle
 keymap('n', '<leader>cp', ':Copilot disable<CR>', opts)

@@ -29,7 +29,7 @@ help:
 	@echo "  make update            - Update system packages and tools"
 	@echo "  make check_dependencies - Check if all required tools are installed"
 
-all: check_dependencies install manual_installs
+all: set_permissions check_dependencies install manual_installs update
 
 install: brew casks cli configs
 
@@ -42,8 +42,8 @@ set_permissions:
 	@echo "Setting correct permissions..."
 	@chmod +x app_discovery.sh brew_discovery.sh cli_tools_discovery.sh
 
-discover: set_permissions
-	@echo "Discovering system state..."
+discover: set_permissions backup_configs
+	@echo "Discovering system state...and backing up configs"
 	@./cli_tools_discovery.sh
 	@./app_discovery.sh
 	@./brew_discovery.sh
