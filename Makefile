@@ -86,6 +86,7 @@ backup_configs:
 	@mkdir -p $(DOTFILES_DIR)
 	@mkdir -p $(DOTFILES_DIR)/.obsidian
 	@cp -f $(HOME)/.zshrc $(DOTFILES_DIR)/.zshrc || true
+	@cp -f $(HOME)/.wezterm.lua $(DOTFILES_DIR)/.wezterm.lua || true
 	@cp -f $(HOME)/.zsh_functions $(DOTFILES_DIR)/.zsh_functions || true
 	@cp -f $(HOME)/.zsh_aliases $(DOTFILES_DIR)/.zsh_aliases || true
 	@cp -f $(HOME)/.config/starship.toml $(DOTFILES_DIR)/starship.toml || true
@@ -98,11 +99,11 @@ backup_configs:
 	@cp -f "$(HOME)/Documents/calmhive/.obsidian/community-plugins.json" $(DOTFILES_DIR)/.obsidian/community-plugins.json || true
 	@cp -f "$(HOME)/Documents/calmhive/.obsidian/hotkeys.json" $(DOTFILES_DIR)/.obsidian/hotkeys.json || true
 	@cp -f $(HOME)/.config/karabiner/karabiner.json $(DOTFILES_DIR)/karabiner.json || true
-	@defaults read com.googlecode.iterm2 > $(DOTFILES_DIR)/iterm2_settings.plist || true
 	@echo "Backup complete. Files saved in $(DOTFILES_DIR)"
 
-configs: 
+configs:
 	@echo "Setting up configurations..."
+	@cp -f $(DOTFILES_DIR)/.wezterm.lua $(HOME)/.wezterm.lua || true
 	@cp -f $(DOTFILES_DIR)/.zshrc $(HOME)/.zshrc || true
 	@cp -f $(DOTFILES_DIR)/.zsh_functions $(HOME)/.zsh_functions || true
 	@cp -f $(DOTFILES_DIR)/.zsh_aliases $(HOME)/.zsh_aliases || true
