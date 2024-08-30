@@ -30,7 +30,6 @@ MonitorControl
 Notion
 Numbers
 Obsidian
-One Thing
 Pages
 Raycast
 Rectangle Pro
@@ -44,11 +43,11 @@ Tot
 Tuple
 Twos
 Visual Studio Code
+WezTerm
 WhatsApp
 Zen Browser
 hhkb-keymap-tool
 iMovie
-iTerm
 iTermAI
 lghub
 superwhisper

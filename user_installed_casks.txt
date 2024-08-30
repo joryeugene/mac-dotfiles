@@ -1,10 +1,10 @@
 docker
 font-hack-nerd-font
-iterm2
 jan
 monitorcontrol
 shortcat
 sourcetree
 tuple
 visual-studio-code
+wezterm
 whatsapp

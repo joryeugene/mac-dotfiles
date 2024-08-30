@@ -140,7 +140,7 @@ require("lazy").setup({
   -- ZenMode for distraction-free writing
   { "folke/zen-mode.nvim", config = function() require("zen-mode").setup {} end },
 
-  -- AI tool
+-- AI tool
   {
     "yetone/avante.nvim",
     event = "VeryLazy",
@@ -385,7 +385,7 @@ keymap('n', '<leader>nd', ':Noice dismiss<CR>', opts)
 
 -- Copilot toggle
 keymap('n', '<leader>cp', ':Copilot disable<CR>', opts)
--- LSP setup
+
 local lspconfig = require('lspconfig')
 local mason = require('mason')
 local mason_lspconfig = require('mason-lspconfig')

@@ -101,7 +101,7 @@ backup_configs:
 	@defaults read com.googlecode.iterm2 > $(DOTFILES_DIR)/iterm2_settings.plist || true
 	@echo "Backup complete. Files saved in $(DOTFILES_DIR)"
 
-configs: backup_configs
+configs: 
 	@echo "Setting up configurations..."
 	@cp -f $(DOTFILES_DIR)/.zshrc $(HOME)/.zshrc || true
 	@cp -f $(DOTFILES_DIR)/.zsh_functions $(HOME)/.zsh_functions || true
@@ -120,7 +120,6 @@ configs: backup_configs
 	@cp -f $(DOTFILES_DIR)/.obsidian/hotkeys.json "$(HOME)/Documents/calmhive/.obsidian/hotkeys.json" || true
 	@mkdir -p $(HOME)/.config/karabiner
 	@cp -f $(DOTFILES_DIR)/karabiner.json $(HOME)/.config/karabiner/karabiner.json || true
-	@defaults import com.googlecode.iterm2 $(DOTFILES_DIR)/iterm2_settings.plist || true
 
 manual_installs:
 	@echo "\nApplications that may need manual installation:"
