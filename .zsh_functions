@@ -181,7 +181,7 @@ function start_project() {
                 docker run -p 8000:8000 --env-file whapp.env whapp:latest
             else
                 echo "Starting whapp in $env mode..."
-                direnv allow
+                # direnv allow
                 poetry run uvicorn app.main:app --reload
             fi
             ;;
