@@ -132,10 +132,10 @@
   },
   {
     "key": "space .",
-    // "command": "workbench.action.togglePanel",
-    // "when": "editorTextFocus && neovim.mode != 'insert'"
     "command": "editor.action.revealDefinition",
     "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor && neovim.mode != 'insert'"
+    // "command": "workbench.action.togglePanel",
+    // "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
     "key": "space '",
@@ -181,6 +181,7 @@
   {
     "key": "space d",
     "command": "workbench.action.debug.start",
+    // "command": "workbench.action.debug.start", // TODO: is this working
     "when": "editorFocus && neovim.mode != 'insert'"
   },
   {
@@ -233,36 +234,12 @@
     "command": "workbench.action.showAllSymbols",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
-  // {
-  //   "key": "space h",
-  //   "command": "workbench.view.debug",
-  //   "when": "editorTextFocus && neovim.mode != 'insert'"
-  // },
   {
     "key": "space h",
-    "command": "workbench.action.closePanel",
+    "command": "vscode-neovim.send",
+    "args": ":noh<CR>",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
-  {
-    "key": "space i",
-    "command": "composer.disable",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
-  },
-  // {
-  //   "key": "space i n",
-  //   "command": "editor.action.inlineSuggest.trigger",
-  //   "when": "editorTextFocus && neovim.mode != 'insert'"
-  // },
-  // {
-  //   "key": "space i c",
-  //   "command": "editor.action.inlineSuggest.showNext",
-  //   "when": "editorTextFocus && neovim.mode != 'insert'"
-  // },
-  // {
-  //   "key": "space i s",
-  //   "command": "editor.action.inlineSuggest.commit",
-  //   "when": "editorTextFocus && neovim.mode != 'insert'"
-  // },
   {
     "key": "space j",
     "command": "workbench.action.openView",
@@ -275,9 +252,8 @@
   },
   {
     "key": "space l",
-    // "command": "editor.action.formatChanges",
-    "command": "aichat.newchatbuttonaction",
-    "when": "editorTextFocus && !editorReadonly && neovim.mode != 'insert'"
+    "command": "aichat.newchataction",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
     "key": "space m",
@@ -321,7 +297,7 @@
   },
   {
     "key": "space r d",
-    "command": "testing.debugCurrentFile",
+    "command": "workbench.action.debug.start",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
@@ -351,9 +327,9 @@
   },
   {
     "key": "space t",
-    "command": "workbench.action.terminal.new",
     // "command": "workbench.view.testing.focus",
-    // "command": "workbench.action.files.newUntitledFile",
+    // "command": "workbench.action.terminal.new",
+    "command": "workbench.action.files.newUntitledFile",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
@@ -361,8 +337,8 @@
     // "command": "testing.toggleInlineTestOutput",
     // "command": "workbench.action.toggleEditorVisibility",
     // "command": "workbench.panel.markers.view.focus",
-    "command": "editor.closeTestPeek",
     // "command": "workbench.panel.testResults.view.toggleVisibility",
+    "command": "editor.closeTestPeek",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
@@ -391,6 +367,12 @@
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
+    "key": "space y v",
+    "command": "vscode.open",
+    "args": "/Users/jory/.config/nvim/init.lua",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
     "key": "space w",
     "command": "workbench.action.files.save",
     "when": "editorTextFocus && neovim.mode != 'insert'"
@@ -409,10 +391,6 @@
     "key": "space z",
     "command": "workbench.action.toggleZenMode",
     "when": "editorTextFocus && neovim.mode != 'insert'"
-  },
-  {
-    "key": "ctrl+shift+j",
-    "command": "workbench.action.terminal.switchTerminal"
   },
   {
     "key": "ctrl+cmd+i",
@@ -472,7 +450,7 @@
     "command": "workbench.panel.composerViewPane"
   },
   {
-    "key": "ctrl+shift+.",
+    "key": "ctrl+shift+,",
     "command": "workbench.action.terminal.new",
     "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
   },

@@ -120,3 +120,5 @@ fi
 # Load Starship prompt (move this line to the end of your .zshrc)
 eval "$(starship init zsh)"
 
+
+. "$HOME/.cargo/env"
