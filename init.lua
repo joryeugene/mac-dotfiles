@@ -99,8 +99,47 @@ require("lazy").setup({
   -- Git integration
   { "lewis6991/gitsigns.nvim" },
 
+  -- Twilight for focusing on current paragraph
+  { "folke/twilight.nvim", config = function() require("twilight").setup {} end },
+
+  -- Transparent for toggling background transparency
+  { "xiyaowong/nvim-transparent", config = function() require("transparent").setup {} end },
+
+  -- Noice for enhancing Neovim UI
+  {
+    "folke/noice.nvim",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    },
+    config = function()
+      require("noice").setup({
+        views = {
+          notify = {
+            backend = "notify",
+            fallback = "mini",
+            timeout = 3000,
+            level = vim.log.levels.INFO,
+            format = "notify",
+          },
+        },
+        lsp = {
+          override = {
+            ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+            ["vim.lsp.util.stylize_markdown"] = true,
+            ["cmp.entry.get_documentation"] = true,
+          },
+        },
+      })
+    end,
+
+  },
+
   -- Terminal management
   { "akinsho/toggleterm.nvim", version = "*" },
+
+  -- ZenMode for distraction-free writing
+  { "folke/zen-mode.nvim", config = function() require("zen-mode").setup {} end },
 
   -- AI tool
   {
@@ -248,97 +287,99 @@ vim.cmd[[colorscheme monokai]] -- _pro
 -- vim.cmd[[colorscheme tokyonight]]
 
 -- Key mappings
-local keymap = vim.api.nvim_set_keymap
+local keymap = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
--- Buffer navigation
+-- Navigation
 keymap("n", "H", ":bprevious<CR>", opts)
 keymap("n", "L", ":bnext<CR>", opts)
+keymap("n", "<C-h>", "<C-w>h", opts)
+keymap("n", "<C-j>", "<C-w>j", opts)
+keymap("n", "<C-k>", "<C-w>k", opts)
+keymap("n", "<C-l>", "<C-w>l", opts)
 
--- Move selected lines up/down
+-- Buffer operations
+keymap("n", "<leader>bd", ":bdelete<CR>", opts)
+keymap("n", "<leader>bn", ":enew<CR>", opts)
+keymap("n", "<leader>bl", ":buffers<CR>", opts)
+keymap("n", "<leader>bo", ":BufferOnly<CR>", opts)
+
+-- Editing
 keymap("v", "J", ":m '>+1<CR>gv=gv", opts)
 keymap("v", "K", ":m '<-2<CR>gv=gv", opts)
-
--- Redo
 keymap("n", "U", "<C-R>", opts)
+keymap("n", "<leader>/", ":Commentary<CR>", opts)
+keymap("v", "<leader>/", ":Commentary<CR>", opts)
 
--- Quick edit and reload of init.lua
-keymap("n", "<leader>ve", ":e ~/.config/nvim/init.lua<CR>", opts)
-keymap("n", "<leader>vr", ":source ~/.config/nvim/init.lua<CR>", opts)
+-- File operations
+keymap("n", "<leader>w", ":w<CR>", opts)
+keymap("n", "<leader>q", ":q<CR>", opts)
+keymap("n", "<leader>x", ":x<CR>", opts)
 
--- Replace entire buffer with system clipboard contents
-keymap("n", "<leader>sp", "ggVG\"+p", opts)
+-- Utility
+keymap("n", "<leader>h", ":noh<CR>", opts)
+keymap("n", "<leader>z", ":ZenMode<CR>", opts)
+keymap("n", "<leader>\\", ":set wrap!<CR>", opts)
+
+keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
+keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+keymap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+keymap("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+keymap("n", "<leader>ff", "<cmd>Telescope find_files<CR>", opts)
+keymap("n", "<leader>fg", "<cmd>Telescope live_grep<CR>", opts)
+keymap("n", "<leader>fb", "<cmd>Telescope buffers<CR>", opts)
+keymap("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", opts)
+keymap("n", "<leader>fm", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+keymap("n", "<leader>d", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+keymap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", opts)
+keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", opts)
 
 -- Windows and splits
 keymap("n", "<leader>sv", ":vsplit<CR>", opts)
 keymap("n", "<leader>sh", ":split<CR>", opts)
 keymap("n", "<leader>sc", ":close<CR>", opts)
 
--- Move between splits
-keymap("n", "<C-h>", "<C-w>h", opts)
-keymap("n", "<C-j>", "<C-w>j", opts)
-keymap("n", "<C-k>", "<C-w>k", opts)
-keymap("n", "<C-l>", "<C-w>l", opts)
+-- Quick save and quit
+keymap("n", "WW", ":w!<CR>", opts)
+keymap("n", "QQ", ":q!<CR>", opts)
 
--- Save and quit
-keymap("n", "<leader>w", ":w<CR>", opts)
-keymap("n", "<leader>q", ":q<CR>", opts)
-keymap("n", "<leader>x", ":x<CR>", opts)
+-- Easy navigation
+keymap("n", "E", "$", opts)
+keymap("n", "B", "^", opts)
 
--- Folding
-keymap("n", "<leader>fo", ":foldopen<CR>", opts)
-keymap("n", "<leader>fc", ":foldclose<CR>", opts)
-keymap("n", "<leader>fu", ":foldopen!<CR>", opts)
-keymap("n", "<leader>fa", ":foldclose!<CR>", opts)
+-- Resize splits
+keymap("n", "<C-W>,", ":vertical resize -10<CR>", opts)
+keymap("n", "<C-W>.", ":vertical resize +10<CR>", opts)
 
--- Commentary
-keymap("n", "<leader>/", ":Commentary<CR>", opts)
-keymap("v", "<leader>/", ":Commentary<CR>", opts)
-
--- Clear search highlighting
-keymap("n", "<leader>h", ":noh<CR>", opts)
-
--- Toggle options
-keymap("n", "<leader>z", ":ZenMode<CR>", opts)
-keymap("n", "<leader>\\", ":set wrap!<CR>", opts)
-
--- Additional useful mappings
-keymap("n", "<leader>bd", ":bdelete<CR>", opts)
-keymap("n", "<leader>bn", ":enew<CR>", opts)
-keymap("n", "<leader>o", ":only<CR>", opts)
+-- Quick access
 keymap("n", "<leader>j", ":e /Users/jory/Documents/calmhive/hub.md<CR>", opts)
-
--- Telescope mappings
-local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+keymap("n", "<leader>vr", ":source $MYVIMRC<CR>", opts) -- Refresh Neovim state
+keymap("n", "<leader>vc", ":e $MYVIMRC<CR>", opts) -- Open init.lua for editing
+keymap("n", "<leader>m", ":Mason<CR>", opts) -- Open Mason
+keymap("n", "<leader>l", ":Lazy<CR>", opts) -- Open Lazy plugin manager
+keymap("n", "<leader>o", ":Telescope buffers<CR>", opts) -- Open buffer list
 
 -- NvimTree
-vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', {})
+vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { noremap = true, silent = true })
 
 -- Toggleterm setup and keybindings
 require('toggleterm').setup({
 })
 -- Keybinding to open ToggleTerm
-vim.keymap.set('n', '<leader>t', ':ToggleTerm<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>tt', ':ToggleTerm<CR>', { noremap = true, silent = true })
 -- Keybinding to close ToggleTerm from within the terminal
 vim.keymap.set('t', '<C-q>', '<C-\\><C-n>:ToggleTerm<CR>', { noremap = true, silent = true })
 
--- LSP keybindings
-local on_attach = function(client, bufnr)
-  local bufopts = { noremap=true, silent=true, buffer=bufnr }
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
-  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<leader>f', function() vim.lsp.buf.format { async = true } end, bufopts)
-end
+
+-- Twilight toggle
+keymap('n', '<leader>tw', ':Twilight<CR>', opts)
+
+-- Transparent toggle
+keymap('n', '<leader>tr', ':TransparentToggle<CR>', opts)
+
+keymap('n', '<leader>nd', ':Noice dismiss<CR>', opts)
 
 -- LSP setup
 local lspconfig = require('lspconfig')
@@ -488,11 +529,35 @@ vim.opt.linespace = 0
 vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50"
 vim.opt.termguicolors = true
 
+-- Custom function to open markdown links
+function _G.open_markdown_link()
+    local line = vim.fn.getline('.')
+    local link = line:match('%[.-%]%((.-)%)')
+    if link then
+        if vim.fn.has('mac') == 1 then
+            vim.fn.system('open ' .. link)
+        elseif vim.fn.has('unix') == 1 then
+            vim.fn.system('xdg-open ' .. link)
+        elseif vim.fn.has('win32') == 1 then
+            vim.fn.system('start ' .. link)
+        end
+    else
+        -- If no markdown link is found, use Neovim's built-in gx functionality
+        vim.api.nvim_command('normal! gx')
+    end
+end
+
+-- Map 'gx' to open markdown links
+vim.api.nvim_set_keymap('n', 'gx', ':lua open_markdown_link()<CR>', {noremap = true, silent = true})
+
+-- Placeholder for ChatGPT plugin
+-- vim.keymap.set('n', '<leader>g', ':ChatGPT<CR>', { noremap = true, silent = true })
+
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "avante",
-  callback = function()
-    vim.bo.modifiable = true
-    vim.bo.buftype = ""
-  end,
+    pattern = "avante",
+    callback = function()
+        vim.bo.modifiable = true
+        vim.bo.buftype = ""
+    end,
 })
 
