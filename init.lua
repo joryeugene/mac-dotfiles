@@ -132,7 +132,6 @@ require("lazy").setup({
         },
       })
     end,
-
   },
 
   -- Terminal management
@@ -200,8 +199,11 @@ require("lazy").setup({
       },
     },
   },
-
-  -- Tailwind CSS support
+  -- AI tools
+  {
+    'github/copilot.vim',
+    event = "InsertEnter",
+  },
   { "williamboman/mason.nvim" },
 
   -- Database plugins
@@ -381,6 +383,8 @@ keymap('n', '<leader>tr', ':TransparentToggle<CR>', opts)
 
 keymap('n', '<leader>nd', ':Noice dismiss<CR>', opts)
 
+-- Copilot toggle
+keymap('n', '<leader>cp', ':Copilot disable<CR>', opts)
 -- LSP setup
 local lspconfig = require('lspconfig')
 local mason = require('mason')
