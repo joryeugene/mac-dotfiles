@@ -74,5 +74,6 @@
     "editor.accessibilitySupport": "off",
     "workbench.layoutControl.enabled": false,
     "window.commandCenter": false,
-    "cursor.chat.showSuggestedFiles": true
+    "cursor.chat.showSuggestedFiles": true,
+    "terminal.integrated.fontSize": 16
 }

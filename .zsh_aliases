@@ -100,3 +100,23 @@ alias ff='find . -type f -name'
 # GitHub Copilot CLI
 alias cpe='gh copilot explain'
 alias cps='gh copilot suggest'
+
+# Add aliases for the start_project function
+alias spwl='start_project whapp dev local'
+alias spwd='start_project whapp dev dev'
+alias spwp='start_project whapp dev prod'
+alias spwdo='start_project whapp docker local'
+alias spal='start_project admin dev local'
+alias spad='start_project admin dev dev'
+alias spap='start_project admin dev prod'
+alias spado='start_project admin docker local'
+
+# Aliases for monohelix (original repo)
+alias spwl1='start_project whapp dev local monohelix'
+alias spwd1='start_project whapp dev dev monohelix'
+alias spwp1='start_project whapp dev prod monohelix'
+alias spwdo1='start_project whapp docker local monohelix'
+alias spal1='start_project admin dev local monohelix'
+alias spad1='start_project admin dev dev monohelix'
+alias spap1='start_project admin dev prod monohelix'
+alias spado1='start_project admin docker local monohelix'

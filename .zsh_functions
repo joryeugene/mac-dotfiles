@@ -127,3 +127,86 @@ function calmhive() {
 
   nvim /Users/jory/Documents/calmhive/hub.md
 }
+
+function start_project() {
+    local project=$1
+    local mode=$2
+    local env=${3:-local}  # Default to local if not specified
+    local repo=${4:-monohelix2}  # Default to monohelix2 if not specified
+    local root="/Users/jory/Documents/GitHub/$repo"
+
+    # Function to check and handle git changes
+    check_git_changes() {
+        if [[ -n $(git status --porcelain) ]]; then
+            echo "There are uncommitted changes in the repository."
+            read "REPLY?Do you want to stash these changes? (y/n) "
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                git stash
+                echo "Changes stashed."
+            else
+                echo "Proceeding with uncommitted changes."
+            fi
+        fi
+    }
+
+    # Function to switch to the correct branch
+    switch_branch() {
+        local target_branch=$1
+        git fetch origin
+        if [[ $(git rev-parse --abbrev-ref HEAD) != $target_branch ]]; then
+            read "REPLY?Not on $target_branch branch. Switch to $target_branch? (y/n) "
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                git checkout $target_branch
+                git pull origin $target_branch
+            else
+                echo "Staying on current branch."
+            fi
+        fi
+    }
+
+    case $project in
+        whapp)
+            cd "$root/projects/whapp" || return
+            check_git_changes
+
+            if [[ $env == "dev" ]]; then
+                switch_branch "dev"
+            elif [[ $env == "prod" ]]; then
+                switch_branch "main"
+            fi
+
+            if [[ $mode == "docker" ]]; then
+                echo "Building and running whapp Docker container..."
+                docker build -t whapp:latest -f Dockerfile ../..
+                docker run -p 8000:8000 --env-file whapp.env whapp:latest
+            else
+                echo "Starting whapp in $env mode..."
+                direnv allow
+                poetry run uvicorn app.main:app --reload
+            fi
+            ;;
+        admin)
+            cd "$root/projects/admin-dashboard" || return
+            check_git_changes
+
+            if [[ $env == "dev" ]]; then
+                switch_branch "dev"
+            elif [[ $env == "prod" ]]; then
+                switch_branch "main"
+            fi
+
+            if [[ $mode == "docker" ]]; then
+                echo "Building admin-dashboard Docker container..."
+                docker build -t admin-dashboard:latest .
+            else
+                echo "Starting admin-dashboard in $env mode..."
+                npm run dev
+            fi
+            ;;
+        *)
+            echo "Usage: start_project [whapp|admin] [dev|docker] [local|dev|prod] [monohelix|monohelix2]"
+            echo "  Third argument defaults to local if not specified"
+            echo "  Fourth argument defaults to monohelix2 if not specified"
+            ;;
+    esac
+}
