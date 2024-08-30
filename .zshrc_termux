@@ -1,0 +1,117 @@
+# Termux-specific .zshrc
+
+# Check if Zinit is installed, if not, install it
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+if [[ ! -f $ZINIT_HOME/zinit.zsh ]]; then
+    print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager (%F{33}zdharma/zinit%F{220})…%f"
+    command mkdir -p "$(dirname $ZINIT_HOME)"
+    command git clone https://github.com/zdharma-continuum/zinit "$ZINIT_HOME" && \
+        print -P "%F{33}▓▒░ %F{34}Installation successful.%f%b" || \
+        print -P "%F{160}▓▒░ The clone has failed.%f%b"
+fi
+
+# Source Zinit
+source "${ZINIT_HOME}/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
+# Load environment variables from ~/.env
+if [ -f "$HOME/.env" ]; then
+  set -a
+  source "$HOME/.env"
+  set +a
+fi
+
+# User configuration
+export EDITOR='nvim'
+
+# Increase FUNCNEST limit
+FUNCNEST=100
+
+# FZF configuration (if installed)
+if command -v fzf >/dev/null 2>&1; then
+    [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+    export FZF_DEFAULT_COMMAND='find . -type f'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_ALT_C_COMMAND="find . -type d"
+fi
+
+# Load plugins
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-history-substring-search
+zinit light agkozak/zsh-z
+
+# Vi mode settings
+bindkey -v
+export KEYTIMEOUT=1
+
+# Function to update cursor and Starship keymap
+function update_vim_mode() {
+    case ${KEYMAP} in
+        vicmd)
+            echo -ne '\e[2 q'
+            STARSHIP_SHELL_KEYMAP=NORMAL
+            ;;
+        main|viins)
+            echo -ne '\e[5 q'
+            STARSHIP_SHELL_KEYMAP=INSERT
+            ;;
+    esac
+}
+
+# Set up Zle hooks
+function zle-line-init zle-keymap-select {
+    update_vim_mode
+    zle reset-prompt
+}
+
+zle -N zle-line-init
+zle -N zle-keymap-select
+
+# Use beam shape cursor on startup and for each new prompt
+echo -ne '\e[5 q'
+preexec() { echo -ne '\e[5 q'; }
+
+# Edit line in vim with ctrl-e
+autoload edit-command-line; zle -N edit-command-line
+bindkey '^e' edit-command-line
+
+# Aliases and functions (load from separate files)
+[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
+[[ -f ~/.zsh_functions ]] && source ~/.zsh_functions
+
+# History configuration
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.zsh_history
+
+# Key bindings
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+if command -v fzf >/dev/null 2>&1; then
+    bindkey '^R' fzf-history-widget
+    bindkey '^F' fzf-cd-widget
+fi
+
+# Colorize man pages
+export LESS_TERMCAP_mb=$'\e[1;32m'
+export LESS_TERMCAP_md=$'\e[1;32m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[01;33m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[1;4;31m'
+
+# Additional PATH and environment variables
+export PATH="$PATH:$HOME/.local/bin"
+
+# Load any local customizations
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# Load Starship prompt if installed
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
