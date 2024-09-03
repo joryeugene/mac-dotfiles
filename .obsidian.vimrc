@@ -4,9 +4,9 @@
 set clipboard=unnamed
 
 " Tab navigation
-exmap nextTab obcommand workspace:next-tab
+exmap nextTab obcommand workspace:previous-tab
 nmap H :nextTab
-exmap prevTab obcommand workspace:previous-tab
+exmap prevTab obcommand workspace:next-tab
 nmap L :prevTab
 
 " Quick note creation

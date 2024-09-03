@@ -19,6 +19,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Leader key
 vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 
 -- Plugin configuration
 require("lazy").setup({
@@ -26,6 +27,7 @@ require("lazy").setup({
   { "Mofiqul/dracula.nvim" },
   { "folke/tokyonight.nvim" },
   { "tanvirtin/monokai.nvim" },
+  { "catppuccin/nvim" },
 
   -- Treesitter for better syntax highlighting
   {
@@ -285,8 +287,8 @@ vim.opt.listchars = {
 }
 
 -- Color scheme
-vim.cmd[[colorscheme monokai]] -- _pro
--- vim.cmd[[colorscheme tokyonight]]
+-- vim.cmd[[colorscheme monokai]] -- _pro -- tokyonight
+vim.cmd.colorscheme "catppuccin"
 
 -- Key mappings
 local keymap = vim.keymap.set
