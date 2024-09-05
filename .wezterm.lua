@@ -38,8 +38,6 @@ return {
 	},
 
 	-- Set default split direction
-	default_cwd = wezterm.home_dir,
-	default_prog = { 'zsh' },
 	split_horizontal = { domain = 'CurrentPaneDomain' },
 	split_vertical = { domain = 'CurrentPaneDomain' },
 }

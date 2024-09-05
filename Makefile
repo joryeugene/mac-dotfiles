@@ -85,12 +85,15 @@ backup_configs:
 	@echo "Backing up configuration files..."
 	@mkdir -p $(DOTFILES_DIR)
 	@mkdir -p $(DOTFILES_DIR)/.obsidian
+	@mkdir -p $(DOTFILES_DIR)/zellij/themes
 	@cp -f $(HOME)/.zshrc $(DOTFILES_DIR)/.zshrc || true
 	@cp -f $(HOME)/.wezterm.lua $(DOTFILES_DIR)/.wezterm.lua || true
 	@cp -f $(HOME)/.zsh_functions $(DOTFILES_DIR)/.zsh_functions || true
 	@cp -f $(HOME)/.zsh_aliases $(DOTFILES_DIR)/.zsh_aliases || true
 	@cp -f $(HOME)/.config/starship.toml $(DOTFILES_DIR)/starship.toml || true
 	@cp -f $(HOME)/.config/nvim/init.lua $(DOTFILES_DIR)/init.lua || true
+	@cp -f $(HOME)/.config/zellij/config.kdl $(DOTFILES_DIR)/zellij/config.kdl || true
+	@cp -f $(HOME)/.config/zellij/themes/* $(DOTFILES_DIR)/zellij/themes/ || true
 	@mkdir -p $(DOTFILES_DIR)/backup_configs
 	@cp -f "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/keybindings.json" $(DOTFILES_DIR)/backup_configs/keybindings_backup.json || true
 	@cp -f "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/settings.json" $(DOTFILES_DIR)/backup_configs/settings_backup.json || true
@@ -116,6 +119,9 @@ configs:
 	@cp -f $(DOTFILES_DIR)/starship.toml $(HOME)/.config/starship.toml || true
 	@mkdir -p $(HOME)/.config/nvim
 	@cp -f $(DOTFILES_DIR)/init.lua $(HOME)/.config/nvim/init.lua || true
+	@mkdir -p $(HOME)/.config/zellij/themes
+	@cp -f $(DOTFILES_DIR)/zellij/config.kdl $(HOME)/.config/zellij/config.kdl || true
+	@cp -f $(DOTFILES_DIR)/zellij/themes/* $(HOME)/.config/zellij/themes/ || true
 	@mkdir -p "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27"
 	@cp -f $(DOTFILES_DIR)/keybindings.json "$(HOME)/Library/Application Support/Cursor/User/keybindings.json" || true
 	@cp -f $(DOTFILES_DIR)/settings.json "$(HOME)/Library/Application Support/Cursor/User/settings.json" || true
