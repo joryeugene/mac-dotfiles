@@ -69,6 +69,9 @@ require("lazy").setup({
     dependencies = { "nvim-lua/plenary.nvim" },
   },
 
+  -- FLYBOY
+  { "CamdenClark/flyboy" },
+
   -- Commentary plugin
   { "tpope/vim-commentary" },
 
