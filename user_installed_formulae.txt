@@ -17,6 +17,7 @@ git-delta
 go
 graphviz
 grep
+hadolint
 helix
 helm
 htop
@@ -30,6 +31,7 @@ lazydocker
 lazygit
 libffi
 lsd
+make
 marksman
 midnight-commander
 mycli
@@ -44,6 +46,7 @@ pre-commit
 prettier
 pyenv
 pylint
+quarylabs/quary/sqruff
 ripgrep
 rsync
 rust

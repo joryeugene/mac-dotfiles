@@ -1,4 +1,5 @@
 .Karabiner-VirtualHIDDevice-Manager
+.KensingtonWorks
 1Password 7
 AltTab
 Asana
@@ -23,6 +24,7 @@ Hidden Bar
 Jan
 Karabiner-Elements
 Karabiner-EventViewer
+KensingtonWorks 
 Keynote
 LM Studio
 Lumina
