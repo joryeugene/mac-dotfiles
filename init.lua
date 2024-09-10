@@ -21,13 +21,15 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Function to check if we're running in VS Code
+local function is_vscode()
+  return vim.g.vscode ~= nil
+end
+
 -- Plugin configuration
 require("lazy").setup({
   -- Theme options
-  { "Mofiqul/dracula.nvim" },
-  { "folke/tokyonight.nvim" },
-  { "tanvirtin/monokai.nvim" },
-  { "catppuccin/nvim" },
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
 
   -- Treesitter for better syntax highlighting
   {
@@ -41,13 +43,14 @@ require("lazy").setup({
     end,
   },
 
-  -- LSP
+  -- LSP and related plugins
   {
     "neovim/nvim-lspconfig",
     dependencies = {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
     },
+    cond = not is_vscode,
   },
 
   -- Autocompletion
@@ -61,12 +64,14 @@ require("lazy").setup({
       "L3MON4D3/LuaSnip",
       "saadparwaiz1/cmp_luasnip",
     },
+    cond = not is_vscode,
   },
 
   -- Linting and formatting
   {
     "jose-elias-alvarez/null-ls.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
+    cond = not is_vscode,
   },
 
   -- FLYBOY
@@ -391,91 +396,107 @@ keymap('n', '<leader>nn', ':Noice dismiss<CR>', opts)
 -- Copilot toggle
 keymap('n', '<leader>cp', ':Copilot disable<CR>', opts)
 
-local lspconfig = require('lspconfig')
-local mason = require('mason')
-local mason_lspconfig = require('mason-lspconfig')
+-- LSP setup (only for standalone Neovim)
+if not is_vscode() then
+  local status_ok, lspconfig = pcall(require, 'lspconfig')
+  if not status_ok then
+    vim.notify("lspconfig not found", vim.log.levels.WARN)
+    return
+  end
 
-mason.setup()
-mason_lspconfig.setup({
-  ensure_installed = {
-    "pyright",
-    "tsserver",
-    "html",
-    "cssls",
-    "tailwindcss",
-    "dockerls",
-    "marksman",
-  },
-  automatic_installation = true,
-})
+  local mason_status_ok, mason = pcall(require, 'mason')
+  if not mason_status_ok then
+    vim.notify("mason not found", vim.log.levels.WARN)
+    return
+  end
 
--- Configure LSP servers
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
+  local mason_lspconfig_status_ok, mason_lspconfig = pcall(require, 'mason-lspconfig')
+  if not mason_lspconfig_status_ok then
+    vim.notify("mason-lspconfig not found", vim.log.levels.WARN)
+    return
+  end
 
-local servers = { "pyright", "tsserver", "html", "cssls", "tailwindcss", "dockerls", "marksman" }
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup({
-    on_attach = on_attach,
-    capabilities = capabilities,
+  mason.setup()
+  mason_lspconfig.setup({
+    ensure_installed = { "pyright", "tsserver", "html", "cssls", "tailwindcss", "dockerls", "marksman" },
+    automatic_installation = true,
+  })
+
+  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+  local servers = { "pyright", "tsserver", "html", "cssls", "tailwindcss", "dockerls", "marksman" }
+  for _, lsp in ipairs(servers) do
+    lspconfig[lsp].setup({
+      capabilities = capabilities,
+    })
+  end
+
+  -- Autocompletion setup
+  local cmp_status_ok, cmp = pcall(require, 'cmp')
+  if not cmp_status_ok then
+    vim.notify("cmp not found", vim.log.levels.WARN)
+    return
+  end
+
+  local luasnip_status_ok, luasnip = pcall(require, 'luasnip')
+  if not luasnip_status_ok then
+    vim.notify("luasnip not found", vim.log.levels.WARN)
+    return
+  end
+
+  cmp.setup({
+    snippet = {
+      expand = function(args)
+        luasnip.lsp_expand(args.body)
+      end,
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<CR>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
+      ['<Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        elseif luasnip.expand_or_jumpable() then
+          luasnip.expand_or_jump()
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
+      ['<S-Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        elseif luasnip.jumpable(-1) then
+          luasnip.jump(-1)
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
+    }),
+    sources = {
+      { name = 'nvim_lsp' },
+      { name = 'luasnip' },
+      { name = 'buffer' },
+      { name = 'path' },
+    },
+  })
+
+  -- Linting and formatting setup
+  local null_ls_status_ok, null_ls = pcall(require, "null-ls")
+  if not null_ls_status_ok then
+    vim.notify("null-ls not found", vim.log.levels.WARN)
+    return
+  end
+
+  null_ls.setup({
+    sources = {
+      null_ls.builtins.formatting.black,
+      null_ls.builtins.formatting.prettier,
+      null_ls.builtins.diagnostics.eslint,
+      null_ls.builtins.diagnostics.flake8,
+    },
   })
 end
-
--- Autocompletion setup
-local cmp = require('cmp')
-local luasnip = require('luasnip')
-
-cmp.setup({
-  snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
-  },
-  mapping = cmp.mapping.preset.insert({
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    },
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-  }),
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-    { name = 'buffer' },
-    { name = 'path' },
-  },
-})
-
--- Linting and formatting setup
-local null_ls = require("null-ls")
-
-null_ls.setup({
-  sources = {
-    null_ls.builtins.formatting.black,
-    null_ls.builtins.formatting.prettier,
-    null_ls.builtins.diagnostics.eslint,
-    null_ls.builtins.diagnostics.flake8,
-  },
-})
 
 -- Additional plugin configurations
 require('gitsigns').setup()
