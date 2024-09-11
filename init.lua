@@ -56,6 +56,7 @@ require("lazy").setup({
   -- Autocompletion
   {
     "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
@@ -64,7 +65,46 @@ require("lazy").setup({
       "L3MON4D3/LuaSnip",
       "saadparwaiz1/cmp_luasnip",
     },
-    cond = not is_vscode,
+    config = function()
+      local cmp = require('cmp')
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            require('luasnip').lsp_expand(args.body)
+          end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+          ['<C-f>'] = cmp.mapping.scroll_docs(4),
+          ['<C-Space>'] = cmp.mapping.complete(),
+          ['<CR>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
+          ['<Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif require('luasnip').expand_or_jumpable() then
+              require('luasnip').expand_or_jump()
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+          ['<S-Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif require('luasnip').jumpable(-1) then
+              require('luasnip').jump(-1)
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+        }),
+        sources = {
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
+          { name = 'buffer' },
+          { name = 'path' },
+        },
+      })
+    end,
   },
 
   -- Linting and formatting
@@ -153,6 +193,7 @@ require("lazy").setup({
 -- AI tool
   {
     "yetone/avante.nvim",
+    build = "./install.sh",
     event = "VeryLazy",
     lazy = false,
     opts = {
@@ -369,7 +410,7 @@ keymap("n", "<C-W>.", ":vertical resize +10<CR>", opts)
 keymap("n", "<leader>j", ":e /Users/jory/Documents/calmhive/hub.md<CR>", opts)
 keymap("n", "<leader>vr", ":source $MYVIMRC<CR>", opts) -- Refresh Neovim state
 keymap("n", "<leader>vc", ":e $MYVIMRC<CR>", opts) -- Open init.lua for editing
-keymap("n", "<leader>m", ":Mason<CR>", opts) -- Open Mason
+keymap("n", "<leader>m", ":messages<CR>", opts) -- Open messages
 keymap("n", "<leader>l", ":Lazy<CR>", opts) -- Open Lazy plugin manager
 keymap("n", "<leader>o", ":Telescope buffers<CR>", opts) -- Open buffer list
 
@@ -398,103 +439,86 @@ keymap('n', '<leader>cp', ':Copilot disable<CR>', opts)
 
 -- LSP setup (only for standalone Neovim)
 if not is_vscode() then
-  local status_ok, lspconfig = pcall(require, 'lspconfig')
-  if not status_ok then
-    vim.notify("lspconfig not found", vim.log.levels.WARN)
-    return
-  end
+  vim.api.nvim_create_autocmd("User", {
+    pattern = "LazyDone",
+    callback = function()
+      local lspconfig = require('lspconfig')
+      local mason = require('mason')
+      local mason_lspconfig = require('mason-lspconfig')
+      local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
-  local mason_status_ok, mason = pcall(require, 'mason')
-  if not mason_status_ok then
-    vim.notify("mason not found", vim.log.levels.WARN)
-    return
-  end
+      mason.setup()
+      mason_lspconfig.setup({
+        ensure_installed = { "pyright", "tsserver", "html", "cssls", "tailwindcss", "dockerls", "marksman" },
+        automatic_installation = true,
+      })
 
-  local mason_lspconfig_status_ok, mason_lspconfig = pcall(require, 'mason-lspconfig')
-  if not mason_lspconfig_status_ok then
-    vim.notify("mason-lspconfig not found", vim.log.levels.WARN)
-    return
-  end
+      local capabilities = cmp_nvim_lsp.default_capabilities()
+      local servers = { "pyright", "tsserver", "html", "cssls", "tailwindcss", "dockerls", "marksman" }
+      for _, lsp in ipairs(servers) do
+        lspconfig[lsp].setup({
+          capabilities = capabilities,
+        })
+      end
 
-  mason.setup()
-  mason_lspconfig.setup({
-    ensure_installed = { "pyright", "tsserver", "html", "cssls", "tailwindcss", "dockerls", "marksman" },
-    automatic_installation = true,
-  })
+      -- Move the cmp setup here
+      local cmp = require('cmp')
+      local luasnip = require('luasnip')
 
-  local capabilities = require('cmp_nvim_lsp').default_capabilities()
-  local servers = { "pyright", "tsserver", "html", "cssls", "tailwindcss", "dockerls", "marksman" }
-  for _, lsp in ipairs(servers) do
-    lspconfig[lsp].setup({
-      capabilities = capabilities,
-    })
-  end
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+          ['<C-f>'] = cmp.mapping.scroll_docs(4),
+          ['<C-Space>'] = cmp.mapping.complete(),
+          ['<CR>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
+          ['<Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+          ['<S-Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+        }),
+        sources = {
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
+          { name = 'buffer' },
+          { name = 'path' },
+        },
+      })
 
-  -- Autocompletion setup
-  local cmp_status_ok, cmp = pcall(require, 'cmp')
-  if not cmp_status_ok then
-    vim.notify("cmp not found", vim.log.levels.WARN)
-    return
-  end
+      -- Linting and formatting setup
+      local null_ls_status_ok, null_ls = pcall(require, "null-ls")
+      if not null_ls_status_ok then
+        vim.notify("null-ls not found", vim.log.levels.WARN)
+        return
+      end
 
-  local luasnip_status_ok, luasnip = pcall(require, 'luasnip')
-  if not luasnip_status_ok then
-    vim.notify("luasnip not found", vim.log.levels.WARN)
-    return
-  end
-
-  cmp.setup({
-    snippet = {
-      expand = function(args)
-        luasnip.lsp_expand(args.body)
-      end,
-    },
-    mapping = cmp.mapping.preset.insert({
-      ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-      ['<C-f>'] = cmp.mapping.scroll_docs(4),
-      ['<C-Space>'] = cmp.mapping.complete(),
-      ['<CR>'] = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
-      ['<Tab>'] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_next_item()
-        elseif luasnip.expand_or_jumpable() then
-          luasnip.expand_or_jump()
-        else
-          fallback()
-        end
-      end, { 'i', 's' }),
-      ['<S-Tab>'] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_prev_item()
-        elseif luasnip.jumpable(-1) then
-          luasnip.jump(-1)
-        else
-          fallback()
-        end
-      end, { 'i', 's' }),
-    }),
-    sources = {
-      { name = 'nvim_lsp' },
-      { name = 'luasnip' },
-      { name = 'buffer' },
-      { name = 'path' },
-    },
-  })
-
-  -- Linting and formatting setup
-  local null_ls_status_ok, null_ls = pcall(require, "null-ls")
-  if not null_ls_status_ok then
-    vim.notify("null-ls not found", vim.log.levels.WARN)
-    return
-  end
-
-  null_ls.setup({
-    sources = {
-      null_ls.builtins.formatting.black,
-      null_ls.builtins.formatting.prettier,
-      null_ls.builtins.diagnostics.eslint,
-      null_ls.builtins.diagnostics.flake8,
-    },
+      null_ls.setup({
+        sources = {
+          null_ls.builtins.formatting.black,
+          null_ls.builtins.formatting.prettier,
+          null_ls.builtins.diagnostics.eslint,
+          null_ls.builtins.diagnostics.flake8,
+        },
+      })
+    end
   })
 end
 
