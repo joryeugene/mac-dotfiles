@@ -4,6 +4,38 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "Mouse 5 Dictation",
+                        "manipulators": [
+                            {
+                                "from": { "pointing_button": "button5" },
+                                "to": [
+                                    {
+                                        "key_code": "d",
+                                        "modifiers": ["left_shift", "left_alt"],
+                                        "repeat": false
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Mouse 4 select left word",
+                        "manipulators": [
+                            {
+                                "from": { "pointing_button": "button4" },
+                                "to": [
+                                    {
+                                        "key_code": "left_arrow",
+                                        "modifiers": ["left_shift", "left_alt"],
+                                        "repeat": false
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Cmd + Custom HHKB Fn Layer for internal keyboard only",
                         "manipulators": [
                             {
@@ -581,16 +613,30 @@
                     "identifiers": { "is_keyboard": true },
                     "simple_modifications": [
                         {
+                            "from": { "key_code": "backslash" },
+                            "to": [{ "key_code": "delete_or_backspace" }]
+                        },
+                        {
                             "from": { "key_code": "caps_lock" },
                             "to": [{ "key_code": "left_control" }]
                         },
                         {
                             "from": { "key_code": "left_control" },
                             "to": [{ "key_code": "caps_lock" }]
-                        },
+                        }
+                    ]
+                },
+                {
+                    "identifiers": {
+                        "is_pointing_device": true,
+                        "product_id": 5120,
+                        "vendor_id": 21298
+                    },
+                    "ignore": false,
+                    "simple_modifications": [
                         {
-                            "from": { "key_code": "backslash" },
-                            "to": [{ "key_code": "delete_or_backspace" }]
+                            "from": { "pointing_button": "button3" },
+                            "to": [{ "apple_vendor_keyboard_key_code": "mission_control" }]
                         }
                     ]
                 }
