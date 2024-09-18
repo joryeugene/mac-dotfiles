@@ -1,4 +1,5 @@
 local wezterm = require 'wezterm'
+local act = wezterm.action
 
 return {
   color_scheme = 'Catppuccin Mocha',
@@ -7,7 +8,7 @@ return {
 
   -- Use the custom Nerd Font
   font = wezterm.font('BerkeleyMonoVariable Nerd Font Mono', {
-    weight = 'Regular',  -- 'Regular' or 'Italic' depending on your preference
+    weight = 'Regular',
   }),
 
   macos_window_background_blur = 30,
@@ -19,25 +20,35 @@ return {
     {
       event = { Up = { streak = 1, button = 'Left' } },
       mods = 'CTRL',
-      action = wezterm.action.OpenLinkAtMouseCursor,
+      action = act.OpenLinkAtMouseCursor,
     },
     -- Right-click to copy the selection to the clipboard
     {
       event = { Up = { streak = 1, button = 'Right' } },
       mods = 'NONE',
-      action = wezterm.action.CopyTo 'Clipboard',
+      action = act.CopyTo 'Clipboard',
     },
   },
-	mouse_bindings = {
-	  -- Ctrl-click will open the link under the mouse cursor
-	  {
-	    event = { Up = { streak = 1, button = 'Left' } },
-	    mods = 'CTRL',
-	    action = wezterm.action.OpenLinkAtMouseCursor,
-	  },
-	},
+  -- Enable ligatures
+  harfbuzz_features = { 'calt=1', 'clig=1', 'liga=1' },
 
-	-- Set default split direction
-	split_horizontal = { domain = 'CurrentPaneDomain' },
-	split_vertical = { domain = 'CurrentPaneDomain' },
+  -- Set cursor style
+  default_cursor_style = 'SteadyBlock',
+
+  -- Enable scrollback
+  scrollback_lines = 10000,
+
+  -- Set working directory to home
+  default_cwd = wezterm.home_dir,
+
+  -- Enable native macOS full screen
+  native_macos_fullscreen_mode = true,
+
+  -- Custom color overrides
+  -- colors = {
+  --   cursor_bg = '#ff9e64',
+  --   cursor_border = '#ff9e64',
+  --   selection_fg = 'black',
+  --   selection_bg = '#fffacd',
+  -- },
 }

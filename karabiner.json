@@ -4,6 +4,26 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "Mouse 4 Switch Left",
+                        "enabled": false,
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "modifiers": { "mandatory": ["left_shift"] },
+                                    "pointing_button": "button4"
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "tab",
+                                        "modifiers": ["left_gui", "left_shift"],
+                                        "repeat": false
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Mouse 5 Dictation",
                         "manipulators": [
                             {
@@ -612,10 +632,6 @@
                 {
                     "identifiers": { "is_keyboard": true },
                     "simple_modifications": [
-                        {
-                            "from": { "key_code": "backslash" },
-                            "to": [{ "key_code": "delete_or_backspace" }]
-                        },
                         {
                             "from": { "key_code": "caps_lock" },
                             "to": [{ "key_code": "left_control" }]

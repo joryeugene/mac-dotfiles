@@ -9,5 +9,6 @@
   "attachmentFolderPath": "resources",
   "propertiesInDocument": "hidden",
   "showRibbon": false,
-  "readableLineLength": false
+  "readableLineLength": false,
+  "promptDelete": false
 }

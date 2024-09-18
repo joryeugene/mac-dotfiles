@@ -34,11 +34,13 @@ lsd
 make
 marksman
 midnight-commander
+miller
 mycli
 mypy
 neovim
 nmap
 pandoc
+parquet-cli
 pgcli
 pipx
 postgresql@16

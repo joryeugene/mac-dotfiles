@@ -27,11 +27,13 @@ Karabiner-EventViewer
 KensingtonWorks 
 Keynote
 LM Studio
+LookSharp
 Lumina
 MonitorControl
 Notion
 Numbers
 Obsidian
+OmniRecorder
 Pages
 Raycast
 Rectangle Pro
@@ -45,6 +47,7 @@ Tot
 Tuple
 Twos
 Visual Studio Code
+Webcam Effects
 WezTerm
 WhatsApp
 Zen Browser
