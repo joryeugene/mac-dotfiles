@@ -46,6 +46,7 @@ Tailscale
 Tot
 Tuple
 Twos
+Vial
 Visual Studio Code
 Webcam Effects
 WezTerm
