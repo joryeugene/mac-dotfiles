@@ -80,5 +80,7 @@
     "window.commandCenter": false,
     "cursor.chat.showSuggestedFiles": true,
     "terminal.integrated.fontSize": 16,
-    "makefile.configureOnOpen": true
+    "makefile.configureOnOpen": true,
+    "editor.renderControlCharacters": false,
+    "cursor.chat.collapseInputBoxPills": true
 }
