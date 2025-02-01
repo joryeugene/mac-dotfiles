@@ -358,8 +358,18 @@
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
-    "key": "space s s",
+    "key": "space s h",
     "command": "workbench.action.splitEditorOrthogonal",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
+    "key": "space s s",
+    "command": "workbench.action.gotoSymbol",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
+    "key": "space s f",
+    "command": "workbench.action.findInFiles",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   // t bindings
