@@ -30,6 +30,7 @@ kubernetes-cli
 lazydocker
 lazygit
 libffi
+libgit2@1.7
 lsd
 make
 marksman
@@ -48,6 +49,7 @@ pre-commit
 prettier
 pyenv
 pylint
+python@3.11
 quarylabs/quary/sqruff
 ripgrep
 rsync

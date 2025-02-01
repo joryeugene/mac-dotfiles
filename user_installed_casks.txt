@@ -1,5 +1,6 @@
 docker
 font-hack-nerd-font
+iterm2
 jan
 monitorcontrol
 shortcat

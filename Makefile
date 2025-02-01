@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env zsh
 
-.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies compare_cursor_profiles sync_cursor_profiles
+.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies compare_cursor_profiles sync_cursor_profiles check_outdated clean health_check list_installed update_npm
 
 DOTFILES_DIR := $(HOME)/dotfiles
 BREW := brew
@@ -17,6 +17,10 @@ help:
 	@echo "Available commands:"
 	@echo "  make help              - Show this help message"
 	@echo "  make all               - Run the entire installation process"
+	@echo "  make check_outdated    - Check for outdated packages"
+	@echo "  make clean             - Clean up system caches"
+	@echo "  make health_check      - Check system health"
+	@echo "  make list_installed    - List all installed packages"
 	@echo "  make install           - Install everything (brew, casks, cli tools, and configs)"
 	@echo "  make discover          - Discover system state (CLI tools, apps, and Brew packages)"
 	@echo "  make brew              - Install Homebrew formulae"
@@ -30,6 +34,7 @@ help:
 	@echo "  make check_dependencies - Check if all required tools are installed"
 	@echo "  make compare_cursor_profiles - Show differences between Cursor profiles"
 	@echo "  make sync_cursor_profiles - Sync default profile settings to other profiles"
+	@echo "  make update_npm        - Update global NPM packages"
 
 all: set_permissions check_dependencies install manual_installs update
 
@@ -227,3 +232,43 @@ sync_cursor_profiles:
 	else \
 		echo "No profile directory found to sync to."; \
 	fi
+
+check_outdated: check_dependencies
+	@echo "Checking for outdated packages..."
+	@$(BREW) outdated
+	@$(PIPX) list --outdated 2>/dev/null || true
+	@$(NPM) outdated -g 2>/dev/null || true
+
+clean: check_dependencies
+	@echo "Cleaning up system..."
+	@$(BREW) cleanup
+	@$(BREW) autoremove
+	@rm -rf "$(HOME)/Library/Caches/pip" 2>/dev/null || true
+	@rm -rf "$(HOME)/.npm/_cacache" 2>/dev/null || true
+
+health_check: check_dependencies
+	@echo "Checking system health..."
+	@$(BREW) missing 2>/dev/null || echo "Some Homebrew dependencies missing"
+	@command -v node >/dev/null 2>&1 || echo "Node.js not installed"
+	@command -v python3 >/dev/null 2>&1 || echo "Python not installed"
+	@echo "Health check complete."
+
+list_installed: check_dependencies
+	@echo "Listing all installed packages..."
+	@echo "\nHomebrew Formulae:"
+	@$(BREW) list --formula
+	@echo "\nHomebrew Casks:"
+	@$(BREW) list --cask
+	@echo "\nNPM Global Packages:"
+	@$(NPM) list -g --depth=0 2>/dev/null || echo "npm not installed"
+	@echo "\nPipx Packages:"
+	@$(PIPX) list 2>/dev/null || echo "pipx not installed"
+
+update_npm: check_dependencies
+	@echo "Updating NPM packages..."
+	@$(NPM) install -g npm@latest
+	@$(NPM) install -g bash-language-server@latest
+	@$(NPM) install -g create-next-app@latest
+	@$(NPM) install -g pyright@latest
+	@$(NPM) install -g typescript@latest
+	@echo "NPM packages updated."

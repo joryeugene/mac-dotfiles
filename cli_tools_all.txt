@@ -345,6 +345,7 @@ fuser
 fwkdp
 fwkpfv
 fzf
+fzf-preview.sh
 fzf-tmux
 g++
 gatherheaderdoc

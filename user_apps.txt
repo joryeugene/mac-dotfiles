@@ -59,6 +59,7 @@ Wispr Flow
 Zen Browser
 hhkb-keymap-tool
 iMovie
+iTerm
 iTermAI
 lghub
 superwhisper
