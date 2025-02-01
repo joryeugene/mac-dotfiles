@@ -1,4 +1,3 @@
-.pyenv-shim
 2to3
 2to3-3.12
 AssetCacheLocatorUtil

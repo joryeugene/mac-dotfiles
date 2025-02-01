@@ -1,89 +1,82 @@
 {
-    "window.commandCenter": 1,
-    "terminal.integrated.defaultProfile.osx": "zsh",
-    "terminal.external.osxExec": "iTerm.app",
-    "terminal.integrated.profiles.osx": {
-        "bash": {
-            "path": "bash",
-            "args": ["-l"],
-            "icon": "terminal-bash"
-        },
-        "zsh": {
-            "path": "zsh",
-            "args": ["-l"]
-        },
-        "fish": {
-            "path": "fish",
-            "args": ["-l"]
-        },
-        "tmux": {
-            "path": "tmux",
-            "icon": "terminal-tmux"
-        },
-        "pwsh": {
-            "path": "pwsh",
-            "icon": "terminal-powershell"
-        }
-    },
-    "application.shellEnvironmentResolutionTimeout": 90,
-    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.lua",
-    "editor.fontFamily": "Berkeley Mono",
-    "editor.fontSize": 14,
-    "editor.fontLigatures": true,
-    "editor.lineNumbers": "relative",
-    "editor.cursorStyle": "block",
-    "editor.scrollBeyondLastLine": false,
-    "editor.smoothScrolling": true,
-    "editor.minimap.enabled": false,
-    "editor.rulers": [88, 120],
-    "editor.suggestSelection": "first",
-    "editor.acceptSuggestionOnCommitCharacter": true,
-    "editor.snippetSuggestions": "top",
-    "files.trimTrailingWhitespace": true,
-    "files.insertFinalNewline": true,
-
-    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
-    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.lua",
-
-    "python.languageServer": "Jedi",
-    "python.analysis.typeCheckingMode": "basic",
-    "python.testing.pytestEnabled": true,
-    "python.analysis.autoImportCompletions": true,
-
-    "cursor.aipreview.enabled": true,
-    "cursor.cmdk.ghostTextAtSymbols": true,
-    "cursor.cmdk.useThemedDiffBackground": true,
-    "cursor.general.enableShadowWorkspace": true,
-    "cursor.cpp.enablePartialAccepts": true,
-
-    "extensions.experimental.affinity": {
-        "asvetliakov.vscode-neovim": 1
-    },
-    "workbench.colorTheme": "Dracula Theme Soft",
-    // "workbench.colorTheme": "Monokai Dimmed",
     "[jsonc]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
-    "sqltools.useNodeRuntime": true,
-    "workbench.activityBar.location": "bottom",
-    "editor.renderWhitespace": "all",
-    "terminal.integrated.env.osx": {},
-    "cursor.chat.ghostTextAtSymbols": true,
-    "cursor.chat.smoothStreaming": true,
+    "application.shellEnvironmentResolutionTimeout": 90,
     "breadcrumbs.enabled": false,
-    "python.diagnostics.sourceMapsEnabled": true,
-    "git.openRepositoryInParentFolders": "always",
-    "cursor.chat.narrowScrollbar": false,
-    "cursor.diffs.useCharacterLevelDiffs": true,
-    "editor.accessibilitySupport": "off",
-    "workbench.layoutControl.enabled": false,
-    "window.commandCenter": false,
-    "cursor.chat.showSuggestedFiles": true,
-    "terminal.integrated.fontSize": 16,
-    "makefile.configureOnOpen": true,
-    "editor.renderControlCharacters": false,
-    "cursor.chat.collapseInputBoxPills": true,
-    "cursor.terminal.usePreviewBox": true,
+    // cursor
+    "cursor.aipreview.enabled": true,
+    "cursor.cmdk.useThemedDiffBackground": true,
     "cursor.composer.collapsePaneInputBoxPills": true,
-    "cursor.composer.renderPillsInsteadOfBlocks": true
+    "cursor.composer.renderPillsInsteadOfBlocks": true,
+    "cursor.cpp.enablePartialAccepts": true,
+    "cursor.diffs.useCharacterLevelDiffs": true,
+    "cursor.general.enableShadowWorkspace": true,
+    "cursor.terminal.usePreviewBox": true,
+    // editor
+    "editor.acceptSuggestionOnCommitCharacter": true,
+    "editor.accessibilitySupport": "off",
+    "editor.bracketPairColorization.enabled": true,
+    "editor.cursorStyle": "block",
+    "editor.fontFamily": "Berkeley Mono",
+    "editor.fontLigatures": true,
+    "editor.fontSize": 14,
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "editor.guides.bracketPairs": true,
+    "editor.inlineSuggest.enabled": true,
+    "editor.lineNumbers": "relative",
+    "editor.scrollBeyondLastLine": false,
+    "editor.smoothScrolling": true,
+    "editor.snippetSuggestions": "top",
+    "editor.suggestSelection": "first",
+    "editor.linkedEditing": true,
+    "editor.minimap.enabled": false,
+    "editor.renderControlCharacters": false,
+    "editor.renderWhitespace": "all",
+    "editor.rulers": [
+        88,
+        120
+    ],
+    "editor.stickyScroll.enabled": true,
+    "editor.wordWrap": "off",
+    // extensions
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    },
+    // files
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    // git
+    "git.openRepositoryInParentFolders": "always",
+    // python
+    "python.diagnostics.sourceMapsEnabled": true,
+    "python.languageServer": "Jedi",
+    "python.testing.pytestEnabled": true,
+    // search
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/__pycache__": true
+    },
+    // terminal
+    "terminal.external.osxExec": "WezTerm.app",
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.env.osx": {},
+    "terminal.integrated.fontSize": 16,
+    "terminal.integrated.profiles.osx": {
+        "zsh": {
+            "path": "zsh",
+            "args": [
+                "-l"
+            ]
+        }
+    },
+    "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
+    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.lua",
+    "window.commandCenter": false,
+    "workbench.activityBar.location": "bottom",
+    "workbench.colorTheme": "Dracula Theme Soft",
+    "workbench.layoutControl.enabled": false,
 }
