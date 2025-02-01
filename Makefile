@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env zsh
 
-.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies
+.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies compare_cursor_profiles
 
 DOTFILES_DIR := $(HOME)/dotfiles
 BREW := brew
@@ -28,6 +28,7 @@ help:
 	@echo "  make manual_installs   - Show applications that may need manual installation"
 	@echo "  make update            - Update system packages and tools"
 	@echo "  make check_dependencies - Check if all required tools are installed"
+	@echo "  make compare_cursor_profiles - Show differences between Cursor profiles"
 
 all: set_permissions check_dependencies install manual_installs update
 
@@ -86,6 +87,22 @@ backup_configs:
 	@mkdir -p $(DOTFILES_DIR)
 	@mkdir -p $(DOTFILES_DIR)/.obsidian
 	@mkdir -p $(DOTFILES_DIR)/zellij/themes
+	@mkdir -p $(DOTFILES_DIR)/cursor_profiles
+
+	# Backup all Cursor profiles
+	@find "$(HOME)/Library/Application Support/Cursor/User/profiles" -type f \( -name "keybindings.json" -o -name "settings.json" \) -exec bash -c '\
+		profile_dir=$$(dirname "{}"); \
+		profile_name=$$(basename $$profile_dir); \
+		mkdir -p $(DOTFILES_DIR)/cursor_profiles/$$profile_name; \
+		cp -f "{}" $(DOTFILES_DIR)/cursor_profiles/$$profile_name/ \
+	' \;
+
+	# Backup default profile settings
+	@mkdir -p $(DOTFILES_DIR)/cursor_profiles/default
+	@cp -f "$(HOME)/Library/Application Support/Cursor/User/keybindings.json" $(DOTFILES_DIR)/cursor_profiles/default/keybindings.json || true
+	@cp -f "$(HOME)/Library/Application Support/Cursor/User/settings.json" $(DOTFILES_DIR)/cursor_profiles/default/settings.json || true
+
+	# Rest of existing backup operations
 	@cp -f $(HOME)/.zshrc $(DOTFILES_DIR)/.zshrc || true
 	@cp -f $(HOME)/.wezterm.lua $(DOTFILES_DIR)/.wezterm.lua || true
 	@cp -f $(HOME)/.zsh_functions $(DOTFILES_DIR)/.zsh_functions || true
@@ -94,13 +111,6 @@ backup_configs:
 	@cp -f $(HOME)/.config/nvim/init.lua $(DOTFILES_DIR)/init.lua || true
 	@cp -f $(HOME)/.config/zellij/config.kdl $(DOTFILES_DIR)/zellij/config.kdl || true
 	@cp -f $(HOME)/.config/zellij/themes/* $(DOTFILES_DIR)/zellij/themes/ || true
-	@mkdir -p $(DOTFILES_DIR)/backup_configs
-	@cp -f "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/keybindings.json" $(DOTFILES_DIR)/backup_configs/keybindings_backup.json || true
-	@cp -f "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27/settings.json" $(DOTFILES_DIR)/backup_configs/settings_backup.json || true
-	@cp -f "$(HOME)/Library/Application Support/Cursor/User/keybindings.json" $(DOTFILES_DIR)/backup_configs/keybindings_backup_default.json || true
-	@cp -f "$(HOME)/Library/Application Support/Cursor/User/settings.json" $(DOTFILES_DIR)/backup_configs/settings_backup_default.json || true
-	@cp -f "$(HOME)/Library/Application Support/Cursor/User/keybindings.json" $(DOTFILES_DIR)/keybindings.json || true
-	@cp -f "$(HOME)/Library/Application Support/Cursor/User/settings.json" $(DOTFILES_DIR)/settings.json || true
 	@cp -f "$(HOME)/Documents/calmhive/.obsidian.vimrc" $(DOTFILES_DIR)/.obsidian.vimrc || true
 	@cp -f "$(HOME)/Documents/calmhive/.obsidian/app.json" $(DOTFILES_DIR)/.obsidian/app.json || true
 	@cp -f "$(HOME)/Documents/calmhive/.obsidian/appearance.json" $(DOTFILES_DIR)/.obsidian/appearance.json || true
@@ -111,6 +121,21 @@ backup_configs:
 
 configs:
 	@echo "Setting up configurations..."
+
+	# Restore all Cursor profiles
+	@find $(DOTFILES_DIR)/cursor_profiles -type f \( -name "keybindings.json" -o -name "settings.json" \) -exec bash -c '\
+		source_file="{}"; \
+		profile_name=$$(basename $$(dirname "{}")) ; \
+		if [ "$$profile_name" = "default" ]; then \
+			target_dir="$(HOME)/Library/Application Support/Cursor/User"; \
+		else \
+			target_dir="$(HOME)/Library/Application Support/Cursor/User/profiles/$$profile_name"; \
+		fi; \
+		mkdir -p "$$target_dir"; \
+		cp -f "$$source_file" "$$target_dir/" \
+	' \;
+
+	# Rest of existing config operations
 	@cp -f $(DOTFILES_DIR)/.wezterm.lua $(HOME)/.wezterm.lua || true
 	@cp -f $(DOTFILES_DIR)/.zshrc $(HOME)/.zshrc || true
 	@cp -f $(DOTFILES_DIR)/.zsh_functions $(HOME)/.zsh_functions || true
@@ -122,9 +147,7 @@ configs:
 	@mkdir -p $(HOME)/.config/zellij/themes
 	@cp -f $(DOTFILES_DIR)/zellij/config.kdl $(HOME)/.config/zellij/config.kdl || true
 	@cp -f $(DOTFILES_DIR)/zellij/themes/* $(HOME)/.config/zellij/themes/ || true
-	@mkdir -p "$(HOME)/Library/Application Support/Cursor/User/profiles/48fc2b27"
-	@cp -f $(DOTFILES_DIR)/keybindings.json "$(HOME)/Library/Application Support/Cursor/User/keybindings.json" || true
-	@cp -f $(DOTFILES_DIR)/settings.json "$(HOME)/Library/Application Support/Cursor/User/settings.json" || true
+	@mkdir -p "$(HOME)/Documents/calmhive/.obsidian"
 	@cp -f $(DOTFILES_DIR)/.obsidian.vimrc "$(HOME)/Documents/calmhive/.obsidian.vimrc" || true
 	@cp -f $(DOTFILES_DIR)/.obsidian/app.json "$(HOME)/Documents/calmhive/.obsidian/app.json" || true
 	@cp -f $(DOTFILES_DIR)/.obsidian/appearance.json "$(HOME)/Documents/calmhive/.obsidian/appearance.json" || true
@@ -180,3 +203,15 @@ update:
 		echo "nvim not found, skipping"; \
 	fi
 	@echo "System update complete."
+
+compare_cursor_profiles:
+	@echo "Comparing Cursor profiles..."
+	@profile_dir="$$(find "$(HOME)/Library/Application Support/Cursor/User/profiles" -type d -mindepth 1 -maxdepth 1 | head -n 1)"; \
+	for file in keybindings.json settings.json; do \
+		echo "\n=== Comparing $$file ==="; \
+		if [ -f "$(HOME)/Library/Application Support/Cursor/User/$$file" ] && [ -f "$$profile_dir/$$file" ]; then \
+			diff -u --color "$(HOME)/Library/Application Support/Cursor/User/$$file" "$$profile_dir/$$file" || true; \
+		else \
+			echo "Could not find both profile files to compare"; \
+		fi; \
+	done

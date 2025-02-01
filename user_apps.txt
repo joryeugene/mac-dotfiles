@@ -14,6 +14,7 @@ Dash
 DataGrip
 Discord
 Docker
+Drata Agent
 Elgato Stream Deck
 Figma
 Firefox
@@ -28,6 +29,7 @@ KensingtonWorks
 Keynote
 LM Studio
 LookSharp
+Loom
 Lumina
 MonitorControl
 Notion
@@ -35,6 +37,7 @@ Numbers
 Obsidian
 OmniRecorder
 Pages
+Perplexity
 Raycast
 Rectangle Pro
 Shortcat
@@ -51,6 +54,8 @@ Visual Studio Code
 Webcam Effects
 WezTerm
 WhatsApp
+Windsurf
+Wispr Flow
 Zen Browser
 hhkb-keymap-tool
 iMovie
