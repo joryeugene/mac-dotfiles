@@ -1,28 +1,31 @@
--- VSCode-specific Neovim configuration
+-- VSCode Neovim Integration Configuration
 local M = {}
 
--- VSCode-specific plugins
-local plugins = {
-  -- Commentary plugin (essential for commenting)
-  { "tpope/vim-commentary" },
-
-  -- Surround plugin (essential for text objects)
-  { "tpope/vim-surround" },
-
-  -- Repeat plugin (for better . command support)
-  { "tpope/vim-repeat" },
+-- Plugin configuration for VSCode
+M.plugins = {
+  { "tpope/vim-surround" },     -- Surround text objects
+  { "tpope/vim-commentary" },   -- Comments
+  { "tpope/vim-repeat" },       -- Better repeat with .
 }
 
--- VSCode-specific keymaps
-local keymap = vim.keymap.set
-local opts = { noremap = true, silent = true }
+-- Basic settings that don't overlap with VSCode
+vim.opt.clipboard = "unnamedplus"   -- Use system clipboard
+vim.opt.ignorecase = true          -- Ignore case in search
+vim.opt.smartcase = true           -- Smart case in search
 
--- Commenting (uses vim-commentary)
-keymap('n', 'gcc', ':Commentary<CR>', opts)
-keymap('v', 'gc', ':Commentary<CR>', opts)
+-- Disable UI elements that VSCode handles
+vim.opt.number = false
+vim.opt.relativenumber = false
+vim.opt.cursorline = false
+vim.opt.signcolumn = "no"
+vim.opt.foldenable = false
 
--- Diagnostics
-keymap('n', '[d', "<Cmd>call VSCodeNotify('editor.action.marker.prev')<CR>", opts)
-keymap('n', ']d', "<Cmd>call VSCodeNotify('editor.action.marker.next')<CR>", opts)
+-- Only essential autocommands
+vim.cmd[[
+  augroup vscode_neovim
+    autocmd!
+    autocmd BufWritePre * :%s/\s\+$//e  " Trim trailing whitespace
+  augroup END
+]]
 
-return { plugins = plugins }
+return M

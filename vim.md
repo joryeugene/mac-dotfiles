@@ -1,5 +1,45 @@
 # Vim Quick Reference
 
+## Essential Plugins
+
+### vim-surround
+```
+# Adding surroundings
+ys{motion}{char}   " Add surrounding
+ysiw"              " Surround word with quotes: hello -> "hello"
+yss"               " Surround entire line with quotes
+ys$"               " Surround to end of line with quotes
+yS{motion}{char}   " Add surrounding and place on new line
+
+# Changing surroundings
+cs{old}{new}       " Change surrounding
+cs"'               " Change quotes: "hello" -> 'hello'
+cs'<q>             " Change quotes to tag: 'hello' -> <q>hello</q>
+cst"               " Change tag to quotes: <q>hello</q> -> "hello"
+
+# Deleting surroundings
+ds{char}           " Delete surrounding
+ds"                " Delete quotes: "hello" -> hello
+dst                " Delete tag: <q>hello</q> -> hello
+
+# In Visual Mode
+S{char}            " Surround selection
+```
+
+### vim-commentary
+```
+gcc                " Comment/uncomment current line
+gc{motion}         " Comment/uncomment selection
+gcap               " Comment/uncomment paragraph
+gcG                " Comment/uncomment to end of file
+:g/TODO/Commentary " Comment all lines matching pattern
+```
+
+### vim-repeat
+```
+.                  " Repeat last change (works with surround/commentary)
+```
+
 ## File Operations
 :echo @%           " show current file (relative path)
 :echo expand('%:p') " show absolute file path
@@ -70,13 +110,6 @@ K               " Show documentation
 zz              " Center cursor on screen
 zt              " Put cursor at top of screen
 zb              " Put cursor at bottom of screen
-
-## Pro Tips
-- Use counts with commands (e.g., `5dd` deletes 5 lines).
-- Combine operators with motions (e.g., `d2w` deletes two words).
-- Utilize registers for multiple copy/paste operations.
-- Drill these commands regularly to build muscle memory.
-- Use `:help {command}` for details on any Vim command.
 
 ## Additional Workflows
 - Use buffer commands like `:bnext` and `:bprev` to navigate between open files.

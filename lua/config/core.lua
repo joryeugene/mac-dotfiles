@@ -29,17 +29,6 @@ keymap("n", "L", ":bnext<CR>", opts)
 -- keymap("n", "<C-k>", "<C-w>k", opts)
 -- keymap("n", "<C-l>", "<C-w>l", opts)
 
--- Buffer operations
-keymap("n", "<leader>bd", ":bdelete<CR>", opts)
-keymap("n", "<leader>bn", ":enew<CR>", opts)
-keymap("n", "<leader>bl", ":buffers<CR>", opts)
-keymap("n", "<leader>bo", ":BufferOnly<CR>", opts)
-
--- Editing
-keymap("n", "U", "<C-R>", opts)
-keymap("n", "<leader>/", ":Commentary<CR>", opts)
-keymap("v", "<leader>/", ":Commentary<CR>", opts)
-
 -- File operations
 keymap("n", "<leader>w", ":w<CR>", opts)
 keymap("n", "<leader>q", ":q<CR>", opts)
