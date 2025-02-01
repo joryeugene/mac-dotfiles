@@ -95,6 +95,7 @@ backup_configs:
 	@mkdir -p $(DOTFILES_DIR)/.obsidian
 	@mkdir -p $(DOTFILES_DIR)/zellij/themes
 	@mkdir -p $(DOTFILES_DIR)/cursor_profiles
+	@mkdir -p $(DOTFILES_DIR)/lua/config
 
 	# Backup all Cursor profiles
 	@find "$(HOME)/Library/Application Support/Cursor/User/profiles" -type f \( -name "keybindings.json" -o -name "settings.json" \) -exec bash -c '\
@@ -109,13 +110,19 @@ backup_configs:
 	@cp -f "$(HOME)/Library/Application Support/Cursor/User/keybindings.json" $(DOTFILES_DIR)/cursor_profiles/default/keybindings.json || true
 	@cp -f "$(HOME)/Library/Application Support/Cursor/User/settings.json" $(DOTFILES_DIR)/cursor_profiles/default/settings.json || true
 
+	# Backup Neovim configurations
+	@mkdir -p $(DOTFILES_DIR)/lua/config
+	@cp -f $(HOME)/.config/nvim/init.lua $(DOTFILES_DIR)/init.lua || true
+	@cp -f $(HOME)/.config/nvim/lua/config/core.lua $(DOTFILES_DIR)/lua/config/core.lua || true
+	@cp -f $(HOME)/.config/nvim/lua/config/nvim.lua $(DOTFILES_DIR)/lua/config/nvim.lua || true
+	@cp -f $(HOME)/.config/nvim/lua/config/vscode.lua $(DOTFILES_DIR)/lua/config/vscode.lua || true
+
 	# Rest of existing backup operations
 	@cp -f $(HOME)/.zshrc $(DOTFILES_DIR)/.zshrc || true
 	@cp -f $(HOME)/.wezterm.lua $(DOTFILES_DIR)/.wezterm.lua || true
 	@cp -f $(HOME)/.zsh_functions $(DOTFILES_DIR)/.zsh_functions || true
 	@cp -f $(HOME)/.zsh_aliases $(DOTFILES_DIR)/.zsh_aliases || true
 	@cp -f $(HOME)/.config/starship.toml $(DOTFILES_DIR)/starship.toml || true
-	@cp -f $(HOME)/.config/nvim/init.lua $(DOTFILES_DIR)/init.lua || true
 	@cp -f $(HOME)/.config/zellij/config.kdl $(DOTFILES_DIR)/zellij/config.kdl || true
 	@cp -f $(HOME)/.config/zellij/themes/* $(DOTFILES_DIR)/zellij/themes/ || true
 	@cp -f "$(HOME)/Documents/calmhive/.obsidian.vimrc" $(DOTFILES_DIR)/.obsidian.vimrc || true
@@ -128,6 +135,13 @@ backup_configs:
 
 configs:
 	@echo "Setting up configurations..."
+
+	# Restore Neovim configurations
+	@mkdir -p $(HOME)/.config/nvim/lua/config
+	@cp -f $(DOTFILES_DIR)/init.lua $(HOME)/.config/nvim/init.lua || true
+	@cp -f $(DOTFILES_DIR)/lua/config/core.lua $(HOME)/.config/nvim/lua/config/core.lua || true
+	@cp -f $(DOTFILES_DIR)/lua/config/nvim.lua $(HOME)/.config/nvim/lua/config/nvim.lua || true
+	@cp -f $(DOTFILES_DIR)/lua/config/vscode.lua $(HOME)/.config/nvim/lua/config/vscode.lua || true
 
 	# Restore all Cursor profiles
 	@find $(DOTFILES_DIR)/cursor_profiles -type f \( -name "keybindings.json" -o -name "settings.json" \) -exec bash -c '\
@@ -149,8 +163,6 @@ configs:
 	@cp -f $(DOTFILES_DIR)/.zsh_aliases $(HOME)/.zsh_aliases || true
 	@mkdir -p $(HOME)/.config
 	@cp -f $(DOTFILES_DIR)/starship.toml $(HOME)/.config/starship.toml || true
-	@mkdir -p $(HOME)/.config/nvim
-	@cp -f $(DOTFILES_DIR)/init.lua $(HOME)/.config/nvim/init.lua || true
 	@mkdir -p $(HOME)/.config/zellij/themes
 	@cp -f $(DOTFILES_DIR)/zellij/config.kdl $(HOME)/.config/zellij/config.kdl || true
 	@cp -f $(DOTFILES_DIR)/zellij/themes/* $(HOME)/.config/zellij/themes/ || true
