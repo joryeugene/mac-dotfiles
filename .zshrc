@@ -1,7 +1,12 @@
-# Source Zinit
-source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
+# Initialize Zinit if available
+ZINIT_HOME="${HOME}/.local/share/zinit/zinit.git"
+if [ -f "$ZINIT_HOME/zinit.zsh" ]; then
+    source "$ZINIT_HOME/zinit.zsh"
+    autoload -Uz _zinit
+    (( ${+_comps} )) && _comps[zinit]=_zinit
+else
+    echo "Zinit not found. Install with: sh -c "$(curl -fsSL https://git.io/zinit-install)""
+fi
 
 # Load environment variables from ~/.env
 if [ -f "$HOME/.env" ]; then
@@ -10,19 +15,24 @@ if [ -f "$HOME/.env" ]; then
   set +a
 fi
 
-# User configuration
+# Core environment settings
 export EDITOR='nvim'
-
-# Increase FUNCNEST limit
-FUNCNEST=100
+export VISUAL='nvim'
+export PAGER='less'
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export FUNCNEST=100
 
 # FZF configuration
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat --style=numbers --color=always --line-range :500 {}'"
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git"
+export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git --exclude node_modules"
+export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :500 {}'"
+export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
 
-# Load plugins
+# Load plugins with Zinit
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-history-substring-search
@@ -41,11 +51,11 @@ export KEYTIMEOUT=1
 function update_vim_mode() {
     case ${KEYMAP} in
         vicmd)
-            echo -ne '\e[2 q'
+            echo -ne '\e[2 q'  # Block cursor
             STARSHIP_SHELL_KEYMAP=NORMAL
             ;;
         main|viins)
-            echo -ne '\e[5 q'
+            echo -ne '\e[5 q'  # Beam cursor
             STARSHIP_SHELL_KEYMAP=INSERT
             ;;
     esac
@@ -68,14 +78,17 @@ preexec() { echo -ne '\e[5 q'; }
 autoload edit-command-line; zle -N edit-command-line
 bindkey '^e' edit-command-line
 
-# Aliases and functions (load from separate files)
-[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
-[[ -f ~/.zsh_functions ]] && source ~/.zsh_functions
-
-# History configuration
-HISTSIZE=10000
-SAVEHIST=10000
+# Enhanced history configuration
+HISTSIZE=1000000
+SAVEHIST=1000000
 HISTFILE=~/.zsh_history
+setopt EXTENDED_HISTORY          # Write timestamps to history
+setopt HIST_EXPIRE_DUPS_FIRST   # Expire duplicate entries first
+setopt HIST_IGNORE_DUPS         # Don't record duplicates
+setopt HIST_IGNORE_SPACE        # Don't record entries starting with space
+setopt HIST_VERIFY              # Show command with history expansion
+setopt SHARE_HISTORY            # Share history between sessions
+setopt APPEND_HISTORY           # Append to history file
 
 # Key bindings
 bindkey '^[[A' history-substring-search-up
@@ -84,6 +97,7 @@ bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 bindkey '^R' fzf-history-widget
 bindkey '^F' fzf-cd-widget
+bindkey '^T' fzf-file-widget
 
 # Colorize man pages
 export LESS_TERMCAP_mb=$'\e[1;32m'
@@ -94,12 +108,19 @@ export LESS_TERMCAP_so=$'\e[01;33m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[1;4;31m'
 
-# Load environment variables and API keys
-[[ -f "$HOME/.env" ]] && source "$HOME/.env"
+# Load aliases and functions
+[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
+[[ -f ~/.zsh_functions ]] && source ~/.zsh_functions
 
-# Additional PATH and environment variables
-export PATH="$PATH:/Users/jory/.local/bin"
-export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+# PATH configuration
+path=(
+    $HOME/.local/bin
+    /opt/homebrew/opt/postgresql@16/bin
+    $path
+)
+export PATH
+
+# Development environment variables
 export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/opt/libpq/lib"
 export LDFLAGS="-L/opt/homebrew/opt/libpq/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/libpq/include"
@@ -116,9 +137,8 @@ fi
 # Load any local customizations
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
+# Load Cargo environment
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 
-# Load Starship prompt (move this line to the end of your .zshrc)
+# Initialize Starship prompt (keep at end)
 eval "$(starship init zsh)"
-
-
-. "$HOME/.cargo/env"

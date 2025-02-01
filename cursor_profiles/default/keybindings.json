@@ -446,6 +446,12 @@
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
+    "key": "space y z",
+    "command": "vscode.open",
+    "args": "/Users/jory/.zshrc",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
     "key": "space z",
     "command": "workbench.action.toggleZenMode",
     "when": "editorTextFocus && neovim.mode != 'insert'"

@@ -40,6 +40,90 @@ gcG                " Comment/uncomment to end of file
 .                  " Repeat last change (works with surround/commentary)
 ```
 
+## Space Leader Keybindings
+
+### File Operations
+```
+<space>w          " Save file
+<space>x          " Close active editor
+<space>qa         " Close all editors
+<space>qo         " Close other editors
+<space>n          " New untitled file
+<space>o          " Quick open file
+<space>f          " Open recent files
+```
+
+### Navigation
+```
+<space>gd         " Go to definition
+<space>gi         " Go to implementation
+<space>gr         " Go to references
+<space>gs         " Show all symbols
+<space>gg         " Go to line
+<space>gl         " Go to line
+<space>-          " Navigate back
+<space>[          " Previous error/warning
+<space>]          " Next error/warning
+<space>1-9        " Go to editor tab 1-9
+```
+
+### Editor Features
+```
+<space>/          " Toggle line comment
+<space>'          " Format selection
+<space>;          " Quick fix
+<space>=          " Format document
+<space>a          " Select all (ggVG)
+<space>b          " Toggle breakpoint
+<space>c          " Change inner word
+<space>h          " Clear search highlighting
+<space>k          " Show hover
+<space>u          " Convert to uppercase
+```
+
+### View Management
+```
+<space>e          " Toggle explorer
+<space>p          " Show problems
+<space>sv         " Split editor vertically
+<space>sh         " Split editor horizontally
+<space>z          " Toggle zen mode
+<space>\\         " Toggle statusbar
+```
+
+### Terminal
+```
+<space>tt         " Toggle terminal
+<space>tm         " Toggle maximized panel
+<space>tn         " New terminal
+<space>tk         " Kill terminal
+```
+
+### Search and Replace
+```
+<space>sf         " Find in files
+<space>ss         " Go to symbol
+```
+
+### Configuration
+```
+<space>yg         " Open global keybindings
+<space>ys         " Open settings.json
+<space>yk         " Open keybindings.json
+<space>yy         " Open global settings
+<space>yr         " Reload window
+<space>yv         " Open Neovim config
+<space>yz         " Open Zsh config
+```
+
+### AI and Intellisense
+```
+<space>ie         " Trigger inline suggestion
+<space>ic         " New composer action
+<space>if         " Fix error message
+<space>in         " New chat action
+```
+
 ## File Operations
 :echo @%           " show current file (relative path)
 :echo expand('%:p') " show absolute file path
