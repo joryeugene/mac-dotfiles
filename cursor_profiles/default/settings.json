@@ -79,4 +79,5 @@
     "workbench.activityBar.location": "bottom",
     "workbench.colorTheme": "Dracula Theme Soft",
     "workbench.layoutControl.enabled": false,
+    "cursor.composer.cmdPFilePicker2": true,
 }

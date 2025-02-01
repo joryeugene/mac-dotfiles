@@ -27,24 +27,8 @@
     "when": "sideBarVisible"
   },
   {
-    "key": "ctrl+h",
-    "command": "workbench.action.navigateLeft",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
-  },
-  {
-    "key": "ctrl+j",
-    "command": "workbench.action.navigateDown",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
-  },
-  {
-    "key": "ctrl+k",
-    "command": "workbench.action.navigateUp",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
-  },
-  {
     "key": "ctrl+l",
-    "command": "workbench.action.navigateRight",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
+    "command": "learn-vim.focus",
   },
   {
     "key": "ctrl+m",
@@ -216,7 +200,7 @@
   {
     "key": "space d",
     "command": "vscode-neovim.send",
-    "args": "diw",
+    "args": ":put =strftime('%c')<CR>",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
@@ -298,7 +282,7 @@
   {
     "key": "space l",
     "command": "vscode-neovim.send",
-    "args": "$",
+    "args": ":put =expand('%:p')<CR>",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
