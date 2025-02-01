@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env zsh
 
-.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies compare_cursor_profiles
+.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies compare_cursor_profiles sync_cursor_profiles
 
 DOTFILES_DIR := $(HOME)/dotfiles
 BREW := brew
@@ -29,6 +29,7 @@ help:
 	@echo "  make update            - Update system packages and tools"
 	@echo "  make check_dependencies - Check if all required tools are installed"
 	@echo "  make compare_cursor_profiles - Show differences between Cursor profiles"
+	@echo "  make sync_cursor_profiles - Sync default profile settings to other profiles"
 
 all: set_permissions check_dependencies install manual_installs update
 
@@ -215,3 +216,14 @@ compare_cursor_profiles:
 			echo "Could not find both profile files to compare"; \
 		fi; \
 	done
+
+sync_cursor_profiles:
+	@echo "Syncing default profile settings to other profiles..."
+	@profile_dir="$$(find "$(HOME)/Library/Application Support/Cursor/User/profiles" -type d -mindepth 1 -maxdepth 1 | head -n 1)"; \
+	if [ -n "$$profile_dir" ]; then \
+		cp -v "$(HOME)/Library/Application Support/Cursor/User/keybindings.json" "$$profile_dir/keybindings.json"; \
+		cp -v "$(HOME)/Library/Application Support/Cursor/User/settings.json" "$$profile_dir/settings.json"; \
+		echo "Sync complete."; \
+	else \
+		echo "No profile directory found to sync to."; \
+	fi

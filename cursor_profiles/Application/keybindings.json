@@ -26,14 +26,8 @@
     "command": "workbench.action.terminal.toggleTerminal"
   },
   {
-    "key": "shift+h",
-    "command": "workbench.action.previousEditor",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
-  },
-  {
-    "key": "shift+l",
-    "command": "workbench.action.nextEditor",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
+    "key": "ctrl+shift+.",
+    "command": "workbench.action.closePanel"
   },
   {
     "key": "ctrl+[",
@@ -138,8 +132,10 @@
   },
   {
     "key": "space .",
-    "command": "workbench.action.togglePanel",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
+    "command": "editor.action.revealDefinition",
+    "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor && neovim.mode != 'insert'"
+    // "command": "workbench.action.togglePanel",
+    // "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
     "key": "space '",
@@ -179,11 +175,13 @@
   {
     "key": "space c",
     "command": "testing.clearTestResults",
+    // workbench.action.toggleCenteredLayout",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
     "key": "space d",
-    "command": "workbench.view.extension.sqltoolsActivityBarContainer",
+    "command": "workbench.action.debug.start",
+    // "command": "workbench.action.debug.start", // TODO: is this working
     "when": "editorFocus && neovim.mode != 'insert'"
   },
   {
@@ -329,11 +327,17 @@
   },
   {
     "key": "space t",
-    "command": "workbench.action.terminal.new",
+    // "command": "workbench.view.testing.focus",
+    // "command": "workbench.action.terminal.new",
+    "command": "workbench.action.files.newUntitledFile",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
     "key": "space u",
+    // "command": "testing.toggleInlineTestOutput",
+    // "command": "workbench.action.toggleEditorVisibility",
+    // "command": "workbench.panel.markers.view.focus",
+    // "command": "workbench.panel.testResults.view.toggleVisibility",
     "command": "editor.closeTestPeek",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
@@ -389,6 +393,55 @@
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
+    "key": "ctrl+cmd+i",
+    "command": "-workbench.action.chat.open"
+  },
+  {
+    "key": "ctrl+cmd+i",
+    "command": "composer.newcomposeraction"
+  },
+  {
+    "key": "cmd+i",
+    "command": "-workbench.action.chat.stopListeningAndSubmit",
+    "when": "inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'editor' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'inline' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'quick' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'terminal' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'view' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'editor' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'inline' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'quick' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'terminal' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'view'"
+  },
+  {
+    "key": "cmd+i",
+    "command": "-workbench.action.chat.startVoiceChat",
+    "when": "chatIsEnabled && hasSpeechProvider && inChatInput && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress && !terminalChatActiveRequest || chatIsEnabled && hasSpeechProvider && inlineChatFocused && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress && !terminalChatActiveRequest"
+  },
+  {
+    "key": "cmd+i",
+    "command": "-workbench.action.terminal.chat.focusInput",
+    "when": "terminalChatFocus && !inlineChatFocused"
+  },
+  {
+    "key": "cmd+i",
+    "command": "-inlineChat.start",
+    "when": "editorFocus && inlineChatHasProvider && !editorReadonly"
+  },
+  {
+    "key": "cmd+i",
+    "command": "-workbench.action.terminal.chat.start",
+    "when": "terminalChatAgentRegistered && terminalFocusInAny && terminalHasBeenCreated || terminalChatAgentRegistered && terminalFocusInAny && terminalProcessSupported"
+  },
+  {
+    "key": "shift+h",
+    "command": "workbench.action.previousEditor",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
+    "key": "shift+l",
+    "command": "workbench.action.nextEditor",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
+    "key": "space y v",
+    "command": "vscode.open",
+    "args": "/Users/jory/.config/nvim/init.lua",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
     "key": "ctrl+shift+alt+cmd+i",
     "command": "workbench.panel.composerViewPane.resetViewContainerLocation"
   },
@@ -397,13 +450,8 @@
     "command": "workbench.panel.composerViewPane"
   },
   {
-    "key": "ctrl+shift+.",
+    "key": "ctrl+shift+,",
     "command": "workbench.action.terminal.new",
-    "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
-  },
-  {
-    "key": "ctrl+shift+`",
-    "command": "-workbench.action.terminal.new",
     "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
   },
   {
@@ -412,17 +460,7 @@
   },
   {
     "key": "cmd+d",
-    "command": "-editor.action.addSelectionToNextFindMatch",
-    "when": "editorFocus"
-  },
-  {
-    "key": "cmd+d",
     "command": "workbench.action.terminal.split",
     "when": "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
-  },
-  {
-    "key": "cmd+\\",
-    "command": "-workbench.action.terminal.split",
-    "when": "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
-  },
+  }
 ]

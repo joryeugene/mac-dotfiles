@@ -1,4 +1,5 @@
 {
+    "window.commandCenter": 1,
     "terminal.integrated.defaultProfile.osx": "zsh",
     "terminal.external.osxExec": "iTerm.app",
     "terminal.integrated.profiles.osx": {
@@ -24,7 +25,8 @@
             "icon": "terminal-powershell"
         }
     },
-    "application.shellEnvironmentResolutionTimeout": 43,
+    "application.shellEnvironmentResolutionTimeout": 90,
+    "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.lua",
     "editor.fontFamily": "Berkeley Mono",
     "editor.fontSize": 14,
     "editor.fontLigatures": true,
@@ -43,7 +45,7 @@
     "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
     "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.lua",
 
-    "python.languageServer": "Pylance",
+    "python.languageServer": "Jedi",
     "python.analysis.typeCheckingMode": "basic",
     "python.testing.pytestEnabled": true,
     "python.analysis.autoImportCompletions": true,
@@ -57,7 +59,8 @@
     "extensions.experimental.affinity": {
         "asvetliakov.vscode-neovim": 1
     },
-    "workbench.colorTheme": "Monokai",
+    "workbench.colorTheme": "Dracula Theme Soft",
+    // "workbench.colorTheme": "Monokai Dimmed",
     "[jsonc]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
@@ -68,6 +71,7 @@
     "cursor.chat.ghostTextAtSymbols": true,
     "cursor.chat.smoothStreaming": true,
     "breadcrumbs.enabled": false,
+    "python.diagnostics.sourceMapsEnabled": true,
     "git.openRepositoryInParentFolders": "always",
     "cursor.chat.narrowScrollbar": false,
     "cursor.diffs.useCharacterLevelDiffs": true,
@@ -76,5 +80,10 @@
     "window.commandCenter": false,
     "cursor.chat.showSuggestedFiles": true,
     "terminal.integrated.fontSize": 16,
-    "makefile.configureOnOpen": true
+    "makefile.configureOnOpen": true,
+    "editor.renderControlCharacters": false,
+    "cursor.chat.collapseInputBoxPills": true,
+    "cursor.terminal.usePreviewBox": true,
+    "cursor.composer.collapsePaneInputBoxPills": true,
+    "cursor.composer.renderPillsInsteadOfBlocks": true
 }
