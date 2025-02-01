@@ -27,6 +27,16 @@
     "when": "sideBarVisible"
   },
   {
+    "key": "ctrl+k",
+    "command": "workbench.view.extension.figma",
+    "when": "!terminalFocus"
+  },
+  {
+    "key": "ctrl+g",
+    "command": "workbench.view.scm",
+    "when": "!terminalFocus"
+  },
+  {
     "key": "ctrl+l",
     "command": "learn-vim.focus",
   },
@@ -463,4 +473,9 @@
     "args": "diw",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
+  {
+    "key": "ctrl+f",
+    "command": "-workbench.action.terminal.focusFindWidget",
+    "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+  }
 ]
