@@ -62,6 +62,14 @@ di(             " Delete text inside parentheses
 da(             " Delete text including the parentheses
 ~               " Toggle case of character under cursor
 .               " Repeat last change
+gd              " Go to definition
+gD              " Go to declaration
+K               " Show documentation
+<C-o>           " Jump back
+<C-i>           " Jump forward
+zz              " Center cursor on screen
+zt              " Put cursor at top of screen
+zb              " Put cursor at bottom of screen
 
 ## Pro Tips
 - Use counts with commands (e.g., `5dd` deletes 5 lines).

@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env zsh
 
-.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies compare_cursor_profiles sync_cursor_profiles check_outdated clean health_check list_installed update_npm
+.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies compare_cursor_profiles sync_cursor_profiles check_outdated clean health_check list_installed update_npm node_check
 
 DOTFILES_DIR := $(HOME)/dotfiles
 BREW := brew
@@ -35,6 +35,7 @@ help:
 	@echo "  make compare_cursor_profiles - Show differences between Cursor profiles"
 	@echo "  make sync_cursor_profiles - Sync default profile settings to other profiles"
 	@echo "  make update_npm        - Update global NPM packages"
+	@echo "  make node_check        - Check Node.js environment"
 
 all: set_permissions check_dependencies install manual_installs update
 
@@ -241,10 +242,9 @@ check_outdated: check_dependencies
 
 clean: check_dependencies
 	@echo "Cleaning up system..."
-	@$(BREW) cleanup
-	@$(BREW) autoremove
-	@rm -rf "$(HOME)/Library/Caches/pip" 2>/dev/null || true
-	@rm -rf "$(HOME)/.npm/_cacache" 2>/dev/null || true
+	@$(BREW) cleanup --prune=7 # Only remove files older than 7 days
+	-@$(BREW) autoremove 2>/dev/null || true
+	@echo "Cleaned up old Homebrew files"
 
 health_check: check_dependencies
 	@echo "Checking system health..."
@@ -266,9 +266,17 @@ list_installed: check_dependencies
 
 update_npm: check_dependencies
 	@echo "Updating NPM packages..."
-	@$(NPM) install -g npm@latest
+	@$(NPM) install -g npm@10.8.2 # Pin to a compatible version
 	@$(NPM) install -g bash-language-server@latest
 	@$(NPM) install -g create-next-app@latest
 	@$(NPM) install -g pyright@latest
 	@$(NPM) install -g typescript@latest
 	@echo "NPM packages updated."
+
+node_check: check_dependencies
+	@echo "Checking Node.js environment..."
+	@node --version
+	@npm --version
+	@echo "\nGlobal NPM packages:"
+	@npm list -g --depth=0
+	@echo "\nNode.js environment check complete."
