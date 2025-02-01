@@ -25,12 +25,31 @@ export FUNCNEST=100
 
 # FZF configuration
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat --style=numbers --color=always --line-range :500 {}'"
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules'
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --info=inline"
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude node_modules --exclude .DS_Store'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git --exclude node_modules"
-export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :500 {}'"
-export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
+export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git --exclude node_modules --exclude .DS_Store"
+
+# Enhanced preview options
+export FZF_CTRL_T_OPTS="
+  --preview 'bat --style=numbers --color=always --line-range :500 {}'
+  --preview-window 'right:60%'
+  --bind 'ctrl-/:change-preview-window(down|hidden|)'
+  --header 'Press CTRL-/ to toggle preview'
+  --prompt '🔍 '
+  --pointer '▶'
+  --marker '✓'
+"
+
+export FZF_ALT_C_OPTS="
+  --preview 'tree -C {} | head -200'
+  --preview-window 'right:60%'
+  --bind 'ctrl-/:change-preview-window(down|hidden|)'
+  --header 'Press CTRL-/ to toggle preview'
+  --prompt '📁 '
+  --pointer '▶'
+  --marker '✓'
+"
 
 # Load plugins with Zinit
 zinit light zsh-users/zsh-autosuggestions
