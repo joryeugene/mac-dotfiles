@@ -288,7 +288,7 @@
   {
     "key": "space m",
     "command": "vscode-neovim.send",
-    "args": "mm",
+    "args": ":let @a = strftime('%Y-%m-%d')<CR>:edit! /Users/jory/Documents/calmhive/daily/<C-r>a.md<CR>",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
@@ -338,11 +338,6 @@
   },
   {
     "key": "space r n",
-    "command": "workbench.action.debug.run",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
-  },
-  {
-    "key": "space r u",
     "command": "workbench.action.debug.run",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
@@ -461,5 +456,11 @@
     "key": "cmd+i",
     "command": "-workbench.action.terminal.chat.start",
     "when": "terminalChatAgentRegistered && terminalFocusInAny && terminalHasBeenCreated || terminalChatAgentRegistered && terminalFocusInAny && terminalProcessSupported"
+  },
+  {
+    "key": "space backspace",
+    "command": "vscode-neovim.send",
+    "args": "diw",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
   },
 ]
