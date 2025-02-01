@@ -401,8 +401,7 @@
   },
   {
     "key": "space v",
-    "command": "vscode-neovim.send",
-    "args": "viw",
+    "command": "workbench.action.switchWindow",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
