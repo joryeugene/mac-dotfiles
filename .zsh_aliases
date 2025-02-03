@@ -2,16 +2,18 @@
 alias zshconfig='$EDITOR ~/.zshrc'
 alias zshaliases='$EDITOR ~/.zsh_aliases'
 alias zshfunctions='$EDITOR ~/.zsh_functions'
-alias zc='zshconfig'
 alias za='zshaliases'
+alias zc='zshconfig'
 alias zf='zshfunctions'
 alias sourcezsh='source ~/.zshrc && echo "ZSH config reloaded!"'
 alias sz='sourcezsh'
+alias zz='sourcezsh'
 
 # System Operations
 alias c='clear'
 alias h='history'
-alias j='jobs -l'
+alias hg='history | grep'
+alias e='exit'
 alias path='echo -e ${PATH//:/\\n}'
 alias ports='lsof -i -P -n | grep LISTEN'
 alias df='df -h'
@@ -106,6 +108,7 @@ alias nrd='npm run dev'
 alias nrc='npm run clean'
 alias nrl='npm run lint'
 alias nrf='npm run format'
+alias naf='npm audit fix'
 
 # Docker
 # alias d='docker'
@@ -122,8 +125,6 @@ alias nrf='npm run format'
 # Utility Functions
 alias dud='du -d 1 -h'                              # List directory sizes in current dir
 alias duf='du -sh *'                                # List all files/folders sizes in current dir
-alias h='history'                                   # Show history
-alias hg='history | grep'                           # Search history
 alias sortnr='sort -n -r'                          # Sort numbers in descending order (e.g., du -h | sortnr)
 alias cpv='rsync -ah --info=progress2'             # Copy with progress bar (e.g., cpv src/ dest/)
 
