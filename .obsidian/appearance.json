@@ -4,5 +4,6 @@
   "textFontFamily": "Berkeley Mono",
   "monospaceFontFamily": "Berkeley Mono",
   "translucency": false,
-  "baseFontSize": 17
+  "baseFontSize": 17,
+  "showRibbon": false
 }

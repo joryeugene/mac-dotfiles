@@ -295,12 +295,12 @@
     "args": ":put =expand('%:p')<CR>",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
-  {
-    "key": "space m",
-    "command": "vscode-neovim.send",
-    "args": ":let @a = strftime('%Y-%m-%d')<CR>:edit! /Users/jory/Documents/calmhive/daily/<C-r>a.md<CR>",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
-  },
+  // {
+  //   "key": "space m",
+  //   "command": "vscode-neovim.send",
+  //   "args": ":let @a = strftime('%Y-%m-%d')<CR>:edit! /Users/jory/Documents/calmhive/daily/<C-r>a.md<CR>",
+  //   "when": "editorTextFocus && neovim.mode != 'insert'"
+  // },
   {
     "key": "space n",
     "command": "workbench.action.files.newUntitledFile",
@@ -437,6 +437,18 @@
   {
     "key": "space y y",
     "command": "workbench.action.openGlobalSettings",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
+    "key": "space y c",
+    "command": "vscode.open",
+    "args": "/Users/jory/.config/nvim/lua/config/core.lua",
+    "when": "editorTextFocus && neovim.mode != 'insert'"
+  },
+  {
+    "key": "space y n",
+    "command": "vscode.open",
+    "args": "/Users/jory/.config/nvim/lua/config/nvim.lua",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {

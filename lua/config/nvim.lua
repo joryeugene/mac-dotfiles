@@ -146,7 +146,6 @@ M.plugins = {
 -- Additional settings for regular Neovim
 local function setup_options()
   vim.opt.number = true
-  vim.opt.relativenumber = true
   vim.opt.signcolumn = "yes"
   vim.opt.cursorline = true
   vim.opt.wrap = false
@@ -217,6 +216,16 @@ local function setup_keymaps()
   local keymap = vim.keymap.set
   local opts = { noremap = true, silent = true }
 
+  -- File operations (moved from core)
+  keymap("n", "<leader>w", ":w<CR>", opts)
+  keymap("n", "<leader>q", ":q<CR>", opts)
+  keymap("n", "<leader>x", ":x<CR>", opts)
+
+  -- Config management (moved from core)
+  keymap("n", "<leader>yr", ":source $MYVIMRC<CR>", opts)
+  keymap("n", "<leader>yc", ":e $MYVIMRC<CR>", opts)
+  keymap("n", "<leader>l", ":Lazy<CR>", opts)
+
   -- Terminal mappings
   keymap('t', '<C-\\>', '<C-\\><C-n>', opts)
   keymap('t', '<C-h>', '<C-\\><C-n><C-w>h', opts)
@@ -224,10 +233,17 @@ local function setup_keymaps()
   keymap('t', '<C-k>', '<C-\\><C-n><C-w>k', opts)
   keymap('t', '<C-l>', '<C-\\><C-n><C-w>l', opts)
 
+  -- Window navigation
+  keymap('n', '<C-h>', '<C-w>h', opts)
+  keymap('n', '<C-j>', '<C-w>j', opts)
+  keymap('n', '<C-k>', '<C-w>k', opts)
+  keymap('n', '<C-l>', '<C-w>l', opts)
+
   -- Telescope
   keymap('n', '<leader>ff', '<cmd>Telescope find_files<CR>', opts)
   keymap('n', '<leader>fg', '<cmd>Telescope live_grep<CR>', opts)
   keymap('n', '<leader>fb', '<cmd>Telescope buffers<CR>', opts)
+  keymap('n', '<leader>o', '<cmd>Telescope buffers<CR>', opts)
 
   -- LSP
   keymap('n', 'gD', vim.lsp.buf.declaration, opts)

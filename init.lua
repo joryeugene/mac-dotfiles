@@ -25,7 +25,7 @@ require('config.core')
 -- Determine which plugins to load
 local plugins
 if vim.g.vscode then
-  plugins = require('config.vscode').plugins
+  -- plugins = require('config.vscode').plugins
 else
   plugins = require('config.nvim').plugins
 end

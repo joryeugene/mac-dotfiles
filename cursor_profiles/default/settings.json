@@ -25,7 +25,7 @@
     "editor.formatOnSave": true,
     "editor.guides.bracketPairs": true,
     "editor.inlineSuggest.enabled": true,
-    "editor.lineNumbers": "relative",
+    // "editor.lineNumbers": "relative",
     "editor.scrollBeyondLastLine": false,
     "editor.smoothScrolling": true,
     "editor.snippetSuggestions": "top",
@@ -80,4 +80,5 @@
     "workbench.colorTheme": "Dracula Theme Soft",
     "workbench.layoutControl.enabled": false,
     "cursor.composer.cmdPFilePicker2": true,
+    "cursor.general.gitGraphIndexing": "enabled",
 }

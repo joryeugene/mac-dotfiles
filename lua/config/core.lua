@@ -24,15 +24,6 @@ local opts = { noremap = true, silent = true }
 -- Navigation
 keymap("n", "H", ":bprevious<CR>", opts)
 keymap("n", "L", ":bnext<CR>", opts)
--- keymap("n", "<C-h>", "<C-w>h", opts)
--- keymap("n", "<C-j>", "<C-w>j", opts)
--- keymap("n", "<C-k>", "<C-w>k", opts)
--- keymap("n", "<C-l>", "<C-w>l", opts)
-
--- File operations
-keymap("n", "<leader>w", ":w<CR>", opts)
-keymap("n", "<leader>q", ":q<CR>", opts)
-keymap("n", "<leader>x", ":x<CR>", opts)
 
 -- Quick save and quit
 keymap("n", "WW", ":w!<CR>", opts)
@@ -53,13 +44,7 @@ keymap("n", "<leader>sc", ":close<CR>", opts)
 
 -- Quick access
 keymap("n", "<leader>j", ":e /Users/jory/Documents/calmhive/hub.md<CR>", opts)
-keymap("n", "<leader>vr", ":source $MYVIMRC<CR>", opts) -- Refresh Neovim state
-keymap("n", "<leader>vc", ":e $MYVIMRC<CR>", opts) -- Open init.lua for editing
-keymap("n", "<leader>m", ":messages<CR>", opts) -- Open messages
-keymap("n", "<leader>l", ":Lazy<CR>", opts) -- Open Lazy plugin manager
-keymap("n", "<leader>o", ":Telescope buffers<CR>", opts) -- Open buffer list
-
--- Utility
+keymap("n", "<leader>m", ":messages<CR>", opts)
 keymap("n", "<leader>h", ":noh<CR>", opts)
 keymap("n", "<leader>z", ":ZenMode<CR>", opts)
 keymap("n", "<leader>\\", ":set wrap!<CR>", opts)

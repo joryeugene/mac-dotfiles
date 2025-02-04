@@ -8,7 +8,6 @@
   "showUnsupportedFiles": true,
   "attachmentFolderPath": "resources",
   "propertiesInDocument": "hidden",
-  "showRibbon": false,
   "readableLineLength": false,
   "promptDelete": false
 }
