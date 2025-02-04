@@ -63,15 +63,22 @@ M.plugins = {
   -- Telescope
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    branch = "0.1.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+    },
+    cmd = "Telescope",
     keys = {
       { "<leader>ff", "<cmd>Telescope find_files<CR>", desc = "Find files" },
       { "<leader>fg", "<cmd>Telescope live_grep<CR>", desc = "Live grep" },
       { "<leader>fb", "<cmd>Telescope buffers<CR>", desc = "Buffers" },
       { "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "Help tags" },
+      { "<leader>o", "<cmd>Telescope buffers<CR>", desc = "Quick open buffers" },
     },
     config = function()
-      require('telescope').setup({
+      local telescope = require('telescope')
+      telescope.setup({
         defaults = {
           mappings = {
             i = {
@@ -81,7 +88,7 @@ M.plugins = {
           },
         },
       })
-    end
+    end,
   },
 
   -- Status line
@@ -111,41 +118,80 @@ M.plugins = {
   {
     "akinsho/toggleterm.nvim",
     version = "*",
+    cmd = "ToggleTerm",
     keys = {
-      { "<leader>tt", "<cmd>ToggleTerm<CR>", desc = "Toggle terminal" },
-      { "<C-\\>", "<cmd>ToggleTerm<CR>", desc = "Toggle terminal" },
+      { "<leader>tt", "<cmd>ToggleTerm direction=tab<CR>", desc = "Terminal in tab" },
+      { "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", desc = "Floating terminal" },
+      { "<leader>th", "<cmd>ToggleTerm direction=horizontal<CR>", desc = "Horizontal terminal" },
+      { "<leader>tv", "<cmd>ToggleTerm direction=vertical<CR>", desc = "Vertical terminal" },
     },
-    config = function()
-      require("toggleterm").setup({
-        size = 20,
-        hide_numbers = true,
-        shade_terminals = true,
-        shading_factor = 2,
-        start_in_insert = true,
-        insert_mappings = true,
-        persist_size = true,
-        direction = "float",
-        close_on_exit = true,
-        shell = vim.o.shell,
-        float_opts = {
-          border = "curved",
-          winblend = 0,
-          highlights = {
-            border = "Normal",
-            background = "Normal",
-          },
-        },
-      })
-    end,
+    opts = {
+      size = function(term)
+        if term.direction == "horizontal" then
+          return 15
+        elseif term.direction == "vertical" then
+          return vim.o.columns * 0.4
+        end
+      end,
+      on_open = function(term)
+        vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<C-.>", "<C-\\><C-n><cmd>ToggleTerm<CR>", { noremap = true, silent = true })
+      end,
+      shade_terminals = false,
+      direction = 'float',
+      float_opts = {
+        border = "curved",
+      },
+    },
   },
 
   -- AI assistance
   { "github/copilot.vim", event = "InsertEnter" },
+
+  -- File Explorer
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
+    cmd = "Neotree",
+    keys = {
+      { "<C-e>", "<cmd>Neotree toggle<CR>", desc = "Toggle file explorer" },
+    },
+    config = function()
+      -- Disable netrw at the very start of your init.lua
+      vim.g.loaded_netrw = 1
+      vim.g.loaded_netrwPlugin = 1
+
+      require("neo-tree").setup({
+        enable_git_status = true,
+        enable_diagnostics = true,
+        filesystem = {
+          filtered_items = {
+            visible = false,
+            hide_dotfiles = false,
+            hide_gitignored = false,
+          },
+          follow_current_file = true,
+          use_libuv_file_watcher = true,
+        },
+        window = {
+          width = 30,
+          mappings = {
+            ["<C-e>"] = "close_window",
+          }
+        },
+      })
+    end,
+  },
 }
 
 -- Additional settings for regular Neovim
 local function setup_options()
   vim.opt.number = true
+  vim.opt.relativenumber = true
   vim.opt.signcolumn = "yes"
   vim.opt.cursorline = true
   vim.opt.wrap = false
@@ -214,45 +260,72 @@ end
 -- Additional keymaps for regular Neovim
 local function setup_keymaps()
   local keymap = vim.keymap.set
-  local opts = { noremap = true, silent = true }
+  local opts = { noremap = true, silent = true, desc = "" }
 
-  -- File operations (moved from core)
-  keymap("n", "<leader>w", ":w<CR>", opts)
-  keymap("n", "<leader>q", ":q<CR>", opts)
-  keymap("n", "<leader>x", ":x<CR>", opts)
+  local function test_keymap(mode, lhs, rhs)
+    if type(mode) == 'string' then
+      keymap(mode, lhs, rhs, opts)
+    else
+      keymap('n', mode, lhs, opts)
+    end
+  end
 
-  -- Config management (moved from core)
-  keymap("n", "<leader>yr", ":source $MYVIMRC<CR>", opts)
-  keymap("n", "<leader>yc", ":e $MYVIMRC<CR>", opts)
-  keymap("n", "<leader>l", ":Lazy<CR>", opts)
+  -- VSCode style mappings
+  -- Terminal toggles (ensure ToggleTerm is loaded)
+  test_keymap('n', '<C-[>', ':bprevious<CR>')
+  test_keymap('n', '<C-]>', ':bnext<CR>')
+  test_keymap('n', 'H', ':bprevious<CR>')  -- Alternative buffer navigation
+  test_keymap('n', 'L', ':bnext<CR>')
 
-  -- Terminal mappings
-  keymap('t', '<C-\\>', '<C-\\><C-n>', opts)
-  keymap('t', '<C-h>', '<C-\\><C-n><C-w>h', opts)
-  keymap('t', '<C-j>', '<C-\\><C-n><C-w>j', opts)
-  keymap('t', '<C-k>', '<C-\\><C-n><C-w>k', opts)
-  keymap('t', '<C-l>', '<C-\\><C-n><C-w>l', opts)
+  -- Explorer and sidebar
+  test_keymap('n', '<C-e>', ':Neotree toggle<CR>')
+  test_keymap('n', '<leader>e', ':Neotree toggle<CR>')
+
+  -- Quick commands
+  test_keymap('n', '<C-p>', '<cmd>Telescope commands<CR>')
+
+  -- File operations
+  test_keymap('n', '<leader>w', ':w<CR>')
+  test_keymap('n', '<leader>q', ':q<CR>')
+  test_keymap('n', '<leader>x', ':x<CR>')
+  test_keymap('n', 'QQ', ':q!<CR>')
+  test_keymap('n', 'WW', ':w!<CR>')
+
+  -- Split management (not in core.lua)
+  test_keymap('n', '<leader>sv', ':vsplit<CR>')
+  test_keymap('n', '<leader>sh', ':split<CR>')
+
+  -- Terminal splits
+  test_keymap('n', '<C-\\>', ':ToggleTerm<CR>')
+  test_keymap('t', '<C-\\>', '<C-\\><C-n>')  -- Terminal escape
 
   -- Window navigation
-  keymap('n', '<C-h>', '<C-w>h', opts)
-  keymap('n', '<C-j>', '<C-w>j', opts)
-  keymap('n', '<C-k>', '<C-w>k', opts)
-  keymap('n', '<C-l>', '<C-w>l', opts)
+  test_keymap('n', '<C-h>', '<C-w>h')
+  test_keymap('n', '<C-j>', '<C-w>j')
+  test_keymap('n', '<C-k>', '<C-w>k')
+  test_keymap('n', '<C-l>', '<C-w>l')
 
-  -- Telescope
-  keymap('n', '<leader>ff', '<cmd>Telescope find_files<CR>', opts)
-  keymap('n', '<leader>fg', '<cmd>Telescope live_grep<CR>', opts)
-  keymap('n', '<leader>fb', '<cmd>Telescope buffers<CR>', opts)
-  keymap('n', '<leader>o', '<cmd>Telescope buffers<CR>', opts)
+  -- Terminal window navigation
+  test_keymap('t', '<C-h>', '<C-\\><C-n><C-w>h')
+  test_keymap('t', '<C-j>', '<C-\\><C-n><C-w>j')
+  test_keymap('t', '<C-k>', '<C-\\><C-n><C-w>k')
+  test_keymap('t', '<C-l>', '<C-\\><C-n><C-w>l')
+
+  -- Commentary
+  test_keymap('n', '<leader>/', ':Commentary<CR>')
+  test_keymap('v', '<leader>/', ':Commentary<CR>')
 
   -- LSP
-  keymap('n', 'gD', vim.lsp.buf.declaration, opts)
-  keymap('n', 'gd', vim.lsp.buf.definition, opts)
-  keymap('n', 'K', vim.lsp.buf.hover, opts)
-  keymap('n', 'gi', vim.lsp.buf.implementation, opts)
-  keymap('n', '<leader>rn', vim.lsp.buf.rename, opts)
-  keymap('n', '<leader>ca', vim.lsp.buf.code_action, opts)
-  keymap('n', 'gr', vim.lsp.buf.references, opts)
+  test_keymap('n', 'gD', vim.lsp.buf.declaration)
+  test_keymap('n', 'gd', vim.lsp.buf.definition)
+  test_keymap('n', 'K', vim.lsp.buf.hover)
+  test_keymap('n', 'gi', vim.lsp.buf.implementation)
+  test_keymap('n', 'gr', vim.lsp.buf.references)
+
+  -- Config management
+  test_keymap('n', '<leader>l', ':Lazy<CR>')
+  test_keymap('n', '<leader>yr', ':source $MYVIMRC<CR>')
+  test_keymap('n', '<leader>yc', ':e $MYVIMRC<CR>')
 end
 
 -- Initialize everything

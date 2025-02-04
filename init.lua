@@ -27,7 +27,8 @@ local plugins
 if vim.g.vscode then
   -- plugins = require('config.vscode').plugins
 else
-  plugins = require('config.nvim').plugins
+  local nvim_config = require('config.nvim')
+  plugins = nvim_config.plugins
 end
 
 -- Initialize lazy.nvim with the appropriate plugins
@@ -54,9 +55,11 @@ require("lazy").setup(plugins, {
   },
 })
 
--- Setup non-VSCode configurations
+-- Setup non-VSCode configurations immediately
 if not vim.g.vscode then
-  -- This ensures all plugin configurations are loaded after lazy.nvim
+  require('config.nvim').setup()
+
+  -- Also set up an additional check after lazy is done
   vim.api.nvim_create_autocmd("User", {
     pattern = "LazyDone",
     callback = function()

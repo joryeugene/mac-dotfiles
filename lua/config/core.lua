@@ -21,33 +21,12 @@ vim.opt.shortmess:append("c")
 local keymap = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
--- Navigation
-keymap("n", "H", ":bprevious<CR>", opts)
-keymap("n", "L", ":bnext<CR>", opts)
-
--- Quick save and quit
-keymap("n", "WW", ":w!<CR>", opts)
-keymap("n", "QQ", ":q!<CR>", opts)
-
 -- Easy navigation
 keymap("n", "E", "$", opts)
 keymap("n", "B", "^", opts)
 
--- Resize splits
-keymap("n", "<C-W>,", ":vertical resize -10<CR>", opts)
-keymap("n", "<C-W>.", ":vertical resize +10<CR>", opts)
-
--- Windows and splits
-keymap("n", "<leader>sv", ":vsplit<CR>", opts)
-keymap("n", "<leader>sh", ":split<CR>", opts)
-keymap("n", "<leader>sc", ":close<CR>", opts)
-
 -- Quick access
-keymap("n", "<leader>j", ":e /Users/jory/Documents/calmhive/hub.md<CR>", opts)
-keymap("n", "<leader>m", ":messages<CR>", opts)
 keymap("n", "<leader>h", ":noh<CR>", opts)
-keymap("n", "<leader>z", ":ZenMode<CR>", opts)
-keymap("n", "<leader>\\", ":set wrap!<CR>", opts)
 
 -- Custom function to open markdown links
 function _G.open_markdown_link()
@@ -55,7 +34,7 @@ function _G.open_markdown_link()
     local link = line:match('%[.-%]%((.-)%)')
     if link then
         if vim.fn.has('mac') == 1 then
-            vim.fn.system('open ' .. link)
+            -- vim.fn.system('open ' .. link)
         elseif vim.fn.has('unix') == 1 then
             vim.fn.system('xdg-open ' .. link)
         elseif vim.fn.has('win32') == 1 then
