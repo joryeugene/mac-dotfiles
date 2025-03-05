@@ -128,11 +128,11 @@
     "command": "editor.action.formatDocument",
     "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && neovim.mode != 'insert'"
   },
-  {
-    "key": "space -",
-    "command": "workbench.action.navigateBack",
-    "when": "editorTextFocus && neovim.mode != 'insert'"
-  },
+  // {
+  //   "key": "space -",
+  //   "command": "workbench.action.navigateBack",
+  //   "when": "editorTextFocus && neovim.mode != 'insert'"
+  // },
   {
     "key": "space [",
     "command": "editor.action.marker.prev",
@@ -454,7 +454,7 @@
   {
     "key": "space y v",
     "command": "vscode.open",
-    "args": "/Users/jory/.config/nvim/init.lua",
+    "args": "/Users/jory/.config/nvim/lua/config/vscode.lua",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {

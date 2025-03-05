@@ -249,6 +249,7 @@ diff
 diff3
 diffstat
 dig
+direnv
 dirname
 disklabel
 diskutil
@@ -505,6 +506,7 @@ jupyter-kernelspec
 jupyter-migrate
 jupyter-run
 jupyter-troubleshoot
+just
 jvisualvm
 kadmin
 kadmin.local
@@ -936,6 +938,7 @@ rs
 rsync
 rtadvd
 ruby
+ruff
 rwbypid.d
 rwbytype.d
 rwsnoop

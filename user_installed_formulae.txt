@@ -14,6 +14,7 @@ gcc
 gh
 git
 git-delta
+gitleaks
 go
 graphviz
 grep
@@ -38,6 +39,7 @@ midnight-commander
 miller
 mycli
 mypy
+neofetch
 neovim
 nmap
 pandoc
@@ -51,6 +53,7 @@ pyenv
 pylint
 python@3.11
 quarylabs/quary/sqruff
+repomix
 ripgrep
 rsync
 rust
@@ -70,6 +73,7 @@ xh
 yamllint
 yarn
 zellij
+zenith
 zlib
 zoxide
 zsh

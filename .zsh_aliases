@@ -9,6 +9,8 @@ alias sourcezsh='source ~/.zshrc && echo "ZSH config reloaded!"'
 alias sz='sourcezsh'
 alias zz='sourcezsh'
 
+alias zen='zenith'
+
 # System Operations
 alias c='clear'
 alias h='history'
@@ -76,6 +78,10 @@ alias gcb='git checkout -b'
 alias gd='git diff'
 alias gf='git fetch'
 alias gl='git pull'
+alias glg='git log --author="Jory" -n 25 --pretty=format:"%h - %s" | cat'
+alias gl1='git log --author="Jory" -n 25 --pretty=format:"%h - %an, %ar: %s" | cat'
+alias gl2='git log --author="Jory" -n 25 --oneline --decorate'
+alias gl3='git log --author="Jory" -n 25 --pretty=format:"%h%n%s%n%b%n" | cat'
 alias glog='git log --oneline --decorate --graph'
 alias glogg="git log --graph --topo-order --pretty='%w(100,0,6)%C(yellow)%h%C(bold)%C(black)%d %C(cyan)%ar %C(green)%an%n%C(bold)%C(white)%s %N' --abbrev-commit"
 alias gp='git push'
@@ -131,23 +137,3 @@ alias cpv='rsync -ah --info=progress2'             # Copy with progress bar (e.g
 # GitHub Copilot CLI
 alias cpe='gh copilot explain'
 alias cps='gh copilot suggest'
-
-# Project Start Aliases (Whapp)
-alias spwl='start_project whapp dev local'
-alias spwd='start_project whapp dev dev'
-alias spwp='start_project whapp dev prod'
-alias spwdo='start_project whapp docker local'
-alias spal='start_project admin dev local'
-alias spad='start_project admin dev dev'
-alias spap='start_project admin dev prod'
-alias spado='start_project admin docker local'
-
-# Project Start Aliases (Monohelix)
-alias spwl1='start_project whapp dev local monohelix'
-alias spwd1='start_project whapp dev dev monohelix'
-alias spwp1='start_project whapp dev prod monohelix'
-alias spwdo1='start_project whapp docker local monohelix'
-alias spal1='start_project admin dev local monohelix'
-alias spad1='start_project admin dev dev monohelix'
-alias spap1='start_project admin dev prod monohelix'
-alias spado1='start_project admin docker local monohelix'

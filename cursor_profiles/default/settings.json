@@ -77,8 +77,20 @@
     "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.lua",
     "window.commandCenter": false,
     "workbench.activityBar.location": "bottom",
-    "workbench.colorTheme": "Dracula Theme Soft",
+    "workbench.colorTheme": "Catppuccin Frappé",
+    "workbench.colorCustomizations": {
+        "editorGhostText.foreground": "#808080", // a medium gray for ghost text
+        "editorGhostText.background": "#00000020" // a translucent dark background if needed
+    },
     "workbench.layoutControl.enabled": false,
     "cursor.composer.cmdPFilePicker2": true,
     "cursor.general.gitGraphIndexing": "enabled",
+    "repomix.output.style": "markdown",
+    "repomix.output.filePath": "repomix-output.md",
+    "repomix.output.parsableStyle": true,
+    "repomix.output.includeEmptyDirectories": true,
+    "repomix.ignore.customPatterns": [
+        "**/*.svg"
+    ],
+    "explorer.confirmDragAndDrop": false,
 }
