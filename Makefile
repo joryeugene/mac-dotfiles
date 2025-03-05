@@ -6,6 +6,7 @@ DOTFILES_DIR := $(HOME)/dotfiles
 BREW := brew
 PIPX := pipx
 NPM := npm
+CURSOR_CLI := cursor
 RUSTUP := rustup
 GO := go
 VIM := vim
@@ -34,6 +35,7 @@ help:
 	@echo "  make check_dependencies - Check if all required tools are installed"
 	@echo "  make compare_cursor_profiles - Show differences between Cursor profiles"
 	@echo "  make sync_cursor_profiles - Sync default profile settings to other profiles"
+	@echo "  make discover_cursor_extensions - Discover and backup Cursor extensions"
 	@echo "  make update_npm        - Update global NPM packages"
 	@echo "  make node_check        - Check Node.js environment"
 	@echo "  make new_computer      - Set up configs on a new computer (without backup)"
@@ -49,13 +51,18 @@ check_dependencies:
 
 set_permissions:
 	@echo "Setting correct permissions..."
-	@chmod +x app_discovery.sh brew_discovery.sh cli_tools_discovery.sh
+	@chmod +x app_discovery.sh brew_discovery.sh cli_tools_discovery.sh cursor_extensions_discovery.sh
 
-discover: set_permissions backup_configs
+discover: set_permissions backup_configs discover_cursor_extensions
 	@echo "Discovering system state...and backing up configs"
 	@./cli_tools_discovery.sh
 	@./app_discovery.sh
 	@./brew_discovery.sh
+
+# Use the script to discover and backup Cursor extensions
+discover_cursor_extensions: set_permissions
+	@echo "Discovering Cursor extensions..."
+	@./cursor_extensions_discovery.sh
 
 brew:
 	@echo "Installing Homebrew formulae..."
@@ -107,6 +114,7 @@ backup_configs:
 	@mkdir -p $(DOTFILES_DIR)/zellij/themes
 	@mkdir -p $(DOTFILES_DIR)/cursor_profiles
 	@mkdir -p $(DOTFILES_DIR)/lua/config
+	@mkdir -p $(DOTFILES_DIR)/cursor_extensions
 
 	# Backup all Cursor profiles
 	@find "$(HOME)/Library/Application Support/Cursor/User/profiles" -type f \( -name "keybindings.json" -o -name "settings.json" \) -exec bash -c '\
@@ -120,6 +128,11 @@ backup_configs:
 	@mkdir -p $(DOTFILES_DIR)/cursor_profiles/default
 	@cp -f "$(HOME)/Library/Application Support/Cursor/User/keybindings.json" $(DOTFILES_DIR)/cursor_profiles/default/keybindings.json || true
 	@cp -f "$(HOME)/Library/Application Support/Cursor/User/settings.json" $(DOTFILES_DIR)/cursor_profiles/default/settings.json || true
+
+	# Backup Cursor extensions (if not already done by discover_cursor_extensions)
+	@if [ ! -f "$(DOTFILES_DIR)/cursor_extensions/extensions.txt" ]; then \
+		make discover_cursor_extensions; \
+	fi
 
 	# Backup Neovim configurations
 	@mkdir -p $(DOTFILES_DIR)/lua/config
@@ -223,6 +236,16 @@ configs:
 		echo "Copied zellij configs"; \
 	fi
 
+	# Rest of existing config operations
+	@cp -f $(DOTFILES_DIR)/.wezterm.lua $(HOME)/.wezterm.lua || true
+	@cp -f $(DOTFILES_DIR)/.zshrc $(HOME)/.zshrc || true
+	@cp -f $(DOTFILES_DIR)/.zsh_functions $(HOME)/.zsh_functions || true
+	@cp -f $(DOTFILES_DIR)/.zsh_aliases $(HOME)/.zsh_aliases || true
+	@mkdir -p $(HOME)/.config
+	@cp -f $(DOTFILES_DIR)/starship.toml $(HOME)/.config/starship.toml || true
+	@mkdir -p $(HOME)/.config/zellij/themes
+	@cp -f $(DOTFILES_DIR)/zellij/config.kdl $(HOME)/.config/zellij/config.kdl || true
+	@cp -f $(DOTFILES_DIR)/zellij/themes/* $(HOME)/.config/zellij/themes/ || true
 	@mkdir -p "$(HOME)/Documents/calmhive/.obsidian"
 	@cp -f .obsidian.vimrc "$(HOME)/Documents/calmhive/" 2>/dev/null || true
 	@if [ -d ".obsidian" ]; then \
