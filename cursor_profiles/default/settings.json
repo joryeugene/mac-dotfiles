@@ -76,7 +76,6 @@
     "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
     "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/nvim/init.lua",
     "window.commandCenter": false,
-    "workbench.activityBar.location": "bottom",
     "workbench.colorTheme": "Catppuccin Frappé",
     "workbench.colorCustomizations": {
         "editorGhostText.foreground": "#808080", // a medium gray for ghost text

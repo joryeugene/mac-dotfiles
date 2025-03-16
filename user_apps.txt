@@ -3,7 +3,6 @@
 1Password 7
 AltTab
 Asana
-BatFi
 Bloks
 Boop
 ChatGPT
