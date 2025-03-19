@@ -92,4 +92,6 @@
         "**/*.svg"
     ],
     "explorer.confirmDragAndDrop": false,
+    "update.releaseTrack": "prerelease",
+    "git.autofetch": true,
 }

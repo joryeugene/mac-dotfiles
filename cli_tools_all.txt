@@ -249,7 +249,6 @@ diff
 diff3
 diffstat
 dig
-direnv
 dirname
 disklabel
 diskutil

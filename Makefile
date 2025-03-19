@@ -115,6 +115,16 @@ backup_configs:
 	@mkdir -p $(DOTFILES_DIR)/cursor_profiles
 	@mkdir -p $(DOTFILES_DIR)/lua/config
 	@mkdir -p $(DOTFILES_DIR)/cursor_extensions
+	@mkdir -p $(DOTFILES_DIR)/raycast
+
+	# Backup Raycast settings
+	@if [ -d "$(HOME)/Library/Application Support/com.raycast.macos" ]; then \
+		echo "Backing up Raycast settings..."; \
+		cp -f "$(HOME)/Library/Application Support/com.raycast.macos/preferences.json" $(DOTFILES_DIR)/raycast/preferences.json || true; \
+		cp -f "$(HOME)/Library/Application Support/com.raycast.macos/config.json" $(DOTFILES_DIR)/raycast/config.json || true; \
+		cp -f "$(HOME)/Library/Application Support/com.raycast.macos/hotkeys.json" $(DOTFILES_DIR)/raycast/hotkeys.json || true; \
+		cp -f "$(HOME)/Library/Application Support/com.raycast.macos/extensions-index.json" $(DOTFILES_DIR)/raycast/extensions-index.json || true; \
+	fi
 
 	# Backup all Cursor profiles
 	@find "$(HOME)/Library/Application Support/Cursor/User/profiles" -type f \( -name "keybindings.json" -o -name "settings.json" \) -exec bash -c '\

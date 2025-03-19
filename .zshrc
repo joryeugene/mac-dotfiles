@@ -144,10 +144,6 @@ export LIBRARY_PATH="$LIBRARY_PATH:/opt/homebrew/opt/libpq/lib"
 export LDFLAGS="-L/opt/homebrew/opt/libpq/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/libpq/include"
 
-# Optimize direnv
-export DIRENV_LOG_FORMAT=""
-eval "$(direnv hook zsh)"
-
 # System-wide environment settings for zsh
 if [ -x /usr/libexec/path_helper ]; then
     eval `/usr/libexec/path_helper -s`
