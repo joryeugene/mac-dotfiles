@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env zsh
 
-.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies compare_cursor_profiles sync_cursor_profiles check_outdated clean health_check list_installed update_npm node_check
+.PHONY: all install discover brew casks cli configs set_permissions backup_configs help manual_installs update check_dependencies compare_cursor_profiles sync_cursor_profiles check_outdated clean health_check list_installed update_npm node_check new_computer
 
 DOTFILES_DIR := $(HOME)/dotfiles
 BREW := brew
@@ -36,6 +36,7 @@ help:
 	@echo "  make sync_cursor_profiles - Sync default profile settings to other profiles"
 	@echo "  make update_npm        - Update global NPM packages"
 	@echo "  make node_check        - Check Node.js environment"
+	@echo "  make new_computer      - Set up configs on a new computer (without backup)"
 
 all: set_permissions check_dependencies install manual_installs update
 
@@ -88,6 +89,16 @@ cli:
 			echo "$$tool is already installed. Skipping."; \
 		fi; \
 	done
+	@if ! command -v zinit >/dev/null 2>&1; then \
+		echo "Installing zinit..."; \
+		bash -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/zinit/main/scripts/install.sh)"; \
+		echo "Zinit installed successfully"; \
+	fi
+	@if ! command -v zoxide >/dev/null 2>&1; then \
+		echo "Installing zoxide..."; \
+		$(BREW) install zoxide; \
+		echo "Zoxide installed successfully"; \
+	fi
 
 backup_configs:
 	@echo "Backing up configuration files..."
@@ -135,45 +146,144 @@ backup_configs:
 
 configs:
 	@echo "Setting up configurations..."
+	@if [ ! -d "$(DOTFILES_DIR)" ]; then \
+		echo "Dotfiles directory not found. Please run 'make backup_configs' first or ensure your dotfiles repo is cloned to $(DOTFILES_DIR)"; \
+		exit 1; \
+	fi
 
-	# Restore Neovim configurations
-	@mkdir -p $(HOME)/.config/nvim/lua/config
-	@cp -f $(DOTFILES_DIR)/init.lua $(HOME)/.config/nvim/init.lua || true
-	@cp -f $(DOTFILES_DIR)/lua/config/core.lua $(HOME)/.config/nvim/lua/config/core.lua || true
-	@cp -f $(DOTFILES_DIR)/lua/config/nvim.lua $(HOME)/.config/nvim/lua/config/nvim.lua || true
-	@cp -f $(DOTFILES_DIR)/lua/config/vscode.lua $(HOME)/.config/nvim/lua/config/vscode.lua || true
+	# Restore all Cursor profiles with better error handling
+	@echo "Setting up Cursor profiles..."
+	@mkdir -p "$(HOME)/Library/Application Support/Cursor/User/profiles"
+	@if [ -f "cursor_profiles/default/settings.json" ]; then \
+		echo "Found Cursor settings.json, copying..."; \
+		cp -f "cursor_profiles/default/settings.json" "$(HOME)/Library/Application Support/Cursor/User/settings.json"; \
+		echo "Successfully copied Cursor settings.json"; \
+	else \
+		echo "Warning: cursor_profiles/default/settings.json not found"; \
+	fi
+	@if [ -f "cursor_profiles/default/keybindings.json" ]; then \
+		echo "Found Cursor keybindings.json, copying..."; \
+		cp -f "cursor_profiles/default/keybindings.json" "$(HOME)/Library/Application Support/Cursor/User/keybindings.json"; \
+		echo "Successfully copied Cursor keybindings.json"; \
+	else \
+		echo "Warning: cursor_profiles/default/keybindings.json not found"; \
+	fi
 
-	# Restore all Cursor profiles
-	@find $(DOTFILES_DIR)/cursor_profiles -type f \( -name "keybindings.json" -o -name "settings.json" \) -exec bash -c '\
-		source_file="{}"; \
-		profile_name=$$(basename $$(dirname "{}")) ; \
-		if [ "$$profile_name" = "default" ]; then \
-			target_dir="$(HOME)/Library/Application Support/Cursor/User"; \
-		else \
-			target_dir="$(HOME)/Library/Application Support/Cursor/User/profiles/$$profile_name"; \
-		fi; \
-		mkdir -p "$$target_dir"; \
-		cp -f "$$source_file" "$$target_dir/" \
-	' \;
+	# Basic shell config files with better error handling
+	@echo "Setting up shell config files..."
+	@if [ -f ".zshrc" ]; then \
+		cp -f ".zshrc" "$(HOME)/"; \
+		echo "Copied .zshrc"; \
+	else \
+		echo "Warning: .zshrc not found"; \
+	fi
+	@if [ -f ".zsh_aliases" ]; then \
+		cp -f ".zsh_aliases" "$(HOME)/"; \
+		echo "Copied .zsh_aliases"; \
+	else \
+		echo "Warning: .zsh_aliases not found"; \
+	fi
+	@if [ -f ".zsh_functions" ]; then \
+		cp -f ".zsh_functions" "$(HOME)/"; \
+		echo "Copied .zsh_functions"; \
+	else \
+		echo "Warning: .zsh_functions not found"; \
+	fi
+	@if [ -f ".wezterm.lua" ]; then \
+		cp -f ".wezterm.lua" "$(HOME)/"; \
+		echo "Copied .wezterm.lua"; \
+	else \
+		echo "Warning: .wezterm.lua not found"; \
+	fi
 
-	# Rest of existing config operations
-	@cp -f $(DOTFILES_DIR)/.wezterm.lua $(HOME)/.wezterm.lua || true
-	@cp -f $(DOTFILES_DIR)/.zshrc $(HOME)/.zshrc || true
-	@cp -f $(DOTFILES_DIR)/.zsh_functions $(HOME)/.zsh_functions || true
-	@cp -f $(DOTFILES_DIR)/.zsh_aliases $(HOME)/.zsh_aliases || true
-	@mkdir -p $(HOME)/.config
-	@cp -f $(DOTFILES_DIR)/starship.toml $(HOME)/.config/starship.toml || true
-	@mkdir -p $(HOME)/.config/zellij/themes
-	@cp -f $(DOTFILES_DIR)/zellij/config.kdl $(HOME)/.config/zellij/config.kdl || true
-	@cp -f $(DOTFILES_DIR)/zellij/themes/* $(HOME)/.config/zellij/themes/ || true
+	# Add source commands to .zshrc if not present
+	@echo "Checking .zshrc for required source commands..."
+	@if ! grep -q "source ~/.zsh_aliases" "$(HOME)/.zshrc"; then \
+		echo "Adding source commands to .zshrc..."; \
+		echo "\n# Source aliases and functions" >> "$(HOME)/.zshrc"; \
+		echo "source ~/.zsh_aliases" >> "$(HOME)/.zshrc"; \
+		echo "source ~/.zsh_functions" >> "$(HOME)/.zshrc"; \
+		echo "Added source commands to .zshrc"; \
+	fi
+	@if ! grep -q "zoxide init zsh" "$(HOME)/.zshrc"; then \
+		echo "Adding zoxide initialization to .zshrc..."; \
+		echo "\n# Initialize zoxide" >> "$(HOME)/.zshrc"; \
+		echo 'eval "$(zoxide init zsh)"' >> "$(HOME)/.zshrc"; \
+		echo "Added zoxide initialization to .zshrc"; \
+	fi
+
+	# Application configs
+	@echo "Setting up application configs..."
+	@mkdir -p "$(HOME)/.config"
+	@cp -f starship.toml "$(HOME)/.config/" 2>/dev/null || true
+
+	@mkdir -p "$(HOME)/.config/zellij/themes"
+	@if [ -d "zellij" ]; then \
+		cp -rf "zellij/"* "$(HOME)/.config/zellij/" 2>/dev/null || true; \
+		echo "Copied zellij configs"; \
+	fi
+
 	@mkdir -p "$(HOME)/Documents/calmhive/.obsidian"
-	@cp -f $(DOTFILES_DIR)/.obsidian.vimrc "$(HOME)/Documents/calmhive/.obsidian.vimrc" || true
-	@cp -f $(DOTFILES_DIR)/.obsidian/app.json "$(HOME)/Documents/calmhive/.obsidian/app.json" || true
-	@cp -f $(DOTFILES_DIR)/.obsidian/appearance.json "$(HOME)/Documents/calmhive/.obsidian/appearance.json" || true
-	@cp -f $(DOTFILES_DIR)/.obsidian/community-plugins.json "$(HOME)/Documents/calmhive/.obsidian/community-plugins.json" || true
-	@cp -f $(DOTFILES_DIR)/.obsidian/hotkeys.json "$(HOME)/Documents/calmhive/.obsidian/hotkeys.json" || true
+	@cp -f .obsidian.vimrc "$(HOME)/Documents/calmhive/" 2>/dev/null || true
+	@if [ -d ".obsidian" ]; then \
+		cp -rf ".obsidian/"* "$(HOME)/Documents/calmhive/.obsidian/" 2>/dev/null || true; \
+		echo "Copied Obsidian configs"; \
+	fi
+
+	@mkdir -p "$(HOME)/.config/karabiner"
+	@cp -f karabiner.json "$(HOME)/.config/karabiner/" 2>/dev/null || true
+	@echo "Copied karabiner config"
+
+	@echo "Configuration setup complete."
+	@echo "NOTE: To make shell changes take effect immediately, run: source ~/.zshrc"
+	@echo "NOTE: Please restart Cursor and Wezterm for their configurations to take effect."
+
+# New target specifically for setting up a new computer
+new_computer:
+	@echo "Setting up new computer with dotfiles from $(DOTFILES_DIR)"
+	@if [ ! -d "$(DOTFILES_DIR)" ]; then \
+		echo "Error: Dotfiles directory not found at $(DOTFILES_DIR)"; \
+		echo "Please clone your dotfiles repository first:"; \
+		echo "  git clone <your-dotfiles-repo-url> $(DOTFILES_DIR)"; \
+		exit 1; \
+	fi
+	@echo "Checking for dotfiles in $(DOTFILES_DIR)..."
+	@ls -la $(DOTFILES_DIR)
+	@echo "Creating necessary directories..."
+	@mkdir -p $(HOME)/.config/nvim/lua/config
+	@mkdir -p $(HOME)/.config/zellij/themes
+	@mkdir -p "$(HOME)/Documents/calmhive/.obsidian"
 	@mkdir -p $(HOME)/.config/karabiner
-	@cp -f $(DOTFILES_DIR)/karabiner.json $(HOME)/.config/karabiner/karabiner.json || true
+	@mkdir -p "$(HOME)/Library/Application Support/Cursor/User/profiles"
+
+	@echo "Installing required tools..."
+	@if ! command -v zinit >/dev/null 2>&1; then \
+		echo "Installing zinit..."; \
+		bash -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/zinit/main/scripts/install.sh)"; \
+	fi
+	@if ! command -v pyenv >/dev/null 2>&1; then \
+		echo "Installing pyenv..."; \
+		brew install pyenv; \
+	fi
+
+	@echo "Setting up zsh configurations..."
+	@cp -f .zshrc "$(HOME)/" 2>/dev/null || true
+	@cp -f .zsh_aliases "$(HOME)/" 2>/dev/null || true
+	@cp -f .zsh_functions "$(HOME)/" 2>/dev/null || true
+
+	@echo "Adding source commands to .zshrc..."
+	@if ! grep -q "source ~/.zsh_aliases" "$(HOME)/.zshrc"; then \
+		echo "\n# Source aliases and functions" >> "$(HOME)/.zshrc"; \
+		echo "source ~/.zsh_aliases" >> "$(HOME)/.zshrc"; \
+		echo "source ~/.zsh_functions" >> "$(HOME)/.zshrc"; \
+		echo "Added source commands to .zshrc"; \
+	fi
+
+	@echo "Installing configurations from your dotfiles repository..."
+	@$(MAKE) configs
+	@echo "New computer setup complete!"
+	@echo "To make shell changes take effect immediately, run: source ~/.zshrc"
+	@echo "Please restart Cursor and Wezterm for their configurations to take effect."
 
 manual_installs:
 	@echo "\nApplications that may need manual installation:"

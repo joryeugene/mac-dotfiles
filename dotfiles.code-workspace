@@ -7,5 +7,7 @@
 			"path": "../Documents/calmhive"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"makefile.configureOnOpen": false
+	}
 }
