@@ -150,13 +150,10 @@ if [ -x /usr/libexec/path_helper ]; then
 fi
 
 # Load any local customizations
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+# [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 # Load Cargo environment
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
-
-# Initialize zoxide
-eval "$(zoxide init zsh)"
 
 # Initialize Starship prompt (keep at end)
 eval "$(starship init zsh)"

@@ -1,6 +1,14 @@
 [
   // Ctrl bindings
   {
+    "key": "ctrl+t",
+    "command": "workbench.action.tasks.runTask",
+  },
+  {
+    "key": "ctrl+v",
+    "command": "workbench.action.switchWindow",
+  },
+  {
     "key": "ctrl+,",
     "command": "workbench.action.focusFirstEditorGroup"
   },
@@ -317,6 +325,11 @@
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
+    "key": "space m",
+    "command": "editor.action.toggleWordWrap",
+    "when": "editorTextFocus"
+  },
+  {
     "key": "space q a",
     "command": "workbench.action.closeAllEditors",
     "when": "editorTextFocus && neovim.mode != 'insert'"
@@ -401,7 +414,7 @@
   },
   {
     "key": "space v",
-    "command": "workbench.action.switchWindow",
+    "command": "-workbench.action.switchWindow",
     "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {

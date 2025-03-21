@@ -5,10 +5,8 @@
     "application.shellEnvironmentResolutionTimeout": 90,
     "breadcrumbs.enabled": false,
     // cursor
-    "cursor.aipreview.enabled": true,
     "cursor.cmdk.useThemedDiffBackground": true,
     "cursor.composer.collapsePaneInputBoxPills": true,
-    "cursor.composer.renderPillsInsteadOfBlocks": true,
     "cursor.cpp.enablePartialAccepts": true,
     "cursor.diffs.useCharacterLevelDiffs": true,
     "cursor.general.enableShadowWorkspace": true,
@@ -17,7 +15,7 @@
     "editor.acceptSuggestionOnCommitCharacter": true,
     "editor.accessibilitySupport": "off",
     "editor.bracketPairColorization.enabled": true,
-    "editor.cursorStyle": "line",
+    "editor.cursorStyle": "block",
     "editor.fontFamily": "Berkeley Mono",
     "editor.fontLigatures": true,
     "editor.fontSize": 14,
@@ -94,4 +92,6 @@
     "explorer.confirmDragAndDrop": false,
     "update.releaseTrack": "prerelease",
     "git.autofetch": true,
+    "repomix.output.removeEmptyLines": true,
+    "repomix.output.compress": true,
 }

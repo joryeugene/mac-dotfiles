@@ -5,6 +5,7 @@ dorianmassoulier.repomix-runner
 dracula-theme.theme-dracula
 eamodio.gitlens
 figma.figma-vscode-extension
+firefox-devtools.vscode-firefox-debug
 foam.foam-vscode
 github.copilot
 github.copilot-chat
@@ -28,5 +29,6 @@ openai.openai-chatgpt-adhoc
 rangav.vscode-thunder-client
 ritwickdey.liveserver
 rokoroku.vscode-theme-darcula
+tomoki1207.pdf
 vintharas.learn-vim
 voidei.vscode-vimrc
