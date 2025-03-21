@@ -327,7 +327,7 @@
   {
     "key": "space m",
     "command": "editor.action.toggleWordWrap",
-    "when": "editorTextFocus"
+    "when": "editorTextFocus && neovim.mode != 'insert'"
   },
   {
     "key": "space q a",

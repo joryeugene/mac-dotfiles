@@ -26,7 +26,6 @@ ms-toolsai.vscode-jupyter-slideshow
 ms-vscode.test-adapter-converter
 njqdev.vscode-python-typehint
 openai.openai-chatgpt-adhoc
-rangav.vscode-thunder-client
 ritwickdey.liveserver
 rokoroku.vscode-theme-darcula
 tomoki1207.pdf

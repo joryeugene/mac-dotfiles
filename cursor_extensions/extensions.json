@@ -28,13 +28,12 @@
     "ms-vscode.test-adapter-converter",
     "njqdev.vscode-python-typehint",
     "openai.openai-chatgpt-adhoc",
-    "rangav.vscode-thunder-client",
     "ritwickdey.liveserver",
     "rokoroku.vscode-theme-darcula",
     "tomoki1207.pdf",
     "vintharas.learn-vim",
     "voidei.vscode-vimrc"
   ],
-  "timestamp": "2025-03-21T17:28:53Z",
+  "timestamp": "2025-03-21T19:53:02Z",
   "system": "Darwin WorkhelixPro.local 23.5.0 Darwin Kernel Version 23.5.0: Wed May  1 20:13:18 PDT 2024; root:xnu-10063.121.3~5/RELEASE_ARM64_T6030 arm64"
 }
