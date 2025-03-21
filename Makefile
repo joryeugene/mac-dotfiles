@@ -12,6 +12,12 @@ GO := go
 VIM := vim
 NVIM := nvim
 
+# Common directories
+CONFIG_DIR := $(HOME)/.config
+CURSOR_USER_DIR := $(HOME)/Library/Application\ Support/Cursor/User
+CURSOR_PROFILES_DIR := $(CURSOR_USER_DIR)/profiles
+OBSIDIAN_DIR := $(HOME)/Documents/calmhive/.obsidian
+
 .DEFAULT_GOAL := help
 
 help:
@@ -176,17 +182,17 @@ configs:
 
 	# Restore all Cursor profiles with better error handling
 	@echo "Setting up Cursor profiles..."
-	@mkdir -p "$(HOME)/Library/Application Support/Cursor/User/profiles"
+	@mkdir -p "$(CURSOR_PROFILES_DIR)"
 	@if [ -f "cursor_profiles/default/settings.json" ]; then \
 		echo "Found Cursor settings.json, copying..."; \
-		cp -f "cursor_profiles/default/settings.json" "$(HOME)/Library/Application Support/Cursor/User/settings.json"; \
+		cp -f "cursor_profiles/default/settings.json" "$(CURSOR_USER_DIR)/settings.json"; \
 		echo "Successfully copied Cursor settings.json"; \
 	else \
 		echo "Warning: cursor_profiles/default/settings.json not found"; \
 	fi
 	@if [ -f "cursor_profiles/default/keybindings.json" ]; then \
 		echo "Found Cursor keybindings.json, copying..."; \
-		cp -f "cursor_profiles/default/keybindings.json" "$(HOME)/Library/Application Support/Cursor/User/keybindings.json"; \
+		cp -f "cursor_profiles/default/keybindings.json" "$(CURSOR_USER_DIR)/keybindings.json"; \
 		echo "Successfully copied Cursor keybindings.json"; \
 	else \
 		echo "Warning: cursor_profiles/default/keybindings.json not found"; \
@@ -237,34 +243,35 @@ configs:
 
 	# Application configs
 	@echo "Setting up application configs..."
-	@mkdir -p "$(HOME)/.config"
-	@cp -f starship.toml "$(HOME)/.config/" 2>/dev/null || true
+	@mkdir -p "$(CONFIG_DIR)"
+	@cp -f starship.toml "$(CONFIG_DIR)/" 2>/dev/null || true
 
-	@mkdir -p "$(HOME)/.config/zellij/themes"
+	@mkdir -p "$(CONFIG_DIR)/zellij/themes"
 	@if [ -d "zellij" ]; then \
-		cp -rf "zellij/"* "$(HOME)/.config/zellij/" 2>/dev/null || true; \
+		cp -rf "zellij/"* "$(CONFIG_DIR)/zellij/" 2>/dev/null || true; \
 		echo "Copied zellij configs"; \
 	fi
 
-	# Rest of existing config operations
+	# Note: The following operations are duplicates and can be removed in a future cleanup
+	# They are kept for backward compatibility
 	@cp -f $(DOTFILES_DIR)/.wezterm.lua $(HOME)/.wezterm.lua || true
 	@cp -f $(DOTFILES_DIR)/.zshrc $(HOME)/.zshrc || true
 	@cp -f $(DOTFILES_DIR)/.zsh_functions $(HOME)/.zsh_functions || true
 	@cp -f $(DOTFILES_DIR)/.zsh_aliases $(HOME)/.zsh_aliases || true
-	@mkdir -p $(HOME)/.config
-	@cp -f $(DOTFILES_DIR)/starship.toml $(HOME)/.config/starship.toml || true
-	@mkdir -p $(HOME)/.config/zellij/themes
-	@cp -f $(DOTFILES_DIR)/zellij/config.kdl $(HOME)/.config/zellij/config.kdl || true
-	@cp -f $(DOTFILES_DIR)/zellij/themes/* $(HOME)/.config/zellij/themes/ || true
-	@mkdir -p "$(HOME)/Documents/calmhive/.obsidian"
+	@mkdir -p $(CONFIG_DIR)
+	@cp -f $(DOTFILES_DIR)/starship.toml $(CONFIG_DIR)/starship.toml || true
+	@mkdir -p $(CONFIG_DIR)/zellij/themes
+	@cp -f $(DOTFILES_DIR)/zellij/config.kdl $(CONFIG_DIR)/zellij/config.kdl || true
+	@cp -f $(DOTFILES_DIR)/zellij/themes/* $(CONFIG_DIR)/zellij/themes/ || true
+	@mkdir -p "$(OBSIDIAN_DIR)"
 	@cp -f .obsidian.vimrc "$(HOME)/Documents/calmhive/" 2>/dev/null || true
 	@if [ -d ".obsidian" ]; then \
-		cp -rf ".obsidian/"* "$(HOME)/Documents/calmhive/.obsidian/" 2>/dev/null || true; \
+		cp -rf ".obsidian/"* "$(OBSIDIAN_DIR)/" 2>/dev/null || true; \
 		echo "Copied Obsidian configs"; \
 	fi
 
-	@mkdir -p "$(HOME)/.config/karabiner"
-	@cp -f karabiner.json "$(HOME)/.config/karabiner/" 2>/dev/null || true
+	@mkdir -p "$(CONFIG_DIR)/karabiner"
+	@cp -f karabiner.json "$(CONFIG_DIR)/karabiner/" 2>/dev/null || true
 	@echo "Copied karabiner config"
 
 	@echo "Configuration setup complete."
@@ -283,11 +290,11 @@ new_computer:
 	@echo "Checking for dotfiles in $(DOTFILES_DIR)..."
 	@ls -la $(DOTFILES_DIR)
 	@echo "Creating necessary directories..."
-	@mkdir -p $(HOME)/.config/nvim/lua/config
-	@mkdir -p $(HOME)/.config/zellij/themes
-	@mkdir -p "$(HOME)/Documents/calmhive/.obsidian"
-	@mkdir -p $(HOME)/.config/karabiner
-	@mkdir -p "$(HOME)/Library/Application Support/Cursor/User/profiles"
+	@mkdir -p $(CONFIG_DIR)/nvim/lua/config
+	@mkdir -p $(CONFIG_DIR)/zellij/themes
+	@mkdir -p "$(OBSIDIAN_DIR)"
+	@mkdir -p $(CONFIG_DIR)/karabiner
+	@mkdir -p "$(CURSOR_PROFILES_DIR)"
 
 	@echo "Installing required tools..."
 	@if ! command -v zinit >/dev/null 2>&1; then \
@@ -354,13 +361,13 @@ update:
 	fi
 	@if command -v $(VIM) >/dev/null 2>&1; then \
 		echo "Updating Vim plugins..."; \
-		$(VIM) +PlugUpdate +qall; \
+		$(VIM) +PlugInstall +PlugUpdate +qall 2>/dev/null || echo "Vim plugin update failed, may need to install plugins first"; \
 	else \
 		echo "vim not found, skipping"; \
 	fi
 	@if command -v $(NVIM) >/dev/null 2>&1; then \
 		echo "Updating Neovim plugins..."; \
-		$(NVIM) +PlugUpdate +qall; \
+		$(NVIM) +PackerSync +qall 2>/dev/null || $(NVIM) +PlugUpdate +qall 2>/dev/null || echo "Neovim plugin update failed, may need to install plugins first"; \
 	else \
 		echo "nvim not found, skipping"; \
 	fi
@@ -368,11 +375,11 @@ update:
 
 compare_cursor_profiles:
 	@echo "Comparing Cursor profiles..."
-	@profile_dir="$$(find "$(HOME)/Library/Application Support/Cursor/User/profiles" -type d -mindepth 1 -maxdepth 1 | head -n 1)"; \
+	@profile_dir="$$(find "$(CURSOR_PROFILES_DIR)" -type d -mindepth 1 -maxdepth 1 | head -n 1)"; \
 	for file in keybindings.json settings.json; do \
 		echo "\n=== Comparing $$file ==="; \
-		if [ -f "$(HOME)/Library/Application Support/Cursor/User/$$file" ] && [ -f "$$profile_dir/$$file" ]; then \
-			diff -u --color "$(HOME)/Library/Application Support/Cursor/User/$$file" "$$profile_dir/$$file" || true; \
+		if [ -f "$(CURSOR_USER_DIR)/$$file" ] && [ -f "$$profile_dir/$$file" ]; then \
+			diff -u --color "$(CURSOR_USER_DIR)/$$file" "$$profile_dir/$$file" || true; \
 		else \
 			echo "Could not find both profile files to compare"; \
 		fi; \
@@ -380,10 +387,10 @@ compare_cursor_profiles:
 
 sync_cursor_profiles:
 	@echo "Syncing default profile settings to other profiles..."
-	@profile_dir="$$(find "$(HOME)/Library/Application Support/Cursor/User/profiles" -type d -mindepth 1 -maxdepth 1 | head -n 1)"; \
+	@profile_dir="$$(find "$(CURSOR_PROFILES_DIR)" -type d -mindepth 1 -maxdepth 1 | head -n 1)"; \
 	if [ -n "$$profile_dir" ]; then \
-		cp -v "$(HOME)/Library/Application Support/Cursor/User/keybindings.json" "$$profile_dir/keybindings.json"; \
-		cp -v "$(HOME)/Library/Application Support/Cursor/User/settings.json" "$$profile_dir/settings.json"; \
+		cp -v "$(CURSOR_USER_DIR)/keybindings.json" "$$profile_dir/keybindings.json"; \
+		cp -v "$(CURSOR_USER_DIR)/settings.json" "$$profile_dir/settings.json"; \
 		echo "Sync complete."; \
 	else \
 		echo "No profile directory found to sync to."; \
