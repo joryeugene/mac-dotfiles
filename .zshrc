@@ -1,5 +1,11 @@
 # Initialize Zinit if available
 ZINIT_HOME="${HOME}/.local/share/zinit/zinit.git"
+
+# Run neofetch on terminal startup
+if command -v neofetch &> /dev/null; then
+    neofetch
+fi
+
 if [ -f "$ZINIT_HOME/zinit.zsh" ]; then
     source "$ZINIT_HOME/zinit.zsh"
     autoload -Uz _zinit

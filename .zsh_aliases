@@ -13,6 +13,8 @@ alias zen='zenith'
 
 # System Operations
 alias c='clear'
+alias cls='cls'
+alias cl='clear && lld'
 alias h='history'
 alias hg='history | grep'
 alias e='exit'
@@ -20,6 +22,11 @@ alias path='echo -e ${PATH//:/\\n}'
 alias ports='lsof -i -P -n | grep LISTEN'
 alias df='df -h'
 alias du='du -h'
+
+# Weather shortcuts
+alias wttr='weather'                   # Full weather
+alias whelp='weather "" help'          # Show weather help
+alias wsf='weather sf'    # San Francisco weather
 
 # Date and Time
 alias now='date +"%T"'
@@ -36,10 +43,21 @@ alias ze='zellij'
 alias lg='lazygit'
 alias ld='lazydocker'
 alias cat='bat'
-alias grep='rg'
+# alias grep='rg'
 alias diff='delta'
 alias ping='prettyping --nolegend'
 alias preview="fzf --preview 'bat --color \"always\" {}'"
+alias cs='cheat'
+alias csb='cheat bash'
+alias csg='cheat git'
+alias cszsh='cheat zsh'
+
+# Git with integrated GitHub CLI
+alias gh-repo='gh repo view --web'
+alias gh-pr='gh pr list'
+alias gh-prc='gh pr create --web'
+alias gh-prv='gh pr view --web'
+alias gh-dash='gh dash'
 
 # Vim/Neovim
 alias vim='nvim'
@@ -58,11 +76,15 @@ alias .....='cd ../../../..'
 alias ~='cd ~'
 alias cdp='cd -'
 
-# List directory contents
-alias la='ls -A'
-alias ls='ls -GFh'
-alias ll='ls -lAFh'
-alias l='ls -CF'
+# List directory contents (modern alternatives with lsd)
+alias ls='lsd'                                  # Modern ls replacement
+alias l='lsd -F'                                # Simple listing
+alias la='lsd -A'                               # All files
+alias ll='lsd -la'                              # Long format, all files
+alias lt='lsd --tree'                           # Tree view
+alias lta='lsd --tree -a'                       # Tree view with hidden files
+alias lld='lsd -la --group-dirs first'          # Directories first
+alias llc='lsd -la --color=always | less -R'    # Colorized paged output
 
 # Git Enhanced
 alias g='git'

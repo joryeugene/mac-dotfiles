@@ -286,3 +286,81 @@ function start_project() {
             ;;
     esac
 }
+
+# Weather function - get weather for any location with different views
+function weather() {
+  local location=${1:-""}
+  local format=${2:-""}
+
+  # Build URL with options
+  local url="wttr.in/$location"
+
+  # Format options
+  case "$format" in
+    1|today)
+      url="${url}?format=1"  # Just today's weather
+      ;;
+    2|simple)
+      url="${url}?format=2"  # Compact forecast
+      ;;
+    3|current)
+      url="${url}?format=3"  # Just current conditions
+      ;;
+    brief|b)
+      url="${url}?0"  # Today only
+      ;;
+    short|s)
+      url="${url}?1"  # Today + tomorrow
+      ;;
+    week|w|7)
+      url="${url}?n"  # Full forecast (3 days)
+      ;;
+    full|f)
+      url="${url}?F"  # Full detailed forecast with astronomical info
+      ;;
+    forecast|fc)
+      url="${url}?q"  # Quiet version (no city)
+      ;;
+    moon|m)
+      url="${url}?m"  # Moon phase
+      ;;
+    help|h)
+      echo "Usage: weather [location] [format]"
+      echo "Formats:"
+      echo "  today, 1       - Just today's weather"
+      echo "  simple, 2      - Compact forecast"
+      echo "  current, 3     - Just current conditions"
+      echo "  brief, b       - Today only"
+      echo "  short, s       - Today + tomorrow"
+      echo "  week, w, 7     - Full forecast (3 days)"
+      echo "  full, f        - Full detailed forecast with astronomical info"
+      echo "  forecast, fc   - Quiet version (no city)"
+      echo "  moon, m        - Moon phase"
+      echo "  help, h        - Show this help"
+      return
+      ;;
+    *)
+      # Default format
+      ;;
+  esac
+
+  curl -s "$url"
+}
+
+# Cheatsheet function - show common commands
+function cheat() {
+  local command=${1:-""}
+  if [[ -z $command ]]; then
+    curl cheat.sh
+  else
+    curl cheat.sh/$command
+  fi
+}
+
+# Enhanced clear function with neofetch
+function cls() {
+  clear
+  if command -v neofetch &> /dev/null; then
+    neofetch
+  fi
+}
