@@ -83,8 +83,14 @@ alias la='lsd -A'                               # All files
 alias ll='lsd -la'                              # Long format, all files
 alias lt='lsd --tree'                           # Tree view
 alias lta='lsd --tree -a'                       # Tree view with hidden files
+alias ltd='lsd --tree --depth=2'                # Tree view, limited depth
 alias lld='lsd -la --group-dirs first'          # Directories first
+alias lls='lsd -la --sort=time'                 # Sort by date (newest first)
+alias llsize='lsd -la --sort=size --reverse'    # Sort by size (largest first)
 alias llc='lsd -la --color=always | less -R'    # Colorized paged output
+alias lfiles='lsd -la | grep -v "^d"'           # Only files
+alias ldirs='lsd -la | grep "^d"'               # Only directories
+alias lrecent='lsd -la --sort=time | head -20'  # 20 most recent files
 
 # Git Enhanced
 alias g='git'
@@ -159,3 +165,6 @@ alias cpv='rsync -ah --info=progress2'             # Copy with progress bar (e.g
 # GitHub Copilot CLI
 alias cpe='gh copilot explain'
 alias cps='gh copilot suggest'
+
+# Enhanced Git
+alias gits='gits'                                   # Enhanced git status
