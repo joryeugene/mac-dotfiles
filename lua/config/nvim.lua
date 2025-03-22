@@ -184,7 +184,12 @@ M.plugins = {
           width = 30,
           mappings = {
             ["<C-e>"] = "close_window",
-          }
+          },
+          position = "left",
+          auto_resize = false, -- Prevent auto-resizing
+        },
+        buffers = {
+          follow_current_file = true,
         },
       })
     end,
@@ -193,39 +198,9 @@ M.plugins = {
 
 -- Additional settings for regular Neovim
 local function setup_options()
-  -- Augment Code Configuration with dynamic workspace folders
-  local function get_workspace_folders()
-    -- Start with some default folders
-    local folders = {}
-
-    -- Add the current working directory
-    table.insert(folders, vim.fn.getcwd())
-
-    -- Try to detect git root of current directory
-    local git_root = vim.fn.systemlist("git rev-parse --show-toplevel 2>/dev/null")[1]
-    if git_root and git_root ~= "" and not vim.tbl_contains(folders, git_root) then
-      table.insert(folders, git_root)
-    end
-
-    -- Add common project directories if they exist
-    local common_project_dirs = {
-      vim.fn.expand("~/Documents/GitHub/monohelix/projects"),
-      vim.fn.expand("~/Documents/GitHub/monohelix/projects"),
-      vim.fn.expand("~/Documents/working_docs"),
-      vim.fn.expand("~/dotfiles"),
-      vim.fn.expand("~/.config/nvim") -- Include Neovim config as a workspace
-    }
-
-    for _, dir in ipairs(common_project_dirs) do
-      if vim.fn.isdirectory(dir) == 1 and not vim.tbl_contains(folders, dir) then
-        table.insert(folders, dir)
-      end
-    end
-
-    return folders
-  end
-
-  vim.g.augment_workspace_folders = get_workspace_folders()
+  -- Augment Code Configuration with minimal workspace folders
+  -- Just include the current directory by default
+  vim.g.augment_workspace_folders = { vim.fn.getcwd() }
 
   vim.opt.number = true
   vim.opt.relativenumber = true
@@ -307,6 +282,50 @@ local function setup_keymaps()
     end
   end
 
+  -- Custom buffer close function that prevents Neo-tree from taking over
+  local function smart_buffer_close()
+    local buffers = vim.tbl_filter(function(buf)
+      return vim.api.nvim_buf_is_valid(buf)
+          and vim.bo[buf].buflisted
+          and vim.api.nvim_buf_get_name(buf) ~= ""
+          and vim.bo[buf].filetype ~= "neo-tree"
+    end, vim.api.nvim_list_bufs())
+
+    -- Get current buffer
+    local current_buf = vim.api.nvim_get_current_buf()
+
+    -- If there's only one buffer left or no other listed buffers
+    if #buffers <= 1 then
+      -- Create an empty buffer to switch to before closing
+      vim.cmd("enew")
+      vim.bo.buflisted = true
+      vim.bo.bufhidden = ""
+
+      -- Close the original buffer
+      vim.cmd("bdelete " .. current_buf)
+    else
+      -- Find next buffer to switch to
+      local next_buf = nil
+      for i, buf in ipairs(buffers) do
+        if buf == current_buf and i < #buffers then
+          next_buf = buffers[i + 1]
+          break
+        elseif buf == current_buf then
+          next_buf = buffers[i - 1]
+          break
+        end
+      end
+
+      -- Switch to next buffer and close current one
+      if next_buf then
+        vim.cmd("buffer " .. next_buf)
+        vim.cmd("bdelete " .. current_buf)
+      else
+        vim.cmd("bdelete")
+      end
+    end
+  end
+
   -- VSCode style mappings
   -- Terminal toggles (ensure ToggleTerm is loaded)
   test_keymap('n', '<C-[>', ':bprevious<CR>')
@@ -323,8 +342,8 @@ local function setup_keymaps()
 
   -- File operations
   test_keymap('n', '<leader>w', ':w<CR>')
-  test_keymap('n', '<leader>q', ':q<CR>')
-  test_keymap('n', '<leader>x', ':x<CR>')
+  test_keymap('n', '<leader>q', function() smart_buffer_close() end)
+  test_keymap('n', '<leader>x', function() vim.cmd('w') smart_buffer_close() end)
   test_keymap('n', 'QQ', ':q!<CR>')
   test_keymap('n', 'WW', ':w!<CR>')
 
@@ -366,6 +385,8 @@ local function setup_keymaps()
   test_keymap('n', '<leader>an', ':Augment chat-new<CR>')
   test_keymap('n', '<leader>at', ':Augment chat-toggle<CR>')
   test_keymap('n', '<leader>aw', ':AugmentRefreshWorkspaces<CR>')
+  test_keymap('n', '<leader>ax', ':AugmentClearWorkspaces<CR>')
+  test_keymap('n', '<leader>ad', ':AugmentAddCurrentDir<CR>')
 
   -- Config management
   test_keymap('n', '<leader>l', ':Lazy<CR>')
@@ -411,35 +432,19 @@ local function setup_autocmds()
       add_if_exists(folders, git_root)
     end
 
-    -- Common development directories
-    local dev_dirs = {
-      -- Personal projects and configurations
-      -- "~/Documents/GitHub",
-      -- "~/Projects",
-      "~/dotfiles",
-      -- "~/.config/nvim",
-
+    -- List of directories to explicitly include
+    local include_dirs = {
       -- Documentation and notes
       "~/Documents/working_docs",
       "~/Documents/calmhive",
 
       -- Specific project directories
       "~/Documents/GitHub/monohelix/",
-
-      -- Configuration directories
-      "~/.config",
     }
 
-    -- Add all existing directories
-    for _, dir in ipairs(dev_dirs) do
+    -- Add explicitly included directories
+    for _, dir in ipairs(include_dirs) do
       add_if_exists(folders, dir)
-    end
-
-    -- Search for additional git repositories in home directory (limited depth to avoid performance issues)
-    local git_repos = vim.fn.systemlist("find ~ -maxdepth 3 -name .git -type d -prune 2>/dev/null")
-    for _, repo in ipairs(git_repos) do
-      local repo_root = vim.fn.fnamemodify(repo, ':h')
-      add_if_exists(folders, repo_root)
     end
 
     -- Update Augment workspace folders
@@ -455,13 +460,48 @@ local function setup_autocmds()
     vim.api.nvim_echo({{"\nWorkspace folders have been refreshed. Use :messages to see the full list.", "Normal"}}, true, {})
   end, {})
 
-  -- Automatically refresh workspace folders when changing directories
-  vim.api.nvim_create_autocmd({"DirChanged"}, {
-    callback = function()
-      -- Use the same function as the command to avoid duplication
-      vim.cmd("AugmentRefreshWorkspaces")
-    end,
-  })
+  -- Add command to clear workspace folders
+  vim.api.nvim_create_user_command("AugmentClearWorkspaces", function()
+    -- Reset to just the current directory
+    vim.g.augment_workspace_folders = { vim.fn.getcwd() }
+
+    print("Augment workspace folders cleared! Now only using current directory:")
+    print("  - " .. vim.fn.getcwd())
+
+    vim.api.nvim_echo({{"\nWorkspace folders have been cleared. Now only using current directory.", "Normal"}}, true, {})
+  end, {})
+
+  -- Add command to add the current directory to workspace folders
+  vim.api.nvim_create_user_command("AugmentAddCurrentDir", function()
+    local cwd = vim.fn.getcwd()
+
+    -- Check if directory is already in the list
+    local found = false
+    for _, folder in ipairs(vim.g.augment_workspace_folders or {}) do
+      if folder == cwd then
+        found = true
+        break
+      end
+    end
+
+    -- Add it if not found
+    if not found then
+      vim.g.augment_workspace_folders = vim.g.augment_workspace_folders or {}
+      table.insert(vim.g.augment_workspace_folders, cwd)
+      print("Added current directory to Augment workspace folders: " .. cwd)
+    else
+      print("Current directory already in workspace folders: " .. cwd)
+    end
+  end, {})
+
+  -- Add command to delete buffer using our custom function
+  vim.api.nvim_create_user_command("BDelete", function()
+    smart_buffer_close()
+  end, {})
+
+  -- Create a command abbreviation for 'bd' to use our custom function
+  vim.cmd([[cabbrev bd BDelete]])
+  vim.cmd([[cabbrev BD BDelete]])
 end
 
 -- Setup function that will be called after plugins are loaded
