@@ -18,6 +18,9 @@ M.plugins = {
   { "tpope/vim-surround" },
   { "tpope/vim-repeat" },
 
+  -- Claude Code AI
+  require("plugins.claude-code").spec,
+
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
@@ -169,11 +172,92 @@ M.plugins = {
     },
   },
 
-  -- AI assistance
-  { "github/copilot.vim", event = "InsertEnter" },
-
   -- Augment Code AI
   { "augmentcode/augment.vim" },
+
+  -- Debug Adapter Protocol
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      "rcarriga/nvim-dap-ui",
+      "theHamsta/nvim-dap-virtual-text",
+      "nvim-telescope/telescope-dap.nvim",
+      "mfussenegger/nvim-dap-python",
+      "leoluz/nvim-dap-go",
+      "microsoft/vscode-js-debug",
+      "nvim-neotest/nvim-nio",
+    },
+    config = function()
+      local dap = require('dap')
+      local dapui = require('dapui')
+
+      require('dapui').setup()
+      require('nvim-dap-virtual-text').setup()
+
+      -- Automatically open dap UI when debug starts
+      dap.listeners.after.event_initialized["dapui_config"] = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated["dapui_config"] = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited["dapui_config"] = function()
+        dapui.close()
+      end
+
+      -- Python setup (assuming mason-installed debugpy)
+      require('dap-python').setup('~/.local/share/nvim/mason/packages/debugpy/venv/bin/python')
+
+      -- Configure JavaScript/TypeScript debugging
+      require("dap").adapters["pwa-node"] = {
+        type = "server",
+        host = "localhost",
+        port = "${port}",
+        executable = {
+          command = "node",
+          args = {
+            require("mason-registry").get_package("js-debug-adapter"):get_install_path() .. "/js-debug/src/dapDebugServer.js",
+            "${port}"
+          },
+        }
+      }
+
+      dap.configurations.javascript = {
+        {
+          type = "pwa-node",
+          request = "launch",
+          name = "Launch file",
+          program = "${file}",
+          cwd = "${workspaceFolder}",
+        },
+      }
+
+      dap.configurations.typescript = {
+        {
+          type = "pwa-node",
+          request = "launch",
+          name = "Launch file",
+          program = "${file}",
+          cwd = "${workspaceFolder}",
+          runtimeExecutable = "ts-node",
+          sourceMaps = true,
+          resolveSourceMapLocations = {
+            "${workspaceFolder}/**",
+            "!**/node_modules/**"
+          },
+        },
+      }
+    end,
+    keys = {
+      { "<leader>db", function() require('dap').toggle_breakpoint() end, desc = "Toggle breakpoint" },
+      { "<leader>dc", function() require('dap').continue() end, desc = "Continue" },
+      { "<leader>do", function() require('dap').step_over() end, desc = "Step over" },
+      { "<leader>di", function() require('dap').step_into() end, desc = "Step into" },
+      { "<leader>du", function() require('dapui').toggle() end, desc = "Toggle UI" },
+      { "<leader>dr", function() require('dap').repl.open() end, desc = "Open REPL" },
+      { "<leader>dl", function() require('dap').run_last() end, desc = "Run last" },
+    },
+  },
 
   -- Dashboard for better start screen
   {
@@ -485,6 +569,7 @@ local function setup_keymaps()
   -- Split management (not in core.lua)
   test_keymap('n', '<leader>sv', ':vsplit<CR>')
   test_keymap('n', '<leader>sh', ':split<CR>')
+  test_keymap('n', '<leader>sc', ':close<CR>')  -- Close the current split
 
   -- Terminal splits
   test_keymap('n', '<C-\\>', ':ToggleTerm<CR>')

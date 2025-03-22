@@ -120,6 +120,7 @@ backup_configs:
 	@mkdir -p $(DOTFILES_DIR)/zellij/themes
 	@mkdir -p $(DOTFILES_DIR)/cursor_profiles
 	@mkdir -p $(DOTFILES_DIR)/lua/config
+	@mkdir -p $(DOTFILES_DIR)/lua/plugins
 	@mkdir -p $(DOTFILES_DIR)/cursor_extensions
 	@mkdir -p $(DOTFILES_DIR)/raycast
 
@@ -152,10 +153,12 @@ backup_configs:
 
 	# Backup Neovim configurations
 	@mkdir -p $(DOTFILES_DIR)/lua/config
+	@mkdir -p $(DOTFILES_DIR)/lua/plugins
 	@cp -f $(HOME)/.config/nvim/init.lua $(DOTFILES_DIR)/init.lua || true
 	@cp -f $(HOME)/.config/nvim/lua/config/core.lua $(DOTFILES_DIR)/lua/config/core.lua || true
 	@cp -f $(HOME)/.config/nvim/lua/config/nvim.lua $(DOTFILES_DIR)/lua/config/nvim.lua || true
 	@cp -f $(HOME)/.config/nvim/lua/config/vscode.lua $(DOTFILES_DIR)/lua/config/vscode.lua || true
+	@cp -f $(HOME)/.config/nvim/lua/plugins/* $(DOTFILES_DIR)/lua/plugins/ || true
 
 	# Rest of existing backup operations
 	@cp -f $(HOME)/.zshrc $(DOTFILES_DIR)/.zshrc || true
@@ -263,6 +266,11 @@ configs:
 	@mkdir -p $(CONFIG_DIR)/zellij/themes
 	@cp -f $(DOTFILES_DIR)/zellij/config.kdl $(CONFIG_DIR)/zellij/config.kdl || true
 	@cp -f $(DOTFILES_DIR)/zellij/themes/* $(CONFIG_DIR)/zellij/themes/ || true
+	@mkdir -p $(CONFIG_DIR)/nvim/lua/config
+	@mkdir -p $(CONFIG_DIR)/nvim/lua/plugins
+	@cp -f $(DOTFILES_DIR)/init.lua $(CONFIG_DIR)/nvim/init.lua || true
+	@cp -f $(DOTFILES_DIR)/lua/config/* $(CONFIG_DIR)/nvim/lua/config/ || true
+	@cp -f $(DOTFILES_DIR)/lua/plugins/* $(CONFIG_DIR)/nvim/lua/plugins/ || true
 	@mkdir -p "$(OBSIDIAN_DIR)"
 	@cp -f .obsidian.vimrc "$(HOME)/Documents/calmhive/" 2>/dev/null || true
 	@if [ -d ".obsidian" ]; then \
@@ -291,6 +299,7 @@ new_computer:
 	@ls -la $(DOTFILES_DIR)
 	@echo "Creating necessary directories..."
 	@mkdir -p $(CONFIG_DIR)/nvim/lua/config
+	@mkdir -p $(CONFIG_DIR)/nvim/lua/plugins
 	@mkdir -p $(CONFIG_DIR)/zellij/themes
 	@mkdir -p "$(OBSIDIAN_DIR)"
 	@mkdir -p $(CONFIG_DIR)/karabiner
