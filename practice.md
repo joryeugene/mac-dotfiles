@@ -183,4 +183,34 @@ Using Telescope:
 - [ ] Explore more Telescope features
 - [ ] Practice LSP integration commands
 
+---
+
+## Progress Tracking
++ ### Daily Log Template
++ ```markdown
++ Date: YYYY-MM-DD
++
++ #### Commands Practiced
++ - [ ] Command 1
++ - [ ] Command 2
++
++ #### Challenging Areas
++ -
++
++ #### Improvements
++ -
++ ```
++
++ ### Weekly Goals
++ - [ ] Master 3 new text objects
++ - [ ] Reduce use of arrow keys
++ - [ ] Practice one complex macro daily
++ - [ ] Complete vimtutor once
+
+## Resources
++ - Vim Adventures: https://vim-adventures.com
++ - Vim Golf: https://www.vimgolf.com
++ - Vim Cheat Sheet: https://vim.rtorr.com
++ - Neovim Documentation: https://neovim.io/doc
+
 Remember: The goal is not speed but building muscle memory. Practice deliberately and regularly.
