@@ -89,8 +89,30 @@ M.plugins = {
               ["<C-k>"] = "move_selection_previous",
             },
           },
-        },
+        }
       })
+
+      -- Simple safe wrapper for document symbols
+      local builtin = require('telescope.builtin')
+      -- Override the fs keybinding to use a safe version of symbols
+      vim.keymap.set('n', '<leader>fs', function()
+        local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+        local has_symbol_support = false
+
+        for _, client in ipairs(clients) do
+          if client.server_capabilities.documentSymbolProvider then
+            has_symbol_support = true
+            break
+          end
+        end
+
+        if not has_symbol_support then
+          vim.notify("LSP server does not support document symbols", vim.log.levels.WARN)
+          return
+        end
+
+        pcall(builtin.lsp_document_symbols, {})
+      end, { desc = "Document symbols (safe)" })
     end,
   },
 
@@ -155,71 +177,65 @@ M.plugins = {
 
   -- Dashboard for better start screen
   {
-    "nvimdev/dashboard-nvim",
+    "goolord/alpha-nvim",
     event = "VimEnter",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
-      require("dashboard").setup({
-        theme = "doom",
-        config = {
-          header = {
-            "",
-            "",
-            "   ██████╗ █████╗ ██╗     ███╗   ███╗██╗  ██╗██╗██╗   ██╗███████╗",
-            "  ██╔════╝██╔══██╗██║     ████╗ ████║██║  ██║██║██║   ██║██╔════╝",
-            "  ██║     ███████║██║     ██╔████╔██║███████║██║██║   ██║█████╗  ",
-            "  ██║     ██╔══██║██║     ██║╚██╔╝██║██╔══██║██║╚██╗ ██╔╝██╔══╝  ",
-            "  ╚██████╗██║  ██║███████╗██║ ╚═╝ ██║██║  ██║██║ ╚████╔╝ ███████╗",
-            "   ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝",
-            "",
-            "",
-            "",
-          },
-          center = {
-            {
-              icon = "  ",
-              desc = "Find File           ",
-              key = "SPC f f",
-              action = "Telescope find_files",
-            },
-            {
-              icon = "  ",
-              desc = "Recent Files        ",
-              key = "SPC f r",
-              action = "Telescope oldfiles",
-            },
-            {
-              icon = "  ",
-              desc = "Find Word           ",
-              key = "SPC f g",
-              action = "Telescope live_grep",
-            },
-            {
-              icon = "  ",
-              desc = "New File            ",
-              key = "SPC n f",
-              action = "enew",
-            },
-            {
-              icon = "  ",
-              desc = "Config              ",
-              key = "SPC y k",
-              action = "e ~/.config/nvim/lua/config/nvim.lua",
-            },
-            {
-              icon = "  ",
-              desc = "Quit                ",
-              key = "q",
-              action = "qa",
-            },
-          },
-          footer = function()
-            local stats = require("lazy").stats()
-            return {
-              "Neovim loaded " .. stats.count .. " plugins in " .. stats.startuptime .. "ms",
-            }
-          end,
-        },
+      local dashboard = require("alpha.themes.dashboard")
+
+      -- Custom header
+      dashboard.section.header.val = {
+        "",
+        "",
+        "   ██████╗ █████╗ ██╗     ███╗   ███╗██╗  ██╗██╗██╗   ██╗███████╗",
+        "  ██╔════╝██╔══██╗██║     ████╗ ████║██║  ██║██║██║   ██║██╔════╝",
+        "  ██║     ███████║██║     ██╔████╔██║███████║██║██║   ██║█████╗  ",
+        "  ██║     ██╔══██║██║     ██║╚██╔╝██║██╔══██║██║╚██╗ ██╔╝██╔══╝  ",
+        "  ╚██████╗██║  ██║███████╗██║ ╚═╝ ██║██║  ██║██║ ╚████╔╝ ███████╗",
+        "   ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝",
+        "",
+        "",
+      }
+
+      -- Menu items
+      dashboard.section.buttons.val = {
+        dashboard.button("f", "  Find file", ":Telescope find_files <CR>"),
+        dashboard.button("r", "  Recent files", ":Telescope oldfiles <CR>"),
+        dashboard.button("g", "  Find word", ":Telescope live_grep <CR>"),
+        dashboard.button("n", "  New file", ":enew <CR>"),
+        dashboard.button("c", "  Configuration", ":e ~/.config/nvim/lua/config/nvim.lua <CR>"),
+        dashboard.button("l", "  Lazy", ":Lazy<CR>"),
+        dashboard.button("q", "  Quit", ":qa<CR>"),
+      }
+
+      -- Footer
+      dashboard.section.footer.val = function()
+        local stats = require("lazy").stats()
+        return "⚡ Neovim loaded " .. stats.count .. " plugins in " .. stats.startuptime .. "ms"
+      end
+
+      dashboard.section.footer.opts.hl = "Type"
+      dashboard.section.header.opts.hl = "Keyword"
+      dashboard.section.buttons.opts.hl = "Keyword"
+
+      dashboard.opts.opts.noautocmd = true
+
+      require("alpha").setup(dashboard.opts)
+
+      -- Auto start Alpha when no more buffers
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "BDeletePost*",
+        callback = function(event)
+          local remaining_bufs = vim.tbl_filter(function(buf)
+            return vim.api.nvim_buf_is_valid(buf)
+                and vim.bo[buf].buflisted
+                and vim.api.nvim_buf_get_name(buf) ~= ""
+          end, vim.api.nvim_list_bufs())
+
+          if #remaining_bufs == 0 then
+            vim.cmd("Alpha")
+          end
+        end,
       })
     end,
   },
@@ -513,6 +529,7 @@ local function setup_keymaps()
   test_keymap('n', '<leader>yr', ':source $MYVIMRC<CR>')
   test_keymap('n', '<leader>yc', ':e $MYVIMRC<CR>')
   test_keymap('n', '<leader>yk', ':e ~/.config/nvim/lua/config/nvim.lua<CR>')  -- Quick access to nvim.lua for keymaps
+  test_keymap('n', '<leader>h', ':Alpha<CR>')  -- Return to dashboard
 end
 
 -- Initialize everything
