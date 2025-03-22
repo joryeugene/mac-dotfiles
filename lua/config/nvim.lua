@@ -74,6 +74,9 @@ M.plugins = {
       { "<leader>fg", "<cmd>Telescope live_grep<CR>", desc = "Live grep" },
       { "<leader>fb", "<cmd>Telescope buffers<CR>", desc = "Buffers" },
       { "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "Help tags" },
+      { "<leader>fr", "<cmd>Telescope oldfiles<CR>", desc = "Recent files" },
+      { "<leader>fc", "<cmd>Telescope commands<CR>", desc = "Commands" },
+      { "<leader>fs", "<cmd>Telescope lsp_document_symbols<CR>", desc = "Document symbols" },
       { "<leader>o", "<cmd>Telescope buffers<CR>", desc = "Quick open buffers" },
     },
     config = function()
@@ -150,6 +153,77 @@ M.plugins = {
   -- Augment Code AI
   { "augmentcode/augment.vim" },
 
+  -- Dashboard for better start screen
+  {
+    "nvimdev/dashboard-nvim",
+    event = "VimEnter",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      require("dashboard").setup({
+        theme = "doom",
+        config = {
+          header = {
+            "",
+            "",
+            "   ██████╗ █████╗ ██╗     ███╗   ███╗██╗  ██╗██╗██╗   ██╗███████╗",
+            "  ██╔════╝██╔══██╗██║     ████╗ ████║██║  ██║██║██║   ██║██╔════╝",
+            "  ██║     ███████║██║     ██╔████╔██║███████║██║██║   ██║█████╗  ",
+            "  ██║     ██╔══██║██║     ██║╚██╔╝██║██╔══██║██║╚██╗ ██╔╝██╔══╝  ",
+            "  ╚██████╗██║  ██║███████╗██║ ╚═╝ ██║██║  ██║██║ ╚████╔╝ ███████╗",
+            "   ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝  ╚══════╝",
+            "",
+            "",
+            "",
+          },
+          center = {
+            {
+              icon = "  ",
+              desc = "Find File           ",
+              key = "SPC f f",
+              action = "Telescope find_files",
+            },
+            {
+              icon = "  ",
+              desc = "Recent Files        ",
+              key = "SPC f r",
+              action = "Telescope oldfiles",
+            },
+            {
+              icon = "  ",
+              desc = "Find Word           ",
+              key = "SPC f g",
+              action = "Telescope live_grep",
+            },
+            {
+              icon = "  ",
+              desc = "New File            ",
+              key = "SPC n f",
+              action = "enew",
+            },
+            {
+              icon = "  ",
+              desc = "Config              ",
+              key = "SPC y k",
+              action = "e ~/.config/nvim/lua/config/nvim.lua",
+            },
+            {
+              icon = "  ",
+              desc = "Quit                ",
+              key = "q",
+              action = "qa",
+            },
+          },
+          footer = function()
+            local stats = require("lazy").stats()
+            return {
+              "Neovim loaded " .. stats.count .. " plugins in " .. stats.startuptime .. "ms",
+            }
+          end,
+        },
+      })
+    end,
+  },
+
   -- File Explorer
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -220,12 +294,12 @@ local function setup_lsp()
 
   mason.setup()
   mason_lspconfig.setup({
-    ensure_installed = { "pyright", "tsserver", "lua_ls" },
+    ensure_installed = { "pyright", "ts_ls", "lua_ls" },
     automatic_installation = true,
   })
 
   local capabilities = cmp_nvim_lsp.default_capabilities()
-  local servers = { "pyright", "tsserver", "lua_ls" }
+  local servers = { "pyright", "ts_ls", "lua_ls" }
 
   for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup({
@@ -282,6 +356,30 @@ local function setup_keymaps()
     end
   end
 
+  -- Create a function to launch lazygit with proper terminal handling
+  local function open_lazygit()
+    local term = require("toggleterm.terminal").Terminal:new({
+      cmd = "lazygit",
+      hidden = true,
+      direction = "float",
+      float_opts = {
+        border = "curved",
+      },
+      on_open = function(term)
+        -- Setup special keybindings for lazygit
+        vim.api.nvim_buf_set_keymap(term.bufnr, "t", "q", "<C-\\><C-n>:lua _G.exit_lazygit()<CR>", {noremap = true, silent = true})
+        vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<ESC>", "<ESC>", {noremap = true, silent = true}) -- Allow ESC to pass through
+        vim.cmd("startinsert!")
+      end,
+    })
+    _G.exit_lazygit = function()
+      -- Send q key to lazygit then close the terminal
+      vim.api.nvim_feedkeys("q", "t", false)
+      vim.defer_fn(function() term:close() end, 100)
+    end
+    term:toggle()
+  end
+
   -- Custom buffer close function that prevents Neo-tree from taking over
   local function smart_buffer_close()
     local buffers = vim.tbl_filter(function(buf)
@@ -335,7 +433,27 @@ local function setup_keymaps()
 
   -- Explorer and sidebar
   test_keymap('n', '<C-e>', ':Neotree toggle<CR>')
-  test_keymap('n', '<leader>e', ':Neotree toggle<CR>')
+  test_keymap('n', '<leader>e', function()
+    local neotree_win = nil
+
+    -- Find if Neo-tree window is already open
+    for _, win in pairs(vim.api.nvim_list_wins()) do
+      local buf = vim.api.nvim_win_get_buf(win)
+      local buf_name = vim.api.nvim_buf_get_name(buf)
+      if buf_name:match("neo%-tree filesystem") then
+        neotree_win = win
+        break
+      end
+    end
+
+    if neotree_win then
+      -- If Neo-tree is open, focus the window
+      vim.api.nvim_set_current_win(neotree_win)
+    else
+      -- Otherwise, open Neo-tree
+      vim.cmd("Neotree toggle")
+    end
+  end)
 
   -- Quick commands
   test_keymap('n', '<C-p>', '<cmd>Telescope commands<CR>')
@@ -344,8 +462,9 @@ local function setup_keymaps()
   test_keymap('n', '<leader>w', ':w<CR>')
   test_keymap('n', '<leader>q', function() smart_buffer_close() end)
   test_keymap('n', '<leader>x', function() vim.cmd('w') smart_buffer_close() end)
-  test_keymap('n', 'QQ', ':q!<CR>')
+  test_keymap('n', 'QQ', ':qa!<CR>')  -- Close all buffers and windows at once
   test_keymap('n', 'WW', ':w!<CR>')
+  test_keymap('n', '<leader>nf', ':enew<CR>') -- Create a new file buffer
 
   -- Split management (not in core.lua)
   test_keymap('n', '<leader>sv', ':vsplit<CR>')
@@ -354,6 +473,7 @@ local function setup_keymaps()
   -- Terminal splits
   test_keymap('n', '<C-\\>', ':ToggleTerm<CR>')
   test_keymap('t', '<C-\\>', '<C-\\><C-n>')  -- Terminal escape
+  test_keymap('n', '<leader>tg', function() open_lazygit() end)  -- Open lazygit in floating terminal
 
   -- Window navigation
   test_keymap('n', '<C-h>', '<C-w>h')
@@ -392,6 +512,7 @@ local function setup_keymaps()
   test_keymap('n', '<leader>l', ':Lazy<CR>')
   test_keymap('n', '<leader>yr', ':source $MYVIMRC<CR>')
   test_keymap('n', '<leader>yc', ':e $MYVIMRC<CR>')
+  test_keymap('n', '<leader>yk', ':e ~/.config/nvim/lua/config/nvim.lua<CR>')  -- Quick access to nvim.lua for keymaps
 end
 
 -- Initialize everything
@@ -409,6 +530,17 @@ local function setup_autocmds()
       autocmd BufWritePre * :%s/\s\+$//e
     augroup END
   ]])
+
+  -- Terminal settings with Lua API instead of Vimscript
+  vim.api.nvim_create_autocmd("TermOpen", {
+    pattern = "*",
+    callback = function() vim.cmd("startinsert") end,
+  })
+
+  vim.api.nvim_create_autocmd("BufEnter", {
+    pattern = "term://*",
+    callback = function() vim.cmd("startinsert") end,
+  })
 
   -- Add command to refresh Augment workspace folders
   vim.api.nvim_create_user_command("AugmentRefreshWorkspaces", function()
