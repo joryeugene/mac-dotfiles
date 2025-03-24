@@ -94,4 +94,8 @@
     "git.autofetch": true,
     "repomix.output.removeEmptyLines": true,
     "repomix.output.compress": true,
+    "github.copilot.enable": {
+        "*": false
+    },
+    "explorer.confirmDelete": false,
 }

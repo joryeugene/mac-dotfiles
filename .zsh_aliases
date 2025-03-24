@@ -161,6 +161,8 @@ alias dud='du -d 1 -h'                              # List directory sizes in cu
 alias duf='du -sh *'                                # List all files/folders sizes in current dir
 alias sortnr='sort -n -r'                          # Sort numbers in descending order (e.g., du -h | sortnr)
 alias cpv='rsync -ah --info=progress2'             # Copy with progress bar (e.g., cpv src/ dest/)
+alias fsd='create_fullstack react-duckdb duckdb'    # Create fullstack with DuckDB
+alias fsp='create_fullstack react-postgres postgres' # Create fullstack with Postgres
 
 # GitHub Copilot CLI
 alias cpe='gh copilot explain'

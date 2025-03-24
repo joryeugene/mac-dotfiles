@@ -175,6 +175,9 @@ M.plugins = {
   -- Augment Code AI
   { "augmentcode/augment.vim" },
 
+  -- Firefox Debug Adapter
+  require("plugins.firefox-debug"),
+
   -- Debug Adapter Protocol
   {
     "mfussenegger/nvim-dap",
@@ -205,16 +208,13 @@ M.plugins = {
         dapui.close()
       end
 
-      -- Python setup (assuming mason-installed debugpy)
-      require('dap-python').setup('~/.local/share/nvim/mason/packages/debugpy/venv/bin/python')
-
-      -- Configure JavaScript/TypeScript debugging
-      require("dap").adapters["pwa-node"] = {
+      -- Node.js / JavaScript / TypeScript setup
+      dap.adapters["pwa-node"] = {
         type = "server",
         host = "localhost",
         port = "${port}",
         executable = {
-          command = "node",
+          command = "/opt/homebrew/bin/node",  -- Full path to Node.js
           args = {
             require("mason-registry").get_package("js-debug-adapter"):get_install_path() .. "/js-debug/src/dapDebugServer.js",
             "${port}"
@@ -222,31 +222,86 @@ M.plugins = {
         }
       }
 
+      -- Chrome/Firefox setup
+      dap.adapters.chrome = dap.adapters["pwa-node"]
+      dap.adapters.firefox = {
+        type = "executable",
+        command = "/opt/homebrew/bin/node",  -- Full path to Node.js
+        args = {
+          require("mason-registry").get_package("firefox-debug-adapter"):get_install_path() .. "/dist/adapter.bundle.js"
+        },
+        options = {
+          env = {
+            RUST_BACKTRACE = "1",  -- More detailed error messages
+            RUST_LOG = "debug"      -- Debug level logging
+          }
+        }
+      }
+
+      -- JavaScript/TypeScript configurations
       dap.configurations.javascript = {
         {
           type = "pwa-node",
           request = "launch",
-          name = "Launch file",
+          name = "Launch Node.js Program",
           program = "${file}",
           cwd = "${workspaceFolder}",
+          sourceMaps = true,
         },
+        {
+          type = "chrome",
+          request = "launch",
+          name = "Launch Chrome",
+          url = "http://localhost:5173",
+          webRoot = "${workspaceFolder}",
+          userDataDir = false,
+          sourceMaps = true,
+        },
+        {
+          type = "firefox",
+          request = "attach",
+          name = "Debug with Firefox/Zen",
+          url = "http://localhost:5173",
+          webRoot = "${workspaceFolder}",
+          firefoxExecutable = "/Applications/Zen Browser.app/Contents/MacOS/zen",
+          port = 9222,
+          reAttach = true,
+          timeout = 60000,  -- 60 second timeout
+          pathMappings = {
+            {
+              url = "webpack:///",
+              path = "${workspaceFolder}/"
+            }
+          },
+          sourceMap = true,
+          sourceMaps = true,
+          host = "localhost",
+          log = {
+            fileName = "${workspaceFolder}/firefox-adapter.log",
+            fileLevel = {
+              default = "Debug"
+            }
+          }
+        }
       }
 
-      dap.configurations.typescript = {
-        {
-          type = "pwa-node",
-          request = "launch",
-          name = "Launch file",
-          program = "${file}",
-          cwd = "${workspaceFolder}",
-          runtimeExecutable = "ts-node",
-          sourceMaps = true,
-          resolveSourceMapLocations = {
-            "${workspaceFolder}/**",
-            "!**/node_modules/**"
-          },
-        },
-      }
+      -- Copy JavaScript configurations to TypeScript
+      dap.configurations.typescript = dap.configurations.javascript
+      dap.configurations.typescriptreact = dap.configurations.javascript
+      dap.configurations.javascriptreact = dap.configurations.javascript
+
+      -- Python setup
+      require('dap-python').setup('python')
+
+      -- Add configurations for Python Django and Flask
+      table.insert(dap.configurations.python, {
+        type = 'python',
+        request = 'launch',
+        name = 'Django',
+        program = '${workspaceFolder}/manage.py',
+        args = {'runserver', '--noreload'},
+        console = 'integratedTerminal',
+      })
     end,
     keys = {
       { "<leader>db", function() require('dap').toggle_breakpoint() end, desc = "Toggle breakpoint" },
@@ -256,6 +311,260 @@ M.plugins = {
       { "<leader>du", function() require('dapui').toggle() end, desc = "Toggle UI" },
       { "<leader>dr", function() require('dap').repl.open() end, desc = "Open REPL" },
       { "<leader>dl", function() require('dap').run_last() end, desc = "Run last" },
+      { "<leader>dt", function() require('dap').terminate() end, desc = "Terminate" },
+      { "<leader>dC", function()
+        local has_telescope, telescope = pcall(require, "telescope")
+        if has_telescope then
+          telescope.load_extension("dap")
+          telescope.extensions.dap.configurations{}
+        else
+          vim.ui.select(
+            require('dap').configurations[vim.bo.filetype] or {},
+            { prompt = "Select Configuration" },
+            function(selected)
+              if selected then require('dap').run(selected) end
+            end
+          )
+        end
+      end, desc = "Select debug configuration" },
+
+      -- Web Debugging - Launch Zen Browser
+      { "<leader>dwl", function()
+        -- Use osascript for more reliable launching
+        local cmd = string.format([[
+          osascript -e 'tell application "Zen Browser" to quit' 2>/dev/null || true
+          sleep 1
+          open -n -a "/Applications/Zen Browser.app" --args --remote-debugging-port=9222 --no-first-run --no-default-browser-check "http://localhost:5173/login"
+        ]])
+
+        -- Run the command in a background process
+        vim.fn.jobstart(cmd, {
+          on_exit = function(_, code)
+            if code == 0 then
+              vim.notify(
+                "Launched Zen Browser with debugging port at http://localhost:5173/login\n" ..
+                "IMPORTANT: Wait for browser to fully load before connecting debugger.\n" ..
+                "Then try:\n" ..
+                "1. Firefox protocol: <leader>dwa\n" ..
+                "2. Chrome protocol: <leader>dwc",
+                vim.log.levels.INFO
+              )
+            else
+              vim.notify("Failed to launch Zen Browser", vim.log.levels.ERROR)
+            end
+          end
+        })
+      end, desc = "Launch Zen Browser for debugging" },
+
+      -- Web Debugging - Attach to Zen Browser (using Firefox protocol)
+      { "<leader>dwa", function()
+        -- Check if the port is actually open before attempting to attach
+        local function is_port_open(port)
+          local handle = io.popen("nc -z localhost " .. port .. " && echo success || echo failure")
+          if not handle then return false end
+
+          local result = handle:read("*a")
+          handle:close()
+
+          return result:match("success") ~= nil
+        end
+
+        if not is_port_open(9222) then
+          vim.notify(
+            "Debugging port 9222 is not open! Make sure:\n" ..
+            "1. Zen Browser is running\n" ..
+            "2. It was started with --remote-debugging-port=9222\n" ..
+            "Run <leader>dwl to launch the browser properly",
+            vim.log.levels.ERROR
+          )
+          return
+        end
+
+        -- Open the debug UI first
+        require('dapui').open()
+
+        -- Get all JavaScript configurations
+        local configs = require('dap').configurations.javascript or {}
+
+        -- Find the Firefox/Zen configuration
+        local firefox_config = nil
+        for _, config in ipairs(configs) do
+          if config.name == "Debug with Firefox/Zen" then
+            firefox_config = config
+            break
+          end
+        end
+
+        if firefox_config then
+          -- Explicitly run the Firefox configuration
+          vim.notify("Attaching to Zen Browser with Firefox protocol on port 9222...", vim.log.levels.INFO)
+          require('dap').run(firefox_config)
+        else
+          vim.notify("Could not find Firefox/Zen debug configuration", vim.log.levels.ERROR)
+        end
+      end, desc = "Attach to browser using Firefox protocol" },
+
+      -- Web Debugging - Attach to Zen Browser with Chrome protocol (alternative)
+      { "<leader>dwc", function()
+        -- Check if the port is actually open before attempting to attach
+        local function is_port_open(port)
+          local handle = io.popen("nc -z localhost " .. port .. " && echo success || echo failure")
+          if not handle then return false end
+
+          local result = handle:read("*a")
+          handle:close()
+
+          return result:match("success") ~= nil
+        end
+
+        if not is_port_open(9222) then
+          vim.notify(
+            "Debugging port 9222 is not open! Make sure:\n" ..
+            "1. Zen Browser is running\n" ..
+            "2. It was started with --remote-debugging-port=9222\n" ..
+            "Run <leader>dwl to launch the browser properly",
+            vim.log.levels.ERROR
+          )
+          return
+        end
+
+        -- Open the debug UI first
+        require('dapui').open()
+
+        -- Get Chrome configuration
+        local chrome_config = {
+          type = "chrome",
+          request = "attach",
+          name = "Attach to Chrome",
+          host = "localhost",
+          port = 9222,
+          webRoot = "${workspaceFolder}",
+          sourceMaps = true
+        }
+
+        -- Explicitly run Chrome configuration
+        vim.notify("Attaching to browser with Chrome protocol...", vim.log.levels.INFO)
+        require('dap').run(chrome_config)
+      end, desc = "Attach to browser using Chrome protocol" },
+
+      -- Web Debugging - Set a breakpoint with clear instructions
+      { "<leader>dwb", function()
+        -- Get the current buffer's file path and line number
+        local current_file = vim.fn.expand("%:p")
+        local line_nr = vim.api.nvim_win_get_cursor(0)[1]
+
+        -- Toggle a breakpoint at the current line
+        require('dap').toggle_breakpoint()
+
+        -- Log to help with debugging
+        vim.notify(string.format("Toggled breakpoint at %s:%d", current_file, line_nr), vim.log.levels.INFO)
+
+        -- Check if we're in a JavaScript/TypeScript file
+        local ft = vim.bo.filetype
+        if ft == "javascript" or ft == "typescript" or ft == "javascriptreact" or ft == "typescriptreact" then
+          vim.notify("Breakpoint set for web debugging. Make sure to:\n" ..
+                      "1. Launch browser with <leader>dwl\n" ..
+                      "2. Wait for browser to fully load\n" ..
+                      "3. Try attaching with Firefox protocol: <leader>dwa\n" ..
+                      "4. If that fails, try Chrome protocol: <leader>dwc",
+                      vim.log.levels.INFO)
+        end
+      end, desc = "Set web breakpoint with instructions" },
+
+      -- Add a key binding to run your specific project debug tasks
+      { "<leader>dA", function()
+        -- Create a terminal for the API
+        vim.cmd("ToggleTerm direction=horizontal size=15")
+        local term_id = vim.api.nvim_get_current_buf()
+        vim.api.nvim_chan_send(vim.b[term_id].terminal, "cd " .. vim.fn.getcwd() .. " && make api\n")
+
+        -- Create a split for the dashboard
+        vim.cmd("vsplit")
+        vim.cmd("ToggleTerm direction=vertical")
+        local term_id2 = vim.api.nvim_get_current_buf()
+        vim.api.nvim_chan_send(vim.b[term_id2].terminal, "cd " .. vim.fn.getcwd() .. " && make dashboard\n")
+
+        -- Return to the main window
+        vim.cmd("wincmd p")
+
+        -- Let user know
+        vim.notify("Started API and Dashboard services", vim.log.levels.INFO)
+      end, desc = "Start API and Dashboard" },
+
+      -- Web Debugging - Kill and restart Zen Browser
+      { "<leader>dwr", function()
+        -- Use osascript for more reliable restarting
+        local cmd = string.format([[
+          osascript -e 'tell application "Zen Browser" to quit' 2>/dev/null || true
+          sleep 1
+          open -n -a "/Applications/Zen Browser.app" --args --remote-debugging-port=9222 --no-first-run --no-default-browser-check "http://localhost:5173/login"
+        ]])
+
+        -- Run the command in a background process
+        vim.fn.jobstart(cmd, {
+          on_exit = function(_, code)
+            if code == 0 then
+              vim.notify(
+                "Restarted Zen Browser with debugging port at http://localhost:5173/login\n" ..
+                "IMPORTANT: Wait for browser to fully load before connecting debugger.\n" ..
+                "Then use <leader>dwa to attach debugger.",
+                vim.log.levels.INFO
+              )
+            else
+              vim.notify("Failed to restart Zen Browser", vim.log.levels.ERROR)
+            end
+          end
+        })
+      end, desc = "Restart Zen Browser for debugging" },
+
+      -- Web Debugging - Verify browser debugging is working
+      { "<leader>dwv", function()
+        -- Create a temporary script file
+        local script_path = "/tmp/check_browser_debug.js"
+        local script_content = [[
+const http = require('http');
+
+// Try to connect to the Chrome DevTools Protocol
+http.get('http://localhost:9222/json/version', (res) => {
+  let data = '';
+
+  res.on('data', (chunk) => {
+    data += chunk;
+  });
+
+  res.on('end', () => {
+    console.log('SUCCESS: Browser debugging port is open!');
+    console.log('Response:');
+    console.log(data);
+    process.exit(0);
+  });
+}).on('error', (err) => {
+  console.error('ERROR: Failed to connect to browser debugging port');
+  console.error(err.message);
+  process.exit(1);
+});
+]]
+
+        -- Write script to file
+        local file = io.open(script_path, "w")
+        if file then
+          file:write(script_content)
+          file:close()
+        else
+          vim.notify("Failed to create debug test script", vim.log.levels.ERROR)
+          return
+        end
+
+        -- Create terminal for test
+        vim.cmd("ToggleTerm direction=float")
+        local term_id = vim.api.nvim_get_current_buf()
+
+        -- Run the test
+        vim.api.nvim_chan_send(vim.b[term_id].terminal, "node " .. script_path .. "\n")
+
+        -- Let the user know
+        vim.notify("Running browser debug connection test...", vim.log.levels.INFO)
+      end, desc = "Verify browser debug connection" },
     },
   },
 
@@ -392,20 +701,174 @@ local function setup_lsp()
   local lspconfig = require('lspconfig')
   local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
-  mason.setup()
+  -- Setup Mason first
+  mason.setup({
+    ui = {
+      border = "rounded",
+      icons = {
+        package_installed = "✓",
+        package_pending = "➜",
+        package_uninstalled = "✗"
+      }
+    }
+  })
+
+  -- Ensure debug adapters are installed
+  local ensure_installed = {
+    -- LSP servers are handled by mason-lspconfig
+    -- Debug adapters
+    "js-debug-adapter",
+    "firefox-debug-adapter",
+  }
+
+  -- Install tools
+  for _, tool in ipairs(ensure_installed) do
+    local pkg = require("mason-registry").get_package(tool)
+    if not pkg:is_installed() then
+      pkg:install()
+    end
+  end
+
+  -- Setup LSP
   mason_lspconfig.setup({
-    ensure_installed = { "pyright", "ts_ls", "lua_ls" },
+    ensure_installed = require('config.mason_list'),
     automatic_installation = true,
   })
 
+  -- Enhanced capabilities for completion and snippets
   local capabilities = cmp_nvim_lsp.default_capabilities()
-  local servers = { "pyright", "ts_ls", "lua_ls" }
+  capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-  for _, lsp in ipairs(servers) do
+  -- Common LSP on_attach function
+  local on_attach = function(client, bufnr)
+    -- Customize autocomplete and LSP behavior
+    if client.name == "typescript-language-server" or client.name == "ts_ls" then
+      -- Disable formatting from tsserver in favor of eslint
+      client.server_capabilities.documentFormattingProvider = false
+    end
+
+    -- Enable inlay hints for supported servers
+    if client.server_capabilities.inlayHintProvider then
+      if vim.fn.has('nvim-0.10') == 1 then
+        -- For Neovim 0.10+
+        vim.lsp.inlay_hint.enable(true, {bufnr = bufnr})
+      else
+        -- For older versions
+        vim.lsp.inlay_hint.enable(true, {bufnr = bufnr})
+      end
+    end
+  end
+
+  -- Server-specific configurations
+  local servers = {
+    pyright = {
+      settings = {
+        python = {
+          analysis = {
+            typeCheckingMode = "basic",
+            autoSearchPaths = true,
+            useLibraryCodeForTypes = true,
+            diagnosticMode = "workspace",
+          }
+        }
+      }
+    },
+    ts_ls = {
+      settings = {
+        typescript = {
+          inlayHints = {
+            includeInlayParameterNameHints = "all",
+            includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+            includeInlayFunctionParameterTypeHints = true,
+            includeInlayVariableTypeHints = true,
+            includeInlayPropertyDeclarationTypeHints = true,
+            includeInlayFunctionLikeReturnTypeHints = true,
+            includeInlayEnumMemberValueHints = true,
+          }
+        },
+        javascript = {
+          inlayHints = {
+            includeInlayParameterNameHints = "all",
+            includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+            includeInlayFunctionParameterTypeHints = true,
+            includeInlayVariableTypeHints = true,
+            includeInlayPropertyDeclarationTypeHints = true,
+            includeInlayFunctionLikeReturnTypeHints = true,
+            includeInlayEnumMemberValueHints = true,
+          }
+        }
+      }
+    },
+    eslint = {
+      -- ESLint will be applied for JavaScript and TypeScript
+      -- and validate various types of files like .jsx, .tsx, etc.
+      filetypes = {
+        "javascript",
+        "javascriptreact",
+        "javascript.jsx",
+        "typescript",
+        "typescriptreact",
+        "typescript.tsx"
+      },
+      settings = {
+        workingDirectory = { mode = "auto" },
+        format = { enable = true },
+      }
+    },
+    lua_ls = {
+      settings = {
+        Lua = {
+          diagnostics = {
+            globals = { "vim" } -- Recognize 'vim' global in Neovim config
+          },
+          workspace = {
+            library = vim.api.nvim_get_runtime_file("", true),
+            checkThirdParty = false,
+          },
+          telemetry = { enable = false },
+        }
+      }
+    },
+    tailwindcss = {
+      filetypes = {
+        "html", "css", "javascript", "javascriptreact", "typescript", "typescriptreact"
+      }
+    }
+  }
+
+  -- Setup each server
+  for server_name, server_settings in pairs(servers) do
+    local config = {
+      capabilities = capabilities,
+      on_attach = on_attach,
+      flags = {
+        debounce_text_changes = 150,
+      }
+    }
+
+    -- Merge settings if provided
+    if server_settings then
+      for key, value in pairs(server_settings) do
+        config[key] = value
+      end
+    end
+
+    lspconfig[server_name].setup(config)
+  end
+
+  -- Setup the rest of the servers with default configuration
+  local additional_servers = { "cssls", "html" }
+  for _, lsp in ipairs(additional_servers) do
     lspconfig[lsp].setup({
       capabilities = capabilities,
+      on_attach = on_attach,
     })
   end
+
+  -- Create format command
+  vim.api.nvim_create_user_command("Format", function()
+    vim.lsp.buf.format({ async = true })
+  end, {})
 end
 
 -- Completion setup
@@ -413,10 +876,74 @@ local function setup_completion()
   local cmp = require('cmp')
   local luasnip = require('luasnip')
 
+  -- Load friendly snippets if available
+  pcall(require, "luasnip/loaders/from_vscode")
+
+  -- Better handling of tab completion with snippets
+  local has_words_before = function()
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+  end
+
+  -- Define completion icons
+  local kind_icons = {
+    Text = "",
+    Method = "",
+    Function = "󰊕",
+    Constructor = "",
+    Field = "󰇽",
+    Variable = "󰂡",
+    Class = "󰠱",
+    Interface = "",
+    Module = "",
+    Property = "󰜢",
+    Unit = "",
+    Value = "󰎠",
+    Enum = "",
+    Keyword = "󰌋",
+    Snippet = "",
+    Color = "󰏘",
+    File = "󰈙",
+    Reference = "",
+    Folder = "󰉋",
+    EnumMember = "",
+    Constant = "󰏿",
+    Struct = "",
+    Event = "",
+    Operator = "󰆕",
+    TypeParameter = "󰅲",
+  }
+
   cmp.setup({
     snippet = {
       expand = function(args)
         luasnip.lsp_expand(args.body)
+      end,
+    },
+    window = {
+      completion = cmp.config.window.bordered(),
+      documentation = cmp.config.window.bordered(),
+    },
+    formatting = {
+      format = function(entry, vim_item)
+        -- Add icons
+        vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind] or "", vim_item.kind)
+
+        -- Set max width of abbr (item name)
+        local abbr_max = 50
+        if vim_item.abbr:len() > abbr_max then
+          vim_item.abbr = vim_item.abbr:sub(1, abbr_max) .. "..."
+        end
+
+        -- Show source
+        vim_item.menu = ({
+          nvim_lsp = "[LSP]",
+          luasnip = "[Snippet]",
+          buffer = "[Buffer]",
+          path = "[Path]",
+        })[entry.source.name]
+
+        return vim_item
       end,
     },
     mapping = cmp.mapping.preset.insert({
@@ -429,17 +956,70 @@ local function setup_completion()
           cmp.select_next_item()
         elseif luasnip.expand_or_jumpable() then
           luasnip.expand_or_jump()
+        elseif has_words_before() then
+          cmp.complete()
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
+      ['<S-Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        elseif luasnip.jumpable(-1) then
+          luasnip.jump(-1)
         else
           fallback()
         end
       end, { 'i', 's' }),
     }),
-    sources = {
-      { name = 'nvim_lsp' },
-      { name = 'luasnip' },
-      { name = 'buffer' },
-      { name = 'path' },
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp', priority = 1000 },
+      { name = 'luasnip', priority = 750 },
+      { name = 'path', priority = 500 },
+      { name = 'buffer', priority = 250, max_item_count = 5 },
+    }),
+    experimental = {
+      ghost_text = true,  -- Show ghost text preview of completion
     },
+  })
+
+  -- Filetype-specific configurations
+  cmp.setup.filetype('python', {
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp', priority = 1000 },
+      { name = 'luasnip', priority = 750 },
+      { name = 'path', priority = 500 },
+    }, {
+      { name = 'buffer', priority = 250, max_item_count = 5 },
+    })
+  })
+
+  cmp.setup.filetype({ 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' }, {
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp', priority = 1000 },
+      { name = 'luasnip', priority = 750 },
+      { name = 'path', priority = 500 },
+    }, {
+      { name = 'buffer', priority = 250, max_item_count = 5 },
+    })
+  })
+
+  -- Set up enhanced cmdline completion
+  cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
+  })
+
+  -- Set up enhanced search completion
+  cmp.setup.cmdline('/', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = 'buffer' }
+    }
   })
 end
 

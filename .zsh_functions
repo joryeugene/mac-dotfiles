@@ -332,3 +332,839 @@ function gits() {
   echo "\n📝 Active Stashes:"
   git stash list || echo "No stashes."
 }
+
+# Create a modern fullstack project with React frontend and Python backend
+function create_fullstack() {
+  local project_name=${1:-"fullstack-app"}
+  local db_type=${2:-"duckdb"}  # duckdb or postgres
+  local use_uv=${3:-"yes"}      # Use UV package manager by default
+
+  if [[ "$1" == "help" ]]; then
+    echo "Create a modern fullstack project with React TypeScript frontend and Python FastAPI backend"
+    echo ""
+    echo "Usage: create_fullstack [project_name] [db_type] [use_uv]"
+    echo "  project_name:  Name of the project (default: fullstack-app)"
+    echo "  db_type:       Database type: 'duckdb' or 'postgres' (default: duckdb)"
+    echo "  use_uv:        Use UV package manager: 'yes' or 'no' (default: yes)"
+    echo "                 UV docs: https://github.com/astral-sh/uv"
+    echo ""
+    echo "Examples:"
+    echo "  create_fullstack my-awesome-app"
+    echo "  create_fullstack data-explorer duckdb yes"
+    echo "  create_fullstack web-service postgres no"
+    return
+  fi
+
+  # Check if UV is installed when requested
+  if [[ "$use_uv" == "yes" ]]; then
+    if ! command -v uv &> /dev/null; then
+      echo "⚠️ UV is not installed, but was requested. Install it with:"
+      echo "curl -LsSf https://astral.sh/uv/install.sh | sh"
+      echo ""
+      read -q "REPLY?Continue with pip instead? (y/n) "
+      echo
+      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Aborted. Install UV first or run with use_uv=no"
+        return 1
+      fi
+      use_uv="no"
+    fi
+  fi
+
+  # Create project directory
+  mkdir -p "$project_name"
+  cd "$project_name" || return
+
+  echo "🚀 Creating modern fullstack project: $project_name with $db_type"
+  echo "📂 Project location: $(pwd)"
+
+  # Create initial project structure
+  mkdir -p frontend backend
+  touch README.md
+
+  # Create root README
+  cat > README.md << EOL
+# $project_name
+
+Modern fullstack application with React TypeScript frontend and Python FastAPI backend.
+
+## Structure
+
+- \`/frontend\`: React TypeScript application
+- \`/backend\`: Python FastAPI application with $db_type
+
+## Development
+
+The project includes a Makefile for easy setup and execution:
+
+### First-time setup
+\`\`\`
+make setup       # Set up both frontend and backend
+\`\`\`
+
+### Running the application
+\`\`\`
+make run         # Start both frontend and backend
+make run-fe      # Start only the frontend
+make run-be      # Start only the backend
+\`\`\`
+
+### Other commands
+\`\`\`
+make help        # Show all available commands
+make clean       # Clean up build artifacts
+make test        # Run all tests
+\`\`\`
+
+See the Makefile for more commands.
+EOL
+
+  # Initialize git repository
+  git init
+  cat > .gitignore << EOL
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+venv/
+ENV/
+dist/
+build/
+*.egg-info/
+
+# JavaScript/TypeScript
+node_modules/
+.npm
+.pnp
+.pnp.js
+.yarn/
+.cache/
+dist/
+build/
+*.log*
+.DS_Store
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+EOL
+
+  # Create Makefile
+  cat > Makefile << EOL
+.PHONY: help setup setup-fe setup-be run run-fe run-be clean test test-fe test-be
+
+# Default Python interpreter
+PYTHON := python3
+
+# UV settings - properly quoted now
+USE_UV := ${use_uv}
+
+ifeq (\$(USE_UV),yes)
+	PIP_CMD := uv pip
+	VENV_CMD := uv venv
+else
+	PIP_CMD := pip
+	VENV_CMD := \$(PYTHON) -m venv
+endif
+
+# Application ports
+FRONTEND_PORT := 5173
+BACKEND_PORT := 8000
+
+# Docker settings (for PostgreSQL)
+DOCKER_COMPOSE := docker-compose
+
+# Default target
+.DEFAULT_GOAL := help
+
+help:
+	@echo "Available commands:"
+	@echo "  setup      - Set up both frontend and backend"
+	@echo "  setup-fe   - Set up frontend dependencies"
+	@echo "  setup-be   - Set up backend dependencies"
+	@echo "  run        - Run both frontend and backend"
+	@echo "  run-fe     - Run only frontend"
+	@echo "  run-be     - Run only backend"
+	@echo "  test       - Run all tests"
+	@echo "  test-fe    - Run frontend tests"
+	@echo "  test-be    - Run backend tests"
+	@echo "  clean      - Clean build artifacts"
+	@echo "  format     - Format code in both frontend and backend"
+EOL
+
+if [[ "$db_type" == "postgres" ]]; then
+  cat >> Makefile << EOL
+	@echo "  db-up      - Start PostgreSQL database container"
+	@echo "  db-down    - Stop PostgreSQL database container"
+EOL
+fi
+
+  cat >> Makefile << EOL
+
+# Full application setup
+setup: setup-fe setup-be
+	@echo "✅ Setup complete"
+
+# Frontend setup
+setup-fe:
+	@echo "📦 Setting up frontend..."
+	cd frontend && npm install
+
+# Backend setup
+setup-be:
+	@echo "🐍 Setting up backend..."
+	cd backend && mkdir -p data && \$(VENV_CMD) .venv && \\
+	. .venv/bin/activate && \\
+	\$(PIP_CMD) install -e . && \\
+	\$(PIP_CMD) install -e ".[dev]"
+
+# Run both frontend and backend with proper dependency
+run: setup
+	@echo "🚀 Starting application..."
+	@make -j2 run-be run-fe
+
+# Run frontend only
+run-fe:
+	@echo "🌐 Starting frontend on port \$(FRONTEND_PORT)..."
+	cd frontend && npm run dev
+
+# Run backend only - fixed to ensure setup-be runs first and data directory exists
+run-be: setup-be
+EOL
+
+  if [[ "$db_type" == "postgres" ]]; then
+    cat >> Makefile << EOL
+	@echo "⚙️ Starting backend on port \$(BACKEND_PORT)..."
+	@make db-up
+	cd backend && . .venv/bin/activate && uvicorn app.main:app --reload --port \$(BACKEND_PORT)
+
+# Database operations
+db-up:
+	@echo "🐘 Starting PostgreSQL database..."
+	\$(DOCKER_COMPOSE) up -d postgres
+
+db-down:
+	@echo "🛑 Stopping PostgreSQL database..."
+	\$(DOCKER_COMPOSE) down
+EOL
+  else
+    cat >> Makefile << EOL
+	@echo "⚙️ Starting backend on port \$(BACKEND_PORT)..."
+	cd backend && . .venv/bin/activate && uvicorn app.main:app --reload --port \$(BACKEND_PORT)
+EOL
+  fi
+
+  cat >> Makefile << EOL
+
+# Testing
+test: test-be test-fe
+	@echo "✅ All tests completed"
+
+# Test frontend
+test-fe:
+	@echo "🧪 Running frontend tests..."
+	cd frontend && npm test
+
+# Test backend
+test-be:
+	@echo "🧪 Running backend tests..."
+	cd backend && . .venv/bin/activate && python -m pytest
+
+# Format code
+format:
+	@echo "🧹 Formatting code..."
+	cd frontend && npm run format || echo "No format script defined"
+	cd backend && . .venv/bin/activate && (command -v black >/dev/null && black app tests || echo "Black not installed")
+
+# Clean build artifacts
+clean:
+	@echo "🧹 Cleaning build artifacts..."
+	rm -rf frontend/dist
+	rm -rf frontend/build
+	rm -rf backend/dist
+	rm -rf backend/build
+	rm -rf backend/*.egg-info
+EOL
+
+  # Set up frontend
+  echo "📦 Setting up React TypeScript frontend..."
+  cd frontend || return
+
+  # Use Vite for React frontend
+  npm create vite@latest . -- --template react-ts
+
+  # Make sure default package.json is properly configured
+  if [ ! -f package.json ]; then
+    cat > package.json << EOL
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "axios": "^1.6.2",
+    "react-router-dom": "^6.20.0",
+    "@tanstack/react-query": "^5.8.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "postcss": "^8.4.31",
+    "prettier": "^3.1.0",
+    "tailwindcss": "^3.3.5",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  }
+}
+EOL
+  else
+    # Add format script to package.json (for Makefile format target)
+    sed -i.bak 's/"scripts": {/"scripts": {\n    "format": "prettier --write src\/",/g' package.json
+    rm -f package.json.bak
+  fi
+
+  # Add essential packages if needed
+  npm install axios react-router-dom @tanstack/react-query tailwindcss postcss autoprefixer --no-save || true
+
+  # Install prettier for formatting
+  npm install --save-dev prettier --no-save || true
+
+  # Configure TailwindCSS
+  npx tailwindcss init -p
+
+  # Create a basic tailwind.config.js
+  cat > tailwind.config.js << EOL
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+EOL
+
+  # Create basic CSS file with Tailwind directives
+  cat > src/index.css << EOL
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background-color: rgb(var(--background-rgb));
+}
+EOL
+
+  # Create a basic API service
+  mkdir -p src/services
+  cat > src/services/apiService.ts << EOL
+import axios from 'axios';
+
+const API_URL = 'http://localhost:8000';
+
+const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export const fetchData = async () => {
+  const response = await apiClient.get('/api/data');
+  return response.data;
+};
+
+export default apiClient;
+EOL
+
+  # Create a demo component that uses the API
+  mkdir -p src/components
+  cat > src/components/DataDisplay.tsx << EOL
+import { useState, useEffect } from 'react';
+import { fetchData } from '../services/apiService';
+
+interface DataItem {
+  id: number;
+  name: string;
+  value: number;
+}
+
+export const DataDisplay = () => {
+  const [data, setData] = useState<DataItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const result = await fetchData();
+        setData(result);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch data:', err);
+        setError('Failed to load data from API. Is the backend running?');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  if (loading) return <div className="text-center p-4">Loading data...</div>;
+
+  if (error) {
+    return (
+      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">
+        <p className="font-bold">Error</p>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Data from Backend</h2>
+      {data.length === 0 ? (
+        <p>No data available</p>
+      ) : (
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {data.map((item) => (
+                <tr key={item.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{item.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+EOL
+
+  # Update App.tsx to use the DataDisplay component
+  cat > src/App.tsx << EOL
+import './App.css';
+import { DataDisplay } from './components/DataDisplay';
+
+function App() {
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-white shadow">
+        <div className="max-w-7xl mx-auto py-6 px-4">
+          <h1 className="text-3xl font-bold text-gray-900">$project_name</h1>
+          <p className="text-gray-600">A modern fullstack application</p>
+        </div>
+      </header>
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="border-4 border-dashed border-gray-200 rounded-lg p-4">
+            <DataDisplay />
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default App;
+EOL
+
+  # Return to project root
+  cd ..
+
+  # Set up backend
+  echo "🐍 Setting up Python FastAPI backend..."
+  cd backend || return
+
+  # Create Python package structure
+  mkdir -p app/api app/core app/models app/schemas app/services tests
+  touch app/__init__.py app/api/__init__.py app/core/__init__.py
+  touch app/models/__init__.py app/schemas/__init__.py app/services/__init__.py
+
+  # Create setup.py
+  cat > setup.py << EOL
+from setuptools import setup, find_packages
+
+setup(
+    name="${project_name}-backend",
+    version="0.1.0",
+    packages=find_packages(),
+    install_requires=[
+        "fastapi>=0.103.0",
+        "uvicorn>=0.23.2",
+        "pydantic>=2.3.0",
+EOL
+
+  # Add database-specific dependencies
+  if [[ "$db_type" == "duckdb" ]]; then
+    echo '        "duckdb:///data/data.duckdb")' >> setup.py
+  else
+    echo '        "postgresql://postgres:postgres@localhost:5432/postgres")' >> setup.py
+  fi
+
+  cat >> setup.py << EOL
+        "python-dotenv>=1.0.0",
+        "pydantic-settings>=2.0.3",
+    ],
+    extras_require={
+        "dev": [
+            "pytest>=7.4.0",
+            "pytest-asyncio>=0.21.1",
+            "httpx>=0.24.1",
+            "black>=23.7.0",
+        ]
+    },
+)
+EOL
+
+  # Create main FastAPI app
+  cat > app/main.py << EOL
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from .api import router
+from .core.config import settings
+from .services.database import init_db
+import asyncio
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    description="API for $project_name",
+    version="0.1.0",
+)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers
+app.include_router(router)
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to $project_name API"}
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize the database on startup"""
+    await init_db()
+EOL
+
+  # Create settings module
+  cat > app/core/config.py << EOL
+from pydantic_settings import BaseSettings
+from typing import List
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+class Settings(BaseSettings):
+    PROJECT_NAME: str = "$project_name"
+    API_PREFIX: str = "/api"
+    DEBUG: bool = os.getenv("DEBUG", "True").lower() in ("true", "1", "t")
+
+    # CORS
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",  # React frontend
+        "http://localhost:5173",  # Vite default
+    ]
+
+    # Database
+    DATABASE_URL: str = os.getenv("DATABASE_URL",
+EOL
+
+  # Add database-specific settings
+  if [[ "$db_type" == "duckdb" ]]; then
+    echo '        "duckdb:///data/data.duckdb")' >> app/core/config.py
+  else
+    echo '        "postgresql://postgres:postgres@localhost:5432/postgres")' >> app/core/config.py
+  fi
+
+  cat >> app/core/config.py << EOL
+
+settings = Settings()
+EOL
+
+  # Create router module
+  cat > app/api/__init__.py << EOL
+from fastapi import APIRouter
+from .endpoints import data
+
+router = APIRouter(prefix="/api")
+router.include_router(data.router, prefix="/data", tags=["data"])
+EOL
+
+  # Create data endpoints
+  mkdir -p app/api/endpoints
+  touch app/api/endpoints/__init__.py
+
+  cat > app/api/endpoints/data.py << EOL
+from fastapi import APIRouter, Depends
+from typing import List, Dict, Any
+from ...services.database import get_data
+
+router = APIRouter()
+
+@router.get("/", response_model=List[Dict[str, Any]])
+async def read_data():
+    """Retrieve sample data from database"""
+    return await get_data()
+EOL
+
+  # Create database service
+  mkdir -p app/services
+  touch app/services/__init__.py
+
+  # Add database-specific implementation
+  if [[ "$db_type" == "duckdb" ]]; then
+    cat > app/services/database.py << EOL
+import duckdb
+import os
+from pathlib import Path
+from ..core.config import settings
+import asyncio
+
+# Get the absolute path to the database file
+def get_db_path():
+    # Extract file path from URL
+    db_url = settings.DATABASE_URL
+    db_path = db_url.split("://")[-1]
+
+    # If the path is absolute with / prefix, handle it properly
+    if db_path.startswith('/'):
+        # For absolute paths, ensure the directory exists
+        dir_path = os.path.dirname(db_path)
+        if dir_path and not os.path.exists(dir_path):
+            os.makedirs(dir_path, exist_ok=True)
+    else:
+        # For relative paths, ensure they're in the current directory structure
+        # Create directory if needed
+        dir_path = os.path.dirname(db_path)
+        if dir_path and not os.path.exists(dir_path):
+            os.makedirs(dir_path, exist_ok=True)
+
+    # Return the complete path
+    return db_path
+
+async def get_connection():
+    """Get a DuckDB connection"""
+    db_path = get_db_path()
+    return duckdb.connect(db_path)
+
+async def init_db():
+    """Initialize the database with sample data"""
+    conn = await get_connection()
+
+    # Create a sample table if it doesn't exist
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS sample_data (
+            id INTEGER PRIMARY KEY,
+            name VARCHAR,
+            value DOUBLE
+        )
+    ''')
+
+    # Insert sample data if the table is empty
+    row_count = conn.execute('SELECT COUNT(*) FROM sample_data').fetchone()[0]
+    if row_count == 0:
+        conn.execute('''
+            INSERT INTO sample_data VALUES
+            (1, 'Item 1', 10.5),
+            (2, 'Item 2', 20.75),
+            (3, 'Item 3', 30.25)
+        ''')
+
+    conn.close()
+
+async def get_data():
+    """Get sample data from the database"""
+    conn = await get_connection()
+    result = conn.execute('SELECT * FROM sample_data').fetchall()
+    # Convert to dictionaries
+    columns = ["id", "name", "value"]
+    data = [dict(zip(columns, row)) for row in result]
+    conn.close()
+    return data
+EOL
+  else
+    cat > app/services/database.py << EOL
+from sqlalchemy import create_engine, Column, Integer, String, Float, MetaData, Table, select
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from ..core.config import settings
+
+# Create async PostgreSQL engine
+engine = create_async_engine(
+    settings.DATABASE_URL.replace("postgresql://", "postgresql+psycopg://"),
+    echo=settings.DEBUG,
+)
+async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+# Define metadata and tables
+metadata = MetaData()
+
+sample_data = Table(
+    "sample_data",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("name", String),
+    Column("value", Float),
+)
+
+async def init_db():
+    """Initialize the database and tables"""
+    async with engine.begin() as conn:
+        await conn.run_sync(metadata.create_all)
+
+    # Insert sample data if table is empty
+    async with async_session() as session:
+        result = await session.execute(select(sample_data.c.id))
+        if result.first() is None:
+            await session.execute(
+                sample_data.insert().values(
+                    [
+                        {"id": 1, "name": "Item 1", "value": 10.5},
+                        {"id": 2, "name": "Item 2", "value": 20.75},
+                        {"id": 3, "name": "Item 3", "value": 30.25},
+                    ]
+                )
+            )
+            await session.commit()
+
+async def get_data():
+    """Get sample data from the database"""
+    async with async_session() as session:
+        result = await session.execute(select(sample_data))
+        data = [dict(r._mapping) for r in result.all()]
+        return data
+EOL
+  fi
+
+  # Create .env file
+  cat > .env << EOL
+DEBUG=True
+EOL
+
+  if [[ "$db_type" == "postgres" ]]; then
+    echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres" >> .env
+  else
+    # For DuckDB, ensure the data directory exists
+    mkdir -p data
+    echo "DATABASE_URL=duckdb:///data/data.duckdb" >> .env
+  fi
+
+  # Create a sample test
+  mkdir -p tests
+  cat > tests/test_api.py << EOL
+import pytest
+from httpx import AsyncClient
+from ..app.main import app
+
+@pytest.mark.asyncio
+async def test_read_main():
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get("/")
+        assert response.status_code == 200
+        assert response.json() == {"message": "Welcome to $project_name API"}
+
+@pytest.mark.asyncio
+async def test_read_data():
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        response = await client.get("/api/data")
+        assert response.status_code == 200
+        assert len(response.json()) > 0
+EOL
+
+  # Don't create venv here as Makefile will handle it
+  # Return to project root
+  cd ..
+
+  # Create a docker-compose file for local development
+  if [[ "$db_type" == "postgres" ]]; then
+    cat > docker-compose.yml << EOL
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+EOL
+  fi
+
+  echo "✅ Project setup complete!"
+  echo "📂 Project created at: $(pwd)"
+  echo ""
+  echo "To get started:"
+  echo "  make help     - Show all available commands"
+  echo "  make setup    - Set up all dependencies"
+  echo "  make run      - Start both frontend and backend"
+}

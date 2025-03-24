@@ -1,5 +1,6 @@
 anysphere.pyright
 asvetliakov.vscode-neovim
+augment.vscode-augment
 catppuccin.catppuccin-vsc
 dorianmassoulier.repomix-runner
 dracula-theme.theme-dracula
