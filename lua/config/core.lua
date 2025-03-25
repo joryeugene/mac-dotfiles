@@ -28,24 +28,45 @@ keymap("n", "B", "^", opts)
 -- Quick access
 keymap("n", "<leader>h", ":noh<CR>", opts)
 
--- Custom function to open markdown links
+-- Enhanced function to open URLs and markdown links
 function _G.open_markdown_link()
     local line = vim.fn.getline('.')
-    local link = line:match('%[.-%]%((.-)%)')
-    if link then
+    local col = vim.fn.col('.')
+
+    -- Try to find a URL or markdown link under the cursor
+    local url = nil
+
+    -- Check for markdown link [text](url)
+    local markdown_link = line:match('%[.-%]%((.-)%)')
+    if markdown_link then
+        url = markdown_link
+    else
+        -- Check for plain URL
+        local word = vim.fn.expand('<cWORD>')
+        if word:match('^https?://') or word:match('^www%.') then
+            url = word
+        end
+    end
+
+    if url then
+        -- Handle different operating systems
         if vim.fn.has('mac') == 1 then
-            -- vim.fn.system('open ' .. link)
+            vim.fn.system('open ' .. vim.fn.shellescape(url))
         elseif vim.fn.has('unix') == 1 then
-            vim.fn.system('xdg-open ' .. link)
+            vim.fn.system('xdg-open ' .. vim.fn.shellescape(url))
         elseif vim.fn.has('win32') == 1 then
-            vim.fn.system('start ' .. link)
+            vim.fn.system('start ' .. vim.fn.shellescape(url))
         end
     else
+        -- Fallback to netrw's gx if no URL found
         vim.api.nvim_command('normal! gx')
     end
 end
 
--- Map 'gx' to open markdown links
+-- Map 'gx' to open links
 vim.api.nvim_set_keymap('n', 'gx', ':lua open_markdown_link()<CR>', {noremap = true, silent = true})
+
+-- Also map 'gx' in visual mode to handle selected URLs
+vim.api.nvim_set_keymap('v', 'gx', ':<C-u>lua open_markdown_link()<CR>', {noremap = true, silent = true})
 
 return M
