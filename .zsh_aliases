@@ -115,6 +115,7 @@ alias glogg="git log --graph --topo-order --pretty='%w(100,0,6)%C(yellow)%h%C(bo
 alias gp='git push'
 alias grb='git rebase'
 alias gs='git status'
+alias cg='clear && git status'
 alias gst='git stash'
 alias gstp='git stash pop'
 alias gstc='git stash clear'

@@ -98,4 +98,6 @@
         "*": false
     },
     "explorer.confirmDelete": false,
+    "cursor.composer.shouldAllowCustomModes": true,
+    "cursor.composer.shouldChimeAfterChatFinishes": true,
 }

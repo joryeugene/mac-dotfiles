@@ -1104,12 +1104,23 @@ local function setup_keymaps()
     end
   end
 
-  -- VSCode style mappings
   -- Terminal toggles (ensure ToggleTerm is loaded)
   test_keymap('n', '<C-[>', ':bprevious<CR>')
   test_keymap('n', '<C-]>', ':bnext<CR>')
   test_keymap('n', 'H', ':bprevious<CR>')  -- Alternative buffer navigation
   test_keymap('n', 'L', ':bnext<CR>')
+
+  -- Cursor AI integration
+  test_keymap('n', '<leader>cc', ':!cursor %<CR>')  -- Open current file in Cursor
+  test_keymap('n', '<leader>cd', ':!cursor .<CR>')  -- Open current directory in Cursor
+  test_keymap('n', '<leader>cp', ':!cursor ' .. vim.fn.getcwd() .. '<CR>')  -- Open project root in Cursor
+  test_keymap('n', '<leader>cs', function()  -- Open selected files in Cursor
+    local visual_selection = vim.fn.getregion("v")
+    if visual_selection and #visual_selection > 0 then
+      local selection_content = table.concat(visual_selection, "\n")
+      vim.cmd("!cursor " .. selection_content)
+    end
+  end)
 
   -- Explorer and sidebar
   test_keymap('n', '<C-e>', ':Neotree toggle<CR>')
