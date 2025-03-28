@@ -21,6 +21,28 @@ M.plugins = {
   -- Claude Code AI
   require("plugins.claude-code").spec,
 
+  -- Avante.nvim: AI generative tool like Cursor.AI
+  {
+    "yetone/avante.nvim",
+    lazy = true,
+    build = "make",
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+      "stevearc/dressing.nvim",
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+      { "MeanderingProgrammer/render-markdown.nvim", ft = { "markdown", "Avante" } },
+    },
+    opts = { provider = "claude" },
+    keys = {
+      { "<leader>aa", "<cmd>AvanteAsk<CR>", desc = "Ask AI with Avante" },
+      { "<leader>ar", "<cmd>AvanteRefresh<CR>", desc = "Refresh Avante AI" },
+    },
+    config = function()
+      require("avante").setup({ provider = "claude" })
+    end,
+  },
+
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
@@ -1337,5 +1359,8 @@ function M.setup()
   setup_keymaps()
   setup_autocmds()
 end
+
+-- Define AvanteInputPromptSign to resolve 'Unknown sign' error in avante.nvim
+vim.fn.sign_define("AvanteInputPromptSign", { text = "", texthl = "DiagnosticWarn", linehl = "" })
 
 return M
